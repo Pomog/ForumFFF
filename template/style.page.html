@@ -1,0 +1,76 @@
+{{template "body" .}}
+{{define "styleBlock"}}
+<style>
+    body {
+        background-color: #1a1a1a;
+        color: #ccc;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    header {
+        background-color: #333;
+        padding: 10px;
+        text-align: center;
+    }
+
+    header img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    nav {
+        background-color: #444;
+        padding: 10px;
+        text-align: center;
+    }
+
+    nav a {
+        color: #ccc;
+        text-decoration: none;
+        padding: 0 15px;
+        font-weight: bold;
+    }
+
+    nav a:hover {
+        color: #fff;
+    }
+
+    section {
+        padding: 20px;
+    }
+
+    .latest-news {
+        background-color: #222;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .theme-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .theme-list li {
+        border-bottom: 1px solid #333;
+        padding: 15px 0;
+    }
+
+    .theme-list a {
+        color: #ccc;
+        text-decoration: none;
+    }
+
+    .theme-list a:hover {
+        color: #fff;
+    }
+
+    footer {
+        background-color: #333;
+        padding: 10px;
+        text-align: center;
+    }
+</style>
+{{end}}
