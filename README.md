@@ -1,2 +1,2 @@
 # ForumFFF
-Online forum for MMORPG fans
+Online forum for MMORPG fans and friends!
