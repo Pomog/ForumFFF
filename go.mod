@@ -1,3 +1,3 @@
 module github.com/Pomog/ForumFFF
 
-go 1.21.3
+go 1.21
