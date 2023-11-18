@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FanForgeForum</title>
+    <style>
+      .underTable{
+        background-color: #232427;
+      }
+      #navbarTop {
+        height: 6em;
+      }
+
+      .whiteLink{
+        color: beige;
+      }
+      .forumTable{
+        width: 100%;
+      }
+      .forumFirstCol{
+        width: 80%;
+      }
+
+ 
+      .containerHead {
+        background-color: rgb(7, 11, 20);
+        margin-bottom: 0;
+      }
+      .containerBody {
+        background: linear-gradient(to bottom, #eef1f1, #101113);
+        margin-top: 0;
+      }
+
+      .main-footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 5em;
+        padding: 1em;
+        background-color: rgb(24, 24, 24);
+        margin-top: 2em;
+        color: aliceblue;
+      }
+
+      #form-search{
+        margin-right: 5em;
+      }
+      .login_and_register{
+
+        color: aliceblue;
+      }
+
+    </style>
+</head>
+<body>
+  <nav id="navbarTop" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">Fan.Forge.Forum.</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+          </li> -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Games
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#">L2</a></li>
+              <li><a class="dropdown-item" href="#">L3</a></li>
+              <li><a class="dropdown-item" href="#">New World</a></li>
+              <li><a class="dropdown-item" href="#">AION</a></li>
+              <li><a class="dropdown-item" href="#">Conan</a></li>
+              <li><a class="dropdown-item" href="#">WoW</a></li>
+              <li><a class="dropdown-item" href="#">GW2</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#">Random Topic</a></li>
+            </ul>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+          </li> -->
+        </ul>
+        <form class="d-flex" id="form-search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-light" type="submit">Search</button>
+        </form>
+        <div>
+          <a class="login_and_register" href="login.html">Log-in</a>
+          <a class="login_and_register" href="register.html">Register</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+      
+
+      <div class="container">
+        <div class="d-flex containerHead align-items-center p-3 my-3 mb-0 text-white rounded shadow-sm">
+          <!-- <img class="me-3" src="/docs/5.0/assets/brand/bootstrap-logo-white.svg" alt="" width="48" height="38"> -->
+          <div class="lh-1">
+            <h1 class="h6 mb-0 text-white lh-1">Quick Links</h1>
+          </div>
+        </div>
+        <div class="d-flex containerBody align-items-center p-3 mt-0 text-white rounded shadow-sm">
+          <table class="table table-borderless">
+            <tbody>
+              <tr>
+                <td> <a class="whiteLink" href="rulles.html">Rulles</a></td>
+                <td> <a class="whiteLink" href="contact.html">Contact</a></td>
+                <td> <a class="whiteLink" href="support.html">Support</a></td>
+                <td> <a class="whiteLink" href="disscussion.html">Disscussion</a></td>
+              </tr>
+              <tr>
+                <td> <a class="whiteLink" href="lineage2.html">Lineage2</a></td>
+                <td> <a class="whiteLink" href="lineage3.html">Lineage3</a></td>
+                <td> <a class="whiteLink" href="newworld.html">New World</a></td>
+                <td> <a class="whiteLink" href="aion.html">AION</a></td>
+                <td> <a class="whiteLink" href="wow.html">WOW</a></td>
+                <td> <a class="whiteLink" href="guildwars2.html">Guild Wars 2</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+
+        <table class="table-borderless forumTable whiteLink mt-3">
+          <thead class="containerHead">
+            <tr >
+              <th class="forumFirstCol" scope="col">Forums</th>
+              <th scope="col">Latest Message</th>
+              <th scope="col">Total Messages</th>
+            </tr>
+          </thead>
+          <tbody class="containerBody">
+            <tr>
+              <td>Mark</td>
+              <td>Otto</td>
+              <td>@mdo</td>
+            </tr>
+            <tr>
+              <td>Jacob</td>
+              <td>Thornton</td>
+              <td>@fat</td>
+            </tr>
+            <tr>
+              <td colspan="2">Larry the Bird</td>
+              <td>@twitter</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      
+      <div class="row main-footer">
+        <div class="col">
+          Left
+        </div>
+        <div class="col">
+          Middle
+        </div>
+        <div class="col">
+          Right
+        </div>
+      </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+</body>
+</html>
