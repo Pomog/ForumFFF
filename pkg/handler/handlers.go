@@ -50,3 +50,9 @@ func (m *Repository) AboutHandler(w http.ResponseWriter, r *http.Request) {
 		StringMap: map[string]string{"test": "this is test data!"},
 	})
 }
+
+// MainHandler is a method of the Repository struct that handles requests to the main page.
+// It renders the "home.page.html" template to the provided HTTP response writer.
+func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
+	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{})
+}
