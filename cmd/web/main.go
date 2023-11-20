@@ -15,6 +15,7 @@ const Port = ":8080"
 var app config.AppConfig
 
 func main() {
+
 	err := run()
 	if err != nil {
 		log.Fatal(err)
