@@ -1,0 +1,161 @@
+{{template "body" .}}
+
+{{define "style"}}
+    <style>
+      .logo_img{
+      max-width: 3%;
+      max-height: auto;
+    }
+
+    .ava_img{
+      max-width: 50%;
+      max-height: auto;
+    }
+    .navbar-brand{
+      font-family: 'MedievalSharp', cursive;
+      font-size: 3em;
+    }
+    .underTable{
+      background-color: #232427;
+    }
+    #navbarTop {
+      height: 6em;
+    }
+
+    .whiteLink{
+      color: rgb(225, 225, 225);
+    }
+    .forumTable{
+      width: 100%;
+    }
+    .forumFirstCol{
+      width: 15%;
+    }
+
+    td {
+        padding: 10px; /* Adjust the value as needed */
+      }
+      th {
+        padding: 10px; /* Adjust the value as needed */
+      }
+
+    .custom-container{
+      max-width: 1800px;
+    }
+    .containerHead {
+      background-color: rgb(24, 22, 33)
+
+    }
+    .navBar{
+      background-color: rgb(24, 22, 33)
+    }
+    .containerBody {
+      background: linear-gradient(to bottom, rgb(36, 33, 49), rgb(24, 22, 33));
+      margin-top: 0;
+    }
+
+    .main-footer {
+      /* position: fixed; */
+      bottom: 0;
+      margin-left: 0;
+      width: 100%;
+      height: 5em;
+        padding: 3em;
+        background-color: rgb(2, 0, 7);
+        margin-top: 2em;
+        color: aliceblue;
+      }
+
+      #form-search{
+        margin-right: 5em;
+      }
+      .login_and_register{
+        color: aliceblue;
+      }
+
+      body{
+        background-color: rgb(13, 11, 20);
+      }
+    </style>
+    
+{{end}}
+{{define "centralPart"}}
+<div class="container custom-container">
+  <table class="table-borderless forumTable whiteLink mt-3">
+    <thead class="containerHead">
+      <tr >
+        <th class="forumFirstCol" scope="col">Quick Links</th>
+      </tr>
+    </thead>
+    <tbody class="containerBody">
+      <tr>
+         <td>
+          <a class="whiteLink" href="rulles.html">Rulles; </a>&nbsp; 
+          <a class="whiteLink" href="contact.html">Contact; </a>&nbsp; 
+          <a class="whiteLink" href="support.html">Support;</a>&nbsp; 
+          <a class="whiteLink" href="disscussion.html">Disscussion;</a>&nbsp;
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <a class="whiteLink" href="lineage2.html">Lineage2; </a>&nbsp; 
+          <a class="whiteLink" href="lineage3.html">Lineage3; </a>&nbsp; 
+          <a class="whiteLink" href="newworld.html">New World; </a>&nbsp; 
+          <a class="whiteLink" href="aion.html">AION;</a>&nbsp; 
+          <a class="whiteLink" href="wow.html">WOW;</a>&nbsp;
+          <a class="whiteLink" href="guildwars2.html">Guild Wars 2;</a>&nbsp; 
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  
+  <table class="table-borderless forumTable whiteLink mt-3">
+    <thead class="containerHead">
+      <tr >
+        <th class="forumFirstCol" scope="col" colspan="2">Project TL</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody class="containerBody">
+      <tr>
+        <td>
+          <img src="static\ava\pomogadryg_ava.png" class="ava_img" alt="ava"><strong> &nbsp; Pomogadryg </strong><br>Date of Registration: 10.05.2015 <br> Total Messages: 211
+        </td>
+        <td> 
+        </td>
+        <td> <em>"Project TL (Lineage 3 or Lineage Eternal) release date 
+          is a matter of speculation for nearly a decade. It was 
+          initially announced in 2011, but after delays and complications, 
+          the third installment in the Lineage series has not yet seen the 
+          light of day, nor do we have any vague release date set."</em> 
+          <br>
+          <br>I will play this game, cuz it looks really cool. Who else is going to play it?
+          <br> Posted: 10-11-2023 [15:12]
+          <br>Like 0 👍&nbsp; &nbsp; Dislike 0 👎
+        
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <img src="static\ava\pomog_ava.png" class="ava_img" alt="ava"><strong> &nbsp; Pomog </strong><br>Date of Registration: 05.07.2017 <br> Total Messages: 121
+        </td>
+        <td> 
+        </td>
+        <td> <em>From <strong>Pomogadryg:</strong>&nbsp;"I will play this game, cuz it looks really cool. 
+          Who else is going to play it?"</em> 
+          <br>
+          <br>And what about Kood Johvi? When you going to finish Form???
+          <br> Posted: 10-11-2023 [15:45]
+          <br>Like 1 👍&nbsp; &nbsp; Dislike 👎
+        
+        </td>
+      </tr>
+
+
+    </tbody>
+  </table>
+</div>
+{{end}}

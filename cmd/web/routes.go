@@ -11,5 +11,6 @@ func rounts(a *config.AppConfig) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handler.Repo.MainHandler)
 	mux.HandleFunc("/about", handler.Repo.AboutHandler)
+	mux.HandleFunc("/theme", handler.Repo.ThemeHandler)
 	return mux
 }
