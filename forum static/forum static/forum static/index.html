@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    <title>FanForgeForum</title>
+    <style>
+      .logo_img{
+        max-width: 3%;
+        max-height: auto;
+      }
+      .navbar-brand{
+        font-family: 'MedievalSharp', cursive;
+        font-size: 3em;
+      }
+      .underTable{
+        background-color: #232427;
+      }
+      #navbarTop {
+        height: 6em;
+      }
+
+      .whiteLink{
+        color: rgb(225, 225, 225);
+      }
+      .forumTable{
+        width: 100%;
+      }
+      .forumFirstCol{
+        width: 70%;
+      }
+
+      td {
+          padding: 10px; /* Adjust the value as needed */
+        }
+        th {
+          padding: 10px; /* Adjust the value as needed */
+        }
+
+      .custom-container{
+        max-width: 1800px;
+      }
+      .containerHead {
+        background-color: rgb(24, 22, 33)
+
+      }
+      .navBar{
+        background-color: rgb(24, 22, 33)
+      }
+      .containerBody {
+        background: linear-gradient(to bottom, rgb(36, 33, 49), rgb(24, 22, 33));
+        margin-top: 0;
+      }
+
+      .main-footer {
+        /* position: fixed; */
+        bottom: 0;
+        margin-left: 0;
+        width: 100%;
+        height: 5em;
+        padding: 3em;
+        background-color: rgb(2, 0, 7);
+        margin-top: 2em;
+        color: aliceblue;
+      }
+
+      #form-search{
+        margin-right: 5em;
+      }
+      .login_and_register{
+        color: aliceblue;
+      }
+
+      body{
+        background-color: rgb(13, 11, 20);
+      }
+
+    </style>
+</head>
+<body>
+  <nav id="navbarTop" class="navbar navbar-expand-lg navbar-dark navBar">
+    <div class="container-fluid">
+      <img src="static\logo\10.png" class="logo_img" alt="logo"><a class="navbar-brand" href="index.html">Fan.Forge.Forum.</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+          </li> -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Games
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#">L2</a></li>
+              <li><a class="dropdown-item" href="#">L3</a></li>
+              <li><a class="dropdown-item" href="#">New World</a></li>
+              <li><a class="dropdown-item" href="#">AION</a></li>
+              <li><a class="dropdown-item" href="#">Conan</a></li>
+              <li><a class="dropdown-item" href="#">WoW</a></li>
+              <li><a class="dropdown-item" href="#">GW2</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#">Random Topic</a></li>
+            </ul>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+          </li> -->
+        </ul>
+        <form class="d-flex" id="form-search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-light" type="submit">Search</button>
+        </form>
+        <div>
+          <a class="login_and_register" href="login.html">Log-in</a>
+          <a class="login_and_register" href="register.html">Register</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+      
+
+      <div class="container custom-container">
+        <table class="table-borderless forumTable whiteLink mt-3">
+          <thead class="containerHead">
+            <tr >
+              <th class="forumFirstCol" scope="col">Quick Links</th>
+            </tr>
+          </thead>
+          <tbody class="containerBody">
+            <tr>
+               <td>
+                <a class="whiteLink" href="rulles.html">Rulles; </a>&nbsp; 
+                <a class="whiteLink" href="contact.html">Contact; </a>&nbsp; 
+                <a class="whiteLink" href="support.html">Support;</a>&nbsp; 
+                <a class="whiteLink" href="disscussion.html">Disscussion;</a>&nbsp;
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <a class="whiteLink" href="lineage2.html">Lineage2; </a>&nbsp; 
+                <a class="whiteLink" href="lineage3.html">Lineage3; </a>&nbsp; 
+                <a class="whiteLink" href="newworld.html">New World; </a>&nbsp; 
+                <a class="whiteLink" href="aion.html">AION;</a>&nbsp; 
+                <a class="whiteLink" href="wow.html">WOW;</a>&nbsp;
+                <a class="whiteLink" href="guildwars2.html">Guild Wars 2;</a>&nbsp; 
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="table-borderless forumTable whiteLink mt-3">
+          <thead class="containerHead">
+            <tr >
+              <th class="forumFirstCol" scope="col">Forums</th>
+              <th scope="col">Latest Message</th>
+              <th scope="col">Total Messages</th>
+            </tr>
+          </thead>
+          <tbody class="containerBody">
+            <tr>
+              <td> 
+                <img src="static\logo\message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp; Project TL: </strong>Project TL (Lineage 3 or Lineage Eternal) release date is a matter of speculation for nearly a decade. It was initially announced in 2011, but after delays and complications, the third installment in the Lineage series has not yet seen the light of day, nor do we have any vague release date set.
+              </td>
+              <td>From: Pomogadryg - I will play this game... <br> Posted: 10-12-2023</td>
+              <td>5 messages</td>
+            </tr>
+
+            <tr>
+              <td> 
+                <img src="static\logo\message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp;WoW Classic: </strong>New Lost and Found NPC in Booty Bay - WoW Classic. In the latest update to WoW Classic, Patch 1.15.0, Blizzard has added a new NPC to Booty Bay named "Rix Xizzix" who is a Lost and Found Vendor.
+              </td>
+              <td>From: SomeOneElse - Another Comment here<br> Posted: 21-2-2023</td>
+              <td>1 message</td>
+            </tr>
+            <tr>
+              <td>
+                <img src="static\logo\message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp; Project TL: </strong>Project TL (Lineage 3 or Lineage Eternal) release date is a matter of speculation for nearly a decade. It was initially announced in 2011, but after delays and complications, the third installment in the Lineage series has not yet seen the light of day, nor do we have any vague release date set.
+              </td>
+              <td>From: Pomogadryg - I will play this game...<br> Posted: 10-11-2022</td>
+              <td>5 messages</td>
+            </tr>
+            <tr>
+              <td>
+                <img src="static\logo\message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp; Upcoming MMO: </strong>A new MMO titled "Legends of Eternia" has been teased by a renowned game studio. Little is known about the gameplay or setting, but rumors suggest it will revolutionize the genre.
+              </td>
+              <td>From: Adventurer88 - Excited for this one!<br> Posted: 22-12-2022</td>
+              <td>8 messages</td>
+            </tr>
+            <tr>
+              <td>
+                <img src="static\logo\message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp; Fantasy RPG News: </strong>An unconfirmed leak reveals details about an upcoming fantasy RPG. Speculations about its vast open world and intricate storyline have sparked interest among gaming enthusiasts.
+              </td>
+              <td>From: QuestMaster21 - Can't wait to explore!<br> Posted: 21-11-2023</td>
+              <td>12 messages</td>
+            </tr>
+            <tr>
+              <td>
+                <img src="static\logo\message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp; Sci-Fi MMO Announcement: </strong>A renowned game studio has officially announced the development of a new sci-fi MMO. The teaser trailer hints at futuristic worlds and advanced gameplay mechanics.
+              </td>
+              <td>From: SpaceExplorerX - Ready to embark on this journey!<br> Posted: 02-12-2023</td>
+              <td>6 messages</td>
+            </tr>
+            <tr>
+              <td>
+                <img src="static\logo\message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp; MMORPG Update: </strong>An existing MMORPG is set to receive a major update, promising new quests, improved graphics, and enhanced gameplay mechanics.
+              </td>
+              <td>From: GamerGirl123 - Exciting times ahead!<br> Posted: 10-11-2022</td>
+              <td>10 messages</td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      
+      <div class="row main-footer">
+        <table>
+          <thead>
+            <tr>
+              <th>Website</th>
+              <th>Advertising</th>
+              <th>Privacy Policy</th>
+              <th>Forum Rules</th>
+              <th>Contact Us</th>
+              <th>Help</th>
+              <th>Archive</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+</body>
+</html>
