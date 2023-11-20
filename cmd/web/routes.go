@@ -7,7 +7,7 @@ import (
 	"github.com/Pomog/ForumFFF/pkg/handler"
 )
 
-func rounts(a *config.AppConfig) http.Handler {
+func routes(a *config.AppConfig) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handler.Repo.MainHandler)
 	mux.HandleFunc("/about", handler.Repo.AboutHandler)

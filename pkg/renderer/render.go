@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -14,12 +15,15 @@ import (
 // this var serves to pass data from main.go to render.go
 var app *config.AppConfig
 
+var pathToTemplates = "./template"
+var functions = template.FuncMap{}
+
 // NewTemplate sets the config for the template package
 func NewTemplate(a *config.AppConfig) {
 	app = a
 }
 
-func AddDefaultData(td *models.TemplateData) *models.TemplateData{
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
 	return td
 }
 
@@ -32,16 +36,16 @@ func RendererTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateDat
 		templateCache = app.TemplateCache
 	} else {
 		templateCache, _ = CreateTemplateCache()
+		log.Println("Using CreateTemplateCache")
 	}
 
 	//get requested template from cache
 	t, ok := templateCache[tmpl]
 	if !ok {
-		log.Fatal(ok)
+		log.Fatal("could not get template from template cache")
 	}
 
-	td=AddDefaultData(td)
-
+	td = AddDefaultData(td)
 
 	//optional final error check
 	buf := new(bytes.Buffer)
@@ -55,37 +59,44 @@ func RendererTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateDat
 
 }
 
+// create a template cache
 func CreateTemplateCache() (map[string]*template.Template, error) {
 	myCache := map[string]*template.Template{}
 
-	//get all of the files named *.page.html(or tmpl) from ./template
-	pages, err := filepath.Glob("./template/*.page.html")
+	// get all files *.page.tmpl from templates ./templates
+	pages, err := filepath.Glob(fmt.Sprintf("%s/*.page.html", pathToTemplates))
 	if err != nil {
+		log.Println("error getting pages from templates ", err)
 		return myCache, err
 	}
-
-	//range through all files ending with *.page.html (or tmpl)
+	log.Println("pages: ", pages)
+	
+	// range over pages
 	for _, page := range pages {
-		//here page - is a full path to the file, and we need only name of the file
+		// get file name
 		name := filepath.Base(page)
-		templateSet, err := template.New(name).ParseFiles(page)
+		log.Println("currently parsing page: ", page)
+		// parse page
+		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
+			log.Println("error parsing page ", err)
 			return myCache, err
 		}
-
-		matches, err := filepath.Glob("./template/*.layout.html")
+		// get base layout
+		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.html", pathToTemplates))
 		if err != nil {
+			log.Println("error getting base layout ", err)
 			return myCache, err
 		}
 		if len(matches) > 0 {
-			templateSet, err = templateSet.ParseGlob("./template/*.layout.html")
+			ts, err = ts.ParseGlob(fmt.Sprintf("%s/*.layout.html", pathToTemplates))
 			if err != nil {
+				log.Println("error parsing base layout ", err)
 				return myCache, err
 			}
 		}
-		myCache[name] = templateSet
-
+		// add to cache
+		myCache[name] = ts
 	}
 	return myCache, nil
-
 }
