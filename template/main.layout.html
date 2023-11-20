@@ -6,93 +6,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="/static/css/styles.css">
+
     <title>FanForgeForum</title>
-    <style>
-      .logo_img{
-        max-width: 3%;
-        max-height: auto;
-      }
-      .navbar-brand{
-        font-family: 'MedievalSharp', cursive;
-        font-size: 3em;
-      }
-      .underTable{
-        background-color: #232427;
-      }
-      #navbarTop {
-        height: 6em;
-      }
 
-      .whiteLink{
-        color: rgb(225, 225, 225);
-      }
-      .forumTable{
-        width: 100%;
-      }
-      .forumFirstCol{
-        width: 70%;
-      }
-
-      td {
-          padding: 10px; /* Adjust the value as needed */
-        }
-        th {
-          padding: 10px; /* Adjust the value as needed */
-        }
-
-      .custom-container{
-        max-width: 1800px;
-      }
-      .containerHead {
-        background-color: rgb(24, 22, 33)
-
-      }
-      .navBar{
-        background-color: rgb(24, 22, 33)
-      }
-      .containerBody {
-        background: linear-gradient(to bottom, rgb(36, 33, 49), rgb(24, 22, 33));
-        margin-top: 0;
-      }
-
-      .main-footer {
-        /* position: fixed; */
-        bottom: 0;
-        margin-left: 0;
-        width: 100%;
-        height: 5em;
-        padding: 3em;
-        background-color: rgb(2, 0, 7);
-        margin-top: 2em;
-        color: aliceblue;
-      }
-
-      #form-search{
-        margin-right: 5em;
-      }
-      .login_and_register{
-        color: aliceblue;
-      }
-
-      body{
-        background-color: rgb(13, 11, 20);
-      }
-
-        /* Normal state */
-            a {
-                color: rgb(212, 212, 212); /* Default color */
-                text-decoration: none; /* Remove underline, adjust as needed */
-            }
-
-            /* Hover state */
-            a:hover {
-                color: rgb(255, 255, 255); /* Color on hover */
-            }
-    </style>
-    {{block "style" .}}
-    {{end}}
 </head>
 <body>
   <nav id="navbarTop" class="navbar navbar-expand-lg navbar-dark navBar">
@@ -140,8 +60,7 @@
       </div>
     </div>
   </nav>
-    {{block "styleBlock" .}}
-    {{end}}
+
     </head>
     <body>
         {{block "centralPart" .}}
