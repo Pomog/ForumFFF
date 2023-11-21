@@ -69,11 +69,11 @@ section {
     color: #fff;
 }
 
-footer {
+/* footer {
     background-color: #333;
     padding: 10px;
     text-align: center;
-}
+} */
 
   .logo_img{
     max-width: 3%;
@@ -128,7 +128,7 @@ footer {
     margin-top: 0;
   }
 
-  .main-footer {
+ footer {
     /* position: fixed; */
     bottom: 0;
     margin-left: 0;
