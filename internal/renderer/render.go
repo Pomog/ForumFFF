@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/Pomog/ForumFFF/pkg/config"
-	"github.com/Pomog/ForumFFF/pkg/models"
+	"github.com/Pomog/ForumFFF/internal/config"
+	"github.com/Pomog/ForumFFF/internal/models"
 )
 
 // this var serves to pass data from main.go to render.go
