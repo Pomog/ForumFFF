@@ -59,7 +59,7 @@
         </form>
         <div>
           <a class="btn login_and_register" data-bs-toggle="modal" data-bs-target="#logInModal" href="login.html">Log-in</a>
-          <a class="btn login_and_register" data-bs-toggle="modal" data-bs-target="#registrModal" href="register.html">Register</a>
+          <a class="btn login_and_register" data-bs-toggle="modal" data-bs-target="#registerModal" href="register.html">Register</a>
         </div>
       </div>
     </div>
@@ -86,9 +86,51 @@
             </table>
           </div>
         </footer>
-   
+        
+        <!-- Modal Register -->
+        <form action="/" method="POST">
+          <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="registerModalLabel">Register:</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form>
+                    <div class="mb-3">
+                      <label for="nickName" class="col-form-label">Nickname:</label>
+                      <input type="text" class="form-control" name="nickName" id="nickName">
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="emailRegistr" class="col-form-label">@email:</label>
+                      <input type="email" class="form-control" name="emailRegistr" id="emailRegistr">
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="passwordReg" class="col-form-label">password:</label>
+                      <input type="password" class="form-control" name="passwordReg" id="passwordReg">
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="passwordRep" class="col-form-label"> repeat your password:</label>
+                      <input type="password" class="form-control" name="passwordRep" id="passwordRep">
+                    </div>
+
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary" >Submit</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+      </form>
+
         <!-- Modal Log-in -->
-        <form action="" method="post">
+        <form action="/" method="POST">
           <div class="modal fade" id="logInModal" tabindex="-1" aria-labelledby="logInModalLabel" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -101,16 +143,16 @@
                   <div class="col">
                     <div class="row" id="log-in-modal">
                       <div class="col">
-                        <input required class="form-control" type="email" name="email" id="email" placeholder="@email">
+                        <input required class="form-control" type="email" name="emailLogIn" id="emailLogIn" placeholder="@emailLogIn">
                       </div>
                       <div class="col">
-                        <input required class="form-control" type="text" name="password" id="password" placeholder="password">
+                        <input required class="form-control" type="password" name="passwordLogIn" id="passwordLogIn" placeholder="password">
                       </div>
                     </div>
                   </div>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Log-in</button>
+                <button type="submit" class="btn btn-primary" >Log-in</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 
               </div>
@@ -119,40 +161,7 @@
         </div>
       </form>
 
-       <!-- Modal registration-->
-       <form action="" method="post">
-        <div class="modal fade" id="registrModal" tabindex="-1" aria-labelledby="registrModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="registration-label">Registration:</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col">
-                  <div class="row" id="registration-modal">
-                    <div class="col">
-                      <input required class="form-control" type="email" name="email" id="email" placeholder="@email">
-                    </div>
-                    <div class="col">
-                      <input required class="form-control" type="text" name="password" id="password" placeholder="password">
-                    </div>
-                    <div class="col">
-                      <input required class="form-control" type="text" name="password" id="password" placeholder="repeat password">
-                    </div>
-                  </div>
-                  </div>
-                  </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary">Log-in</button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              
-            </div>
-          </div>
-        </div>
-      </div>
-    </form>
+      
 
         
         
