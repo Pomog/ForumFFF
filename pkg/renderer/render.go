@@ -36,7 +36,7 @@ func RendererTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateDat
 		templateCache = app.TemplateCache
 	} else {
 		templateCache, _ = CreateTemplateCache()
-		log.Println("Using CreateTemplateCache")
+		// log.Println("Using CreateTemplateCache")
 	}
 
 	//get requested template from cache
@@ -54,7 +54,7 @@ func RendererTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateDat
 	//render the template
 	_, err := buf.WriteTo(w)
 	if err != nil {
-		log.Println("error writting template to brwoser ", err)
+		// log.Println("error writting template to brwoser ", err)
 	}
 
 }
@@ -66,32 +66,32 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 	// get all files *.page.tmpl from templates ./templates
 	pages, err := filepath.Glob(fmt.Sprintf("%s/*.page.html", pathToTemplates))
 	if err != nil {
-		log.Println("error getting pages from templates ", err)
+		// log.Println("error getting pages from templates ", err)
 		return myCache, err
 	}
-	log.Println("pages: ", pages)
-	
+	// log.Println("pages: ", pages)
+
 	// range over pages
 	for _, page := range pages {
 		// get file name
 		name := filepath.Base(page)
-		log.Println("currently parsing page: ", page)
+		// log.Println("currently parsing page: ", page)
 		// parse page
 		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
-			log.Println("error parsing page ", err)
+			// log.Println("error parsing page ", err)
 			return myCache, err
 		}
 		// get base layout
 		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.html", pathToTemplates))
 		if err != nil {
-			log.Println("error getting base layout ", err)
+			// log.Println("error getting base layout ", err)
 			return myCache, err
 		}
 		if len(matches) > 0 {
 			ts, err = ts.ParseGlob(fmt.Sprintf("%s/*.layout.html", pathToTemplates))
 			if err != nil {
-				log.Println("error parsing base layout ", err)
+				// log.Println("error parsing base layout ", err)
 				return myCache, err
 			}
 		}

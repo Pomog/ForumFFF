@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/Pomog/ForumFFF/pkg/config"
@@ -33,6 +34,24 @@ func NewHandlers(r *Repository) {
 // MainHandler is a method of the Repository struct that handles requests to the main page.
 // It renders the "home.page.html" template to the provided HTTP response writer.
 func (m *Repository) MainHandler(w http.ResponseWriter, r *http.Request) {
+	emailLog := r.FormValue("emailLogIn")
+	passLog := r.FormValue("passwordLogIn")
+
+	nickname := r.FormValue("nickName")
+	emailReg := r.FormValue("emailRegistr")
+	passwordReg := r.FormValue("passwordReg")
+	passwordRep := r.FormValue("passwordRep")
+
+	if emailLog != "" {
+		fmt.Println("log:", emailLog)
+		fmt.Println("pass:", passLog)
+	} else if nickname != "" {
+		fmt.Println("nickname:", nickname)
+		fmt.Println("emailReg:", emailReg)
+		fmt.Println("passwordReg:", passwordReg)
+		fmt.Println("passwordRep:", passwordRep)
+	}
+
 	renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{})
 }
 
