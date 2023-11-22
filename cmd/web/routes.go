@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Pomog/ForumFFF/pkg/config"
-	"github.com/Pomog/ForumFFF/pkg/handler"
+	"github.com/Pomog/ForumFFF/internal/config"
+	"github.com/Pomog/ForumFFF/internal/handler"
 )
 
 func routes(a *config.AppConfig) http.Handler {

@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Pomog/ForumFFF/pkg/config"
-	"github.com/Pomog/ForumFFF/pkg/handler"
-	"github.com/Pomog/ForumFFF/pkg/renderer"
+	"github.com/Pomog/ForumFFF/internal/config"
+	"github.com/Pomog/ForumFFF/internal/handler"
+	"github.com/Pomog/ForumFFF/internal/renderer"
 )
 
 const Port = ":8080"
