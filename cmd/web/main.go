@@ -5,9 +5,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Pomog/ForumFFF/pkg/config"
-	"github.com/Pomog/ForumFFF/pkg/handler"
-	"github.com/Pomog/ForumFFF/pkg/renderer"
+	"github.com/Pomog/ForumFFF/driver"
+	"github.com/Pomog/ForumFFF/internal/config"
+	"github.com/Pomog/ForumFFF/internal/handler"
+	"github.com/Pomog/ForumFFF/internal/renderer"
 )
 
 const Port = ":8080"
@@ -15,6 +16,8 @@ const Port = ":8080"
 var app config.AppConfig
 
 func main() {
+
+	driver.MakeDB()
 
 	err := run()
 	if err != nil {

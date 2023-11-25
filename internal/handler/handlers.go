@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Pomog/ForumFFF/pkg/config"
-	"github.com/Pomog/ForumFFF/pkg/models"
-	"github.com/Pomog/ForumFFF/pkg/renderer"
+	"github.com/Pomog/ForumFFF/internal/config"
+	"github.com/Pomog/ForumFFF/internal/forms"
+	"github.com/Pomog/ForumFFF/internal/models"
+	"github.com/Pomog/ForumFFF/internal/renderer"
 )
 
 // TemplateData holds data sent from handlers to templates
@@ -52,7 +53,9 @@ func (m *Repository) MainHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("passwordRep:", passwordRep)
 	}
 
-	renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{})
+	renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
+		Form: forms.NewForm(nil),
+	})
 }
 
 // AboutHandler is a method of the Repository struct that handles requests to the about page.
