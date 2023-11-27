@@ -16,8 +16,6 @@ var app config.AppConfig
 
 func main() {
 
-	// driver.MakeDB()
-
 	err := run()
 	if err != nil {
 		log.Fatal(err)
