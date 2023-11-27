@@ -8,4 +8,4 @@ Online forum for MMORPG fans and friends!
 - [Denys Verves](https://github.com/TartuDen)
 - [Yurii Panasiuk](https://github.com/pomog)
 
-### test bash
+### test bash 2
