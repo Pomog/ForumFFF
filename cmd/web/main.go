@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Pomog/ForumFFF/driver"
+	"github.com/Pomog/ForumFFF/db_driver"
 	"github.com/Pomog/ForumFFF/internal/config"
 	"github.com/Pomog/ForumFFF/internal/handler"
 	"github.com/Pomog/ForumFFF/internal/renderer"
@@ -17,7 +17,7 @@ var app config.AppConfig
 
 func main() {
 
-	driver.MakeDB()
+	db_driver.MakeDBTables()
 
 	err := run()
 	if err != nil {
