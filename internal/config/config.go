@@ -11,4 +11,5 @@ type AppConfig struct {
 	TemplateCache map[string]*template.Template
 	InfoLog       *log.Logger
 	InProduction  bool
+	ErrorLog      *log.Logger
 }
