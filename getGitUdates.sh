@@ -19,17 +19,17 @@ else
     exit 1
 fi
 
-# Switch back to your branch (yurii_dev)
-if git checkout yurii_dev; then
+# Switch back to your branch (den_dev)
+if git checkout den_dev; then
     echo "Switched back to yurii_dev branch successfully"
 else
-    echo "Error: Failed to switch back to yurii_dev branch"
+    echo "Error: Failed to switch back to den_dev branch"
     exit 1
 fi
 
 # Rebase your branch onto the latest changes from the local main branch
 if git rebase main; then
-    echo "Rebased yurii_dev onto main successfully"
+    echo "Rebased den_dev onto main successfully"
 else
     echo "Error: Failed to rebase yurii_dev onto main"
     exit 1
