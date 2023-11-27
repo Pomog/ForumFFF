@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Pomog/ForumFFF/db_driver"
 	"github.com/Pomog/ForumFFF/internal/config"
 	"github.com/Pomog/ForumFFF/internal/handler"
 	"github.com/Pomog/ForumFFF/internal/renderer"
@@ -15,6 +16,8 @@ const Port = ":8080"
 var app config.AppConfig
 
 func main() {
+
+	db_driver.MakeDBTables()
 
 	err := run()
 	if err != nil {

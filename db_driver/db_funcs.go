@@ -2,23 +2,27 @@ package db_driver
 
 import (
 	"database/sql"
-	"net/http"
+	"fmt"
+	"log"
 
-	"github.com/Pomog/ForumFFF/internal/helper"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func MakeDBTables() error {
 	database, err := getDB()
 	if err != nil {
-		helper.ServerError(w, err)
+		log.Println(err)
 		return err
 	}
 	defer database.Close()
 
-	for _, sqlQury := range sqlQurys {
+	sqlQuerys := getQuerys()
 
-		statement, _ := database.Prepare(sqlQury)
+	for _, sqlQury := range sqlQuerys {
+		statement, errPrepare := database.Prepare(sqlQury)
+		if errPrepare != nil {
+			fmt.Println("errPrepare:", errPrepare)
+		}
 
 		defer statement.Close()
 
@@ -27,6 +31,7 @@ func MakeDBTables() error {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -36,22 +41,4 @@ func getDB() (*sql.DB, error) {
 		return nil, err
 	}
 	return database, nil
-}
-
-type myWriter struct{}
-
-var w *myWriter
-
-func (tw *myWriter) Header() http.Header {
-	var h http.Header
-	return h
-}
-
-func (tw *myWriter) WriteHeader(i int) {
-
-}
-
-func (tw *myWriter) Write(b []byte) (int, error) {
-	length := len(b)
-	return length, nil
 }
