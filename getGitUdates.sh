@@ -1,5 +1,5 @@
 #!/bin/bash
-# Use chmod +x getGitUpdates.sh
+# Use chmod +x getGitUdates.sh
 
 echo "Getting Updates from GitHub"
 

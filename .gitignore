@@ -19,3 +19,6 @@
 
 # Go workspace file
 go.work
+
+# Bash Git Update
+getGitUdates.sh
