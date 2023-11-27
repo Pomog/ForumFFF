@@ -21,7 +21,7 @@ fi
 
 # Switch back to your branch (den_dev)
 if git checkout den_dev; then
-    echo "Switched back to yurii_dev branch successfully"
+    echo "Switched back to den_dev branch successfully"
 else
     echo "Error: Failed to switch back to den_dev branch"
     exit 1
@@ -31,7 +31,7 @@ fi
 if git rebase main; then
     echo "Rebased den_dev onto main successfully"
 else
-    echo "Error: Failed to rebase yurii_dev onto main"
+    echo "Error: Failed to rebase den_dev onto main"
     exit 1
 fi
 
