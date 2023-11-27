@@ -7,3 +7,5 @@ Online forum for MMORPG fans and friends!
 ## Authors
 - [Denys Verves](https://github.com/TartuDen)
 - [Yurii Panasiuk](https://github.com/pomog)
+
+### test bash
