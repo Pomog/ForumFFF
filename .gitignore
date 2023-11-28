@@ -19,8 +19,11 @@
 
 # Go workspace file
 go.work
+
 # manual
 # Bash Git Update
-# shell
+# shell command
+# wrong fileName
 getGitUdates.sh
+# corrected fileName
 getGitUpdates.sh
