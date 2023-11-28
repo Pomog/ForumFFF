@@ -9,3 +9,6 @@ Online forum for MMORPG fans and friends!
 - [Yurii Panasiuk](https://github.com/pomog)
 
 ### test bash 2
+test here
+###
+Test Commit
