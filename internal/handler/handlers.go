@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/Pomog/ForumFFF/internal/config"
@@ -35,27 +35,33 @@ func NewHandlers(r *Repository) {
 // MainHandler is a method of the Repository struct that handles requests to the main page.
 // It renders the "home.page.html" template to the provided HTTP response writer.
 func (m *Repository) MainHandler(w http.ResponseWriter, r *http.Request) {
-	emailLog := r.FormValue("emailLogIn")
-	passLog := r.FormValue("passwordLogIn")
 
-	nickname := r.FormValue("nickName")
-	emailReg := r.FormValue("emailRegistr")
-	passwordReg := r.FormValue("passwordReg")
-	passwordRep := r.FormValue("passwordRep")
-
-	if emailLog != "" {
-		fmt.Println("log:", emailLog)
-		fmt.Println("pass:", passLog)
-	} else if nickname != "" {
-		fmt.Println("nickname:", nickname)
-		fmt.Println("emailReg:", emailReg)
-		fmt.Println("passwordReg:", passwordReg)
-		fmt.Println("passwordRep:", passwordRep)
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+	}
+	loginData := models.User{
+		FirstName: r.FormValue("firstName"),
+		LastName:  r.FormValue("lastName"),
+		UserName:  r.FormValue("nickName"),
+		Email:     r.FormValue("emailRegistr"),
+		Password:  r.FormValue("passwordReg"),
 	}
 
-	renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
-		Form: forms.NewForm(nil),
-	})
+	form := forms.NewForm(r.PostForm)
+
+	form.Required("firstName", "lastName", "nickName", "emailRegistr", "passwordReg")
+
+	if !form.Valid() {
+		data := make(map[string]interface{})
+		data["loginData"] = loginData
+		renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
+			Form: form,
+			Data: data,
+		})
+		return
+	}
+
 }
 
 // AboutHandler is a method of the Repository struct that handles requests to the about page.
