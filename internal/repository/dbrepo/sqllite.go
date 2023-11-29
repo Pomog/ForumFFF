@@ -25,13 +25,13 @@ func (m *sqliteBDRepo) UserPresent(userName, email string) (bool, error) {
 	}
 
 	if numRows == 0 {
-		return true, nil
+		return false, nil
 	}
 
-	return false, nil
+	return true, nil
 }
 
-func (m *sqliteBDRepo) InsertUser(r models.User) error {
+func (m *sqliteBDRepo) CreatetUser(r models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -53,16 +53,22 @@ func (m *sqliteBDRepo) InsertUser(r models.User) error {
 	return nil
 }
 
-/*
-var userTable = `CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY,
-    username varchar(100) DEFAULT "",
-    password varchar(100) DEFAULT "",
-    first_name varchar(100) DEFAULT "",
-    last_name varchar(100) DEFAULT "",
-    email varchar(254) DEFAULT "",
-    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    picture TEXT DEFAULT "static/ava/pomog_ava.png",
-    last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)`
-*/
+func (m *sqliteBDRepo) CreatetThread(userID int, thread models.Thread) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `insert into thread
+	(subject, userID)
+	values ($1, $2, )
+	`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		thread.Subject,
+		userID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
