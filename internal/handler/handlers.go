@@ -10,8 +10,6 @@ import (
 	"github.com/Pomog/ForumFFF/internal/renderer"
 )
 
-// TemplateData holds data sent from handlers to templates
-
 // Repo the repository used by the handlers
 var Repo *Repository
 
@@ -72,21 +70,6 @@ func (m *Repository) MainHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-}
-
-// AboutHandler is a method of the Repository struct that handles requests to the about page.
-// It renders the "about.page.html" template to the provided HTTP response writer.
-func (m *Repository) AboutHandler(w http.ResponseWriter, r *http.Request) {
-	//perform some logic
-
-	// stringData := models.TemplateData{
-	// 	StringMap: map[string]string{"test": "this is test data!"},
-	// }
-
-	//send data to the template
-	renderer.RendererTemplate(w, "about.page.html", &models.TemplateData{
-		StringMap: map[string]string{"test": "this is test data!"},
-	})
 }
 
 // MainHandler is a method of the Repository struct that handles requests to the main page.
