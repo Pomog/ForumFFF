@@ -9,7 +9,7 @@ import (
 )
 
 func MakeDBTables() error {
-	database, err := getDB()
+	database, err := GetDB()
 	if err != nil {
 		log.Println(err)
 		return err
@@ -35,7 +35,7 @@ func MakeDBTables() error {
 	return nil
 }
 
-func getDB() (*sql.DB, error) {
+func GetDB() (*sql.DB, error) {
 	database, err := sql.Open("sqlite3", "./mainDB.db")
 	if err != nil {
 		return nil, err
