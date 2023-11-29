@@ -24,7 +24,6 @@ func routes(a *config.AppConfig) http.Handler {
 	// mux.Handle("/static/ava/", http.StripPrefix("/static/ava/", http.FileServer(http.Dir("static/ava"))))
 
 	mux.HandleFunc("/", handler.Repo.MainHandler)
-	mux.HandleFunc("/about", handler.Repo.AboutHandler)
 	mux.HandleFunc("/theme", handler.Repo.ThemeHandler)
 	return mux
 }
