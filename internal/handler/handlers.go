@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -37,10 +36,12 @@ func NewHandlers(r *Repository) {
 // It renders the "home.page.html" template to the provided HTTP response writer.
 func (m *Repository) MainHandler(w http.ResponseWriter, r *http.Request) {
 
+	// Parse the raw request body into r.Form
 	err := r.ParseForm()
 	if err != nil {
 		log.Println(err)
 	}
+	// Create a User struct with data from the HTTP request form
 	loginData := models.User{
 		FirstName: r.FormValue("firstName"),
 		LastName:  r.FormValue("lastName"),
@@ -49,8 +50,10 @@ func (m *Repository) MainHandler(w http.ResponseWriter, r *http.Request) {
 		Password:  r.FormValue("passwordReg"),
 	}
 
+	// Create a new form instance based on the HTTP request's PostForm
 	form := forms.NewForm(r.PostForm)
 
+	// Validation checks for required fields and their specific formats and lengths
 	form.Required("firstName", "lastName", "nickName", "emailRegistr", "passwordReg")
 	form.First_LastName_Min_Max_Len("firstName", 3, 12, r)
 	form.First_LastName_Min_Max_Len("lastName", 3, 12, r)
@@ -58,6 +61,7 @@ func (m *Repository) MainHandler(w http.ResponseWriter, r *http.Request) {
 	form.EmailFormat("emailRegistr", r)
 	form.PassFormat("passwordReg", 6, 15, r)
 
+	// Check if the form data is valid; if not, render the home page with error messages
 	if !form.Valid() {
 		data := make(map[string]interface{})
 		data["loginData"] = loginData
@@ -65,8 +69,7 @@ func (m *Repository) MainHandler(w http.ResponseWriter, r *http.Request) {
 			Form: form,
 			Data: data,
 		})
-		fmt.Println("hereeeeeeee")
-		// return
+		return
 	}
 
 }
