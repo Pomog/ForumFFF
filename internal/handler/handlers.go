@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -51,6 +52,11 @@ func (m *Repository) MainHandler(w http.ResponseWriter, r *http.Request) {
 	form := forms.NewForm(r.PostForm)
 
 	form.Required("firstName", "lastName", "nickName", "emailRegistr", "passwordReg")
+	form.First_LastName_Min_Max_Len("firstName", 3, 12, r)
+	form.First_LastName_Min_Max_Len("lastName", 3, 12, r)
+	form.First_LastName_Min_Max_Len("nickName", 3, 12, r)
+	form.EmailFormat("emailRegistr", r)
+	form.PassFormat("passwordReg", 6, 15, r)
 
 	if !form.Valid() {
 		data := make(map[string]interface{})
@@ -59,7 +65,8 @@ func (m *Repository) MainHandler(w http.ResponseWriter, r *http.Request) {
 			Form: form,
 			Data: data,
 		})
-		return
+		fmt.Println("hereeeeeeee")
+		// return
 	}
 
 }
