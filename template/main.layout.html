@@ -88,6 +88,7 @@
         </footer>
         
         <!-- Modal Register -->
+        {{$res := index .Data "loginData"}}
         <form action="/" method="POST">
           <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -101,12 +102,14 @@
 
                     <div class="mb-3">
                       <label for="firstName" class="col-form-label">First Name:</label>
-                      <input type="text" class="form-control" name="firstName" id="firstName">
+                      <input type="text" class="form-control {{with .Form.Errors.Get "FirstName"}} is-invalid{{end}}" 
+                      name="firstName" value="{{$res.FirstName}}" id="firstName">
                     </div>
 
                     <div class="mb-3">
                       <label for="lastName" class="col-form-label">Last Name:</label>
-                      <input type="text" class="form-control" name="lastName" id="lastName">
+                      <input type="text" class="form-control {{with .Form.Errors.Get "LastName"}} is-invalid {{end}}" 
+                      name="lastName" value="{{$res.LastName}}" id="lastName">
                     </div>
 
                     <div class="mb-3">
