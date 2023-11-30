@@ -37,11 +37,11 @@
                 <form action="/home" method="post">
                     <div class="mb-3">
                         <label for="emailLogIn" class="form-label">Email</label>
-                        <input class="form-control" type="email" name="emailLogIn" id="emailLogIn" >
+                        <input class="form-control" type="email" name="emailLogIn" id="emailLogIn" required>
                     </div>
                     <div class="mb-3">
                         <label for="passwordLogIn" class="form-label">Password</label>
-                        <input class="form-control" type="password" name="passwordLogIn" id="passwordLogIn" >
+                        <input class="form-control" type="password" name="passwordLogIn" id="passwordLogIn" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Login</button>
                 </form>
@@ -52,25 +52,23 @@
                 <form action="/home" method="post">
                     <div class="mb-3">
                         <label for="firstName" class="col-form-label">First Name:</label>
-                      <input type="text" class="form-control {{with .Form.Errors.Get "firstName"}} is-invalid {{end}}" 
-                      name="firstName" value="{{$res.FirstName}}" id="firstName">
+                      <input type="text" class="form-control" name="firstName" value="{{$res.FirstName}}" id="firstName" required>
                     </div>
                     <div class="mb-3">
                         <label for="lastName" class="col-form-label">Last Name:</label>
-                        <input type="text" class="form-control {{with .Form.Errors.Get "lastName"}} is-invalid {{end}}" 
-                        name="lastName" value="{{$res.LastName}}" id="lastName">
+                        <input type="text" class="form-control" name="lastName" value="{{$res.LastName}}" id="lastName" required>
                     </div>
                     <div class="mb-3">
                         <label for="nickName" class="col-form-label">Nickname:</label>
-                        <input type="text" class="form-control" name="nickName" id="nickName">
+                        <input type="text" class="form-control" name="nickName" id="nickName" required>
                     </div>
                     <div class="mb-3">
                         <label for="emailRegistr" class="col-form-label">@email:</label>
-                      <input type="email" class="form-control" name="emailRegistr" id="emailRegistr">
+                      <input type="email" class="form-control" name="emailRegistr" id="emailRegistr" required>
                     </div>
                     <div class="mb-3">
                         <label for="passwordReg" class="col-form-label">password:</label>
-                      <input type="password" class="form-control" name="passwordReg" id="passwordReg">
+                      <input type="password" class="form-control" name="passwordReg" id="passwordReg" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Register</button>
                 </form>
