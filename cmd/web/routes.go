@@ -18,7 +18,8 @@ func routes(a *config.AppConfig) http.Handler {
 		mux.Handle(fmt.Sprintf("/static/%s/", static), http.StripPrefix(fmt.Sprintf("/static/%s/", static), http.FileServer(http.Dir(fmt.Sprintf("static/%s", static)))))
 	}
 
-	mux.HandleFunc("/", handler.Repo.MainHandler)
+	mux.HandleFunc("/", handler.Repo.LoginHandler)
+	mux.HandleFunc("/home", handler.Repo.HomeHandler)
 	mux.HandleFunc("/theme", handler.Repo.ThemeHandler)
 	return mux
 }
