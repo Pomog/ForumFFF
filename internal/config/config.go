@@ -3,6 +3,8 @@ package config
 import (
 	"html/template"
 	"log"
+
+	"github.com/google/uuid"
 )
 
 // AppConfig holds the app config
@@ -12,4 +14,5 @@ type AppConfig struct {
 	InfoLog       *log.Logger
 	InProduction  bool
 	ErrorLog      *log.Logger
+	UserID        *uuid.UUID // This field can hold a UUID value
 }
