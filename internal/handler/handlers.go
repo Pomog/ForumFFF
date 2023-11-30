@@ -30,10 +30,7 @@ func NewHandlers(r *Repository) {
 	Repo = r
 }
 
-// MainHandler is a method of the Repository struct that handles requests to the main page.
-// It renders the "home.page.html" template to the provided HTTP response writer.
-func (m *Repository) MainHandler(w http.ResponseWriter, r *http.Request) {
-
+func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse the raw request body into r.Form
 	err := r.ParseForm()
 	if err != nil {
@@ -63,12 +60,20 @@ func (m *Repository) MainHandler(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 		data := make(map[string]interface{})
 		data["loginData"] = loginData
-		renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
+		renderer.RendererTemplate(w, "log.page.html", &models.TemplateData{
 			Form: form,
 			Data: data,
 		})
 		return
 	}
+
+}
+
+// MainHandler is a method of the Repository struct that handles requests to the main page.
+// It renders the "home.page.html" template to the provided HTTP response writer.
+func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
+
+	renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{})
 
 }
 
