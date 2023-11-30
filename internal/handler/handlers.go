@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -60,12 +61,18 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 		data := make(map[string]interface{})
 		data["loginData"] = loginData
+		fmt.Println("Form:", form.Errors.Get("LastName"))
 		renderer.RendererTemplate(w, "log.page.html", &models.TemplateData{
 			Form: form,
 			Data: data,
 		})
 		return
 	}
+	// if there is no error, we upload Form data into our Session
+	//WHAT to use here?
+
+	//Redirecting when receiving POST request
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 
 }
 
