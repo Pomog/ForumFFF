@@ -8,7 +8,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func MakeDBTables() error {
+func MakeDBTables() (*sql.DB, error) {
 	database, err := GetDB()
 	if err != nil {
 		log.Println(err)
