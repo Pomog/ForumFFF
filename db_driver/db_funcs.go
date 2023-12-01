@@ -8,13 +8,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func MakeDBTables() error {
+func MakeDBTables() (*sql.DB, error) {
 	database, err := GetDB()
 	if err != nil {
 		log.Println(err)
-		return err
+		return database, err
 	}
-	defer database.Close()
 
 	sqlQuerys := getQuerys()
 
@@ -28,11 +27,11 @@ func MakeDBTables() error {
 
 		_, err = statement.Exec()
 		if err != nil {
-			return err
+			return database, err
 		}
 	}
 
-	return nil
+	return database, nil
 }
 
 func GetDB() (*sql.DB, error) {
@@ -40,5 +39,15 @@ func GetDB() (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	errDB := testDB(database)
+	if errDB != nil {
+		return nil, errDB
+	}
 	return database, nil
+}
+
+func testDB(db *sql.DB) error {
+	//Ping verifies a connection to the database is still alive, establishing a connection if necessary.
+	err := db.Ping()
+	return err
 }
