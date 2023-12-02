@@ -8,6 +8,7 @@ import (
 )
 
 func (m *SqliteBDRepo) UserPresent(userName, email string) (bool, error) {
+func (m *SqliteBDRepo) UserPresent(userName, email string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -31,6 +32,7 @@ func (m *SqliteBDRepo) UserPresent(userName, email string) (bool, error) {
 	return true, nil
 }
 
+func (m *SqliteBDRepo) CreateUser(r models.User) error {
 func (m *SqliteBDRepo) GetUserByID(ID int) (models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
