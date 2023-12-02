@@ -1,7 +1,4 @@
-package db_driver
-
-
-
+package repository
 
 var userTable = `CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY,
@@ -43,7 +40,6 @@ var votesTable = `CREATE TABLE IF NOT EXISTS votes (
     FOREIGN KEY (postID) REFERENCES post(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );`
-
 
 func getQuerys() []string {
 	var sqlQuerys []string
