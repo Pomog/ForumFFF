@@ -1,4 +1,4 @@
-package db_driver
+package repository
 
 import (
 	"database/sql"
@@ -8,17 +8,19 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+var dbConnSQL = &DataBase{}
+
 func MakeDBTables() (*sql.DB, error) {
-	database, err := GetDB()
+	dbConn, err := GetDB()
 	if err != nil {
 		log.Println(err)
-		return database, err
+		return dbConn.SQL, err
 	}
 
 	sqlQuerys := getQuerys()
 
 	for _, sqlQury := range sqlQuerys {
-		statement, errPrepare := database.Prepare(sqlQury)
+		statement, errPrepare := dbConn.SQL.Prepare(sqlQury)
 		if errPrepare != nil {
 			fmt.Println("errPrepare:", errPrepare)
 		}
@@ -27,14 +29,14 @@ func MakeDBTables() (*sql.DB, error) {
 
 		_, err = statement.Exec()
 		if err != nil {
-			return database, err
+			return dbConn.SQL, err
 		}
 	}
 
-	return database, nil
+	return dbConn.SQL, nil
 }
 
-func GetDB() (*sql.DB, error) {
+func GetDB() (*DataBase, error) {
 	database, err := sql.Open("sqlite3", "./mainDB.db")
 	if err != nil {
 		return nil, err
@@ -43,7 +45,10 @@ func GetDB() (*sql.DB, error) {
 	if errDB != nil {
 		return nil, errDB
 	}
-	return database, nil
+
+	dbConnSQL.SQL = database
+
+	return dbConnSQL, nil
 }
 
 func testDB(db *sql.DB) error {

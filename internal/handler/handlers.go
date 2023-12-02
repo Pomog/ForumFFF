@@ -8,6 +8,8 @@ import (
 	"github.com/Pomog/ForumFFF/internal/forms"
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
+	"github.com/Pomog/ForumFFF/internal/repository"
+	"github.com/Pomog/ForumFFF/internal/repository/dbrepo"
 )
 
 // Repo the repository used by the handlers
@@ -16,12 +18,14 @@ var Repo *Repository
 // Repositroy is the repository type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseInt
 }
 
 // NewRepo creates a new repository
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *repository.DataBase) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewSQLiteRepo(a, db.SQL),
 	}
 }
 
