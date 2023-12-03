@@ -56,21 +56,25 @@ func (f *Form) EmailFormat(field string, r *http.Request) bool {
 		return false
 	}
 	sliceToCheck := strings.Split(inputData, "@")
-	firstP := sliceToCheck[0]
-	secondP := sliceToCheck[1]
-	if len(firstP) == 0 {
-		f.Errors.Add(field, "Wrong format of Email - should be local part before @, like john@, or nick@")
-		return false
-	}
-	sliceToCheck2 := strings.Split(secondP, ".")
-	domName := sliceToCheck2[0]
-	TLDName := sliceToCheck2[1]
-	if len(domName) == 0 {
-		f.Errors.Add(field, "Wrong format of Email - should be domain name after @, like @gmail, or @yahoo")
-		return false
-	} else if len(TLDName) == 0 {
-		f.Errors.Add(field, "Wrong format of Email - should be TLD after @, like .com or .net")
-		return false
+	if len(sliceToCheck) == 2 {
+		firstP := sliceToCheck[0]
+		secondP := sliceToCheck[1]
+		if len(firstP) == 0 {
+			f.Errors.Add(field, "Wrong format of Email - should be local part before @, like john@, or nick@")
+			return false
+		}
+		sliceToCheck2 := strings.Split(secondP, ".")
+		if len(sliceToCheck2) == 2 {
+			domName := sliceToCheck2[0]
+			TLDName := sliceToCheck2[1]
+			if len(domName) == 0 {
+				f.Errors.Add(field, "Wrong format of Email - should be domain name after @, like @gmail, or @yahoo")
+				return false
+			} else if len(TLDName) == 0 {
+				f.Errors.Add(field, "Wrong format of Email - should be TLD after @, like .com or .net")
+				return false
+			}
+		}
 	}
 	return true
 }
