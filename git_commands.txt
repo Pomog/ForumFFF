@@ -1,0 +1,19 @@
+1. To sync your local main branch with the remote one, discarding local changes, using git fetch and git reset --hard. 
+But be cautious: this overwrites local changes with the remote branch's state.
+```bash
+    git fetch origin main
+    git checkout main
+    git reset --hard origin/main
+```
+
+2. To update your local den_dev branch with changes from the main branch, you can merge or rebase main into den_dev.
+
+```bash
+    git checkout den_dev
+    git merge main
+```This command incorporates changes from the main branch into your den_dev branch.
+
+```bash
+    git checkout den_dev
+    git rebase main
+```This command moves the changes made in den_dev on top of the current main, allowing for a cleaner history.
