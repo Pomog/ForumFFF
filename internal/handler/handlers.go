@@ -70,12 +70,15 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
+
+	// Check if User is Presaent in the DB, ERR should be handled
+	result, _ := m.DB.UserPresent(loginData.UserName, loginData.Email)
+	if result {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+	}
+
 	// if there is no error, we upload Form data into our Session
 	//WHAT to use here?
-
-	//Redirecting when receiving POST request
-	http.Redirect(w, r, "/home", http.StatusSeeOther)
-
 }
 
 // MainHandler is a method of the Repository struct that handles requests to the main page.
