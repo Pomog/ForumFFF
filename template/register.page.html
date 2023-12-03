@@ -1,0 +1,79 @@
+{{template "body" .}}
+
+{{define "centralPart"}}
+    <div class="container custom-container">
+        <table class="table-borderless forumTable whiteLink mt-3">
+            <thead class="containerHead">
+                <tr>
+                    <th class="forumFirstCol" scope="col">Quick Links</th>
+                </tr>
+            </thead>
+            <tbody class="containerBody">
+                <tr>
+                    <td>
+                        <a class="whiteLink" href="rulles.html">Rulles; </a>&nbsp; 
+                        <a class="whiteLink" href="contact.html">Contact; </a>&nbsp; 
+                        <a class="whiteLink" href="support.html">Support;</a>&nbsp; 
+                        <a class="whiteLink" href="disscussion.html">Disscussion;</a>&nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a class="whiteLink" href="lineage2.html">Lineage2; </a>&nbsp; 
+                        <a class="whiteLink" href="lineage3.html">Lineage3; </a>&nbsp; 
+                        <a class="whiteLink" href="newworld.html">New World; </a>&nbsp; 
+                        <a class="whiteLink" href="aion.html">AION;</a>&nbsp; 
+                        <a class="whiteLink" href="wow.html">WOW;</a>&nbsp;
+                        <a class="whiteLink" href="guildwars2.html">Guild Wars 2;</a>&nbsp; 
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="container">
+            {{$res := index .Data "loginData"}}
+                
+            <div class="col-md-6">
+                <h1>Register</h1>
+                <form action="/" method="post">
+                    <div class="mb-3">
+                        <label for="firstName" class="col-form-label">First Name:</label>
+                        {{with .Form.Errors.Get "firstName"}}
+                            <label class="text-danger">{{.}}</label>
+                        {{end}}
+                        <input type="text" class="form-control {{with .Form.Errors.Get "firstName"}} is-invalid {{end}}" name="firstName" value="{{$res.FirstName}}" id="firstName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="lastName" class="col-form-label">Last Name:</label>
+                        {{with .Form.Errors.Get "lastName"}}
+                            <label class="text-danger">{{.}}</label>
+                        {{end}}
+                        <input type="text" class="form-control {{with .Form.Errors.Get "lastName"}} is-invalid {{end}}" name="lastName" value="{{$res.LastName}}" id="lastName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="nickName" class="col-form-label">Nickname:</label>
+                        {{with .Form.Errors.Get "nickName"}}
+                            <label class="text-danger">{{.}}</label>
+                        {{end}}
+                        <input type="text" class="form-control {{with .Form.Errors.Get "nickName"}} is-invalid {{end}}" name="nickName" id="nickName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="emailRegistr" class="col-form-label">@email:</label>
+                        {{with .Form.Errors.Get "emailRegistr"}}
+                            <label class="text-danger">{{.}}</label>
+                        {{end}}
+                        <input type="email" class="form-control {{with .Form.Errors.Get "emailRegistr"}} is-invalid {{end}}" name="emailRegistr" id="emailRegistr">
+                    </div>
+                    <div class="mb-3">
+                        <label for="passwordReg" class="col-form-label">password:</label>
+                        {{with .Form.Errors.Get "passwordReg"}}
+                            <label class="text-danger">{{.}}</label>
+                        {{end}}
+                        <input type="password" class="form-control {{with .Form.Errors.Get "passwordReg"}} is-invalid {{end}}" name="passwordReg" id="passwordReg">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{{end}}

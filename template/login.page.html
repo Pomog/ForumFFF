@@ -1,0 +1,59 @@
+{{template "body" .}}
+
+{{define "centralPart"}}
+    <div class="container custom-container">
+        <table class="table-borderless forumTable whiteLink mt-3">
+            <thead class="containerHead">
+                <tr>
+                    <th class="forumFirstCol" scope="col">Quick Links</th>
+                </tr>
+            </thead>
+            <tbody class="containerBody">
+                <tr>
+                    <td>
+                        <a class="whiteLink" href="rulles.html">Rulles; </a>&nbsp; 
+                        <a class="whiteLink" href="contact.html">Contact; </a>&nbsp; 
+                        <a class="whiteLink" href="support.html">Support;</a>&nbsp; 
+                        <a class="whiteLink" href="disscussion.html">Disscussion;</a>&nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a class="whiteLink" href="lineage2.html">Lineage2; </a>&nbsp; 
+                        <a class="whiteLink" href="lineage3.html">Lineage3; </a>&nbsp; 
+                        <a class="whiteLink" href="newworld.html">New World; </a>&nbsp; 
+                        <a class="whiteLink" href="aion.html">AION;</a>&nbsp; 
+                        <a class="whiteLink" href="wow.html">WOW;</a>&nbsp;
+                        <a class="whiteLink" href="guildwars2.html">Guild Wars 2;</a>&nbsp; 
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="container">
+            {{$res := index .Data "loginData"}}
+            <div class="row">
+                <div class="col-md-6">
+                    <h1>Login</h1>
+                    <form action="/" method="post">
+                        <div class="mb-3">
+                          <label for="emailLogIn" class="col-form-label">Email</label>
+                            {{with .Form.Errors.Get "emailLogIn"}}
+                                <label class="text-danger">{{.}}</label>
+                            {{end}}
+                            <input class="form-control"  type="email" name="emailLogIn" id="emailLogIn">
+                        </div>
+                        <div class="mb-3">
+                          <label for="passwordLogIn" class="col-form-label">Email</label>
+                            {{with .Form.Errors.Get "passwordLogIn"}}
+                                <label class="text-danger">{{.}}</label>
+                            {{end}}
+                            <input class="form-control" type="password" name="passwordLogIn" id="passwordLogIn" placeholder="Password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}

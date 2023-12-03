@@ -21,8 +21,9 @@ func routes(a *config.AppConfig) http.Handler {
 	// fileServer := http.FileServer(http.Dir("./static/"))
 	// mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
-	mux.HandleFunc("/", handler.Repo.LoginHandler)
-	mux.HandleFunc("/home", handler.Repo.HomeHandler)
+	mux.HandleFunc("/", handler.Repo.HomeHandler)
+	mux.HandleFunc("/login", handler.Repo.LoginHandler)
+	mux.HandleFunc("/register", handler.Repo.RegisterHandler)
 	mux.HandleFunc("/theme", handler.Repo.ThemeHandler)
 	return mux
 }

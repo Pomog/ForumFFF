@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -41,6 +42,47 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	// Create a User struct with data from the HTTP request form
+	registerData := models.User{
+		Email:    r.FormValue("emailLogIn"),
+		Password: r.FormValue("passwordLogIn"),
+	}
+
+	// Create a new form instance based on the HTTP request's PostForm
+	form := forms.NewForm(r.PostForm)
+
+	// Validation checks for required fields and their specific formats and lengths
+	form.Required("emailLogIn", "passwordLogIn")
+
+	// Check if the form data is valid; if not, render the home page with error messages
+	if !form.Valid() {
+		data := make(map[string]interface{})
+		data["registerData"] = registerData
+		renderer.RendererTemplate(w, "login.page.html", &models.TemplateData{
+			Form: form,
+			Data: data,
+		})
+		fmt.Println("here in form.Valid()")
+		// return
+	}
+
+	// Check if User is Presaent in the DB, ERR should be handled
+	result, _ := m.DB.UserPresent(registerData.UserName, registerData.Email)
+	fmt.Println("UserPresent: ", result)
+	if result {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+	}
+
+	// if there is no error, we upload Form data into our Session
+	//WHAT to use here?
+}
+
+func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse the raw request body into r.Form
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+	}
+	// Create a User struct with data from the HTTP request form
 	loginData := models.User{
 		FirstName: r.FormValue("firstName"),
 		LastName:  r.FormValue("lastName"),
@@ -64,7 +106,7 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 		data := make(map[string]interface{})
 		data["loginData"] = loginData
-		renderer.RendererTemplate(w, "log.page.html", &models.TemplateData{
+		renderer.RendererTemplate(w, "register.page.html", &models.TemplateData{
 			Form: form,
 			Data: data,
 		})
