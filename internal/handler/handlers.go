@@ -36,91 +36,118 @@ func NewHandlers(r *Repository) {
 }
 
 func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	// Parse the raw request body into r.Form
-	err := r.ParseForm()
-	if err != nil {
-		log.Println(err)
-	}
-	// Create a User struct with data from the HTTP request form
-	registerData := models.User{
-		Email:    r.FormValue("emailLogIn"),
-		Password: r.FormValue("passwordLogIn"),
-	}
-
-	// Create a new form instance based on the HTTP request's PostForm
-	form := forms.NewForm(r.PostForm)
-
-	// Validation checks for required fields and their specific formats and lengths
-	form.Required("emailLogIn", "passwordLogIn")
-
-	// Check if the form data is valid; if not, render the home page with error messages
-	if !form.Valid() {
+	if r.Method == http.MethodGet {
+		var emtpyLogin models.User
 		data := make(map[string]interface{})
-		data["registerData"] = registerData
+		data["loginData"] = emtpyLogin
 		renderer.RendererTemplate(w, "login.page.html", &models.TemplateData{
-			Form: form,
+			Form: forms.NewForm(nil),
 			Data: data,
 		})
-		fmt.Println("here in form.Valid()")
-		// return
+	} else if r.Method == http.MethodPost {
+		// Parse the raw request body into r.Form
+		err := r.ParseForm()
+		if err != nil {
+			log.Println(err)
+		}
+		// Create a User struct with data from the HTTP request form
+		loginData := models.User{
+			Email:    r.FormValue("emailLogIn"),
+			Password: r.FormValue("passwordLogIn"),
+		}
+
+		// Create a new form instance based on the HTTP request's PostForm
+		form := forms.NewForm(r.PostForm)
+
+		// Validation checks for required fields and their specific formats and lengths
+		form.Required("emailLogIn", "passwordLogIn")
+
+		// Check if the form data is valid; if not, render the home page with error messages
+		if !form.Valid() {
+			data := make(map[string]interface{})
+			data["loginData"] = loginData
+			renderer.RendererTemplate(w, "login.page.html", &models.TemplateData{
+				Form: form,
+				Data: data,
+			})
+			return
+		}
+
+		// Check if User is Presaent in the DB, ERR should be handled
+		result, _ := m.DB.UserPresent(loginData.UserName, loginData.Email)
+		fmt.Println("UserPresent: ", result)
+		if result {
+			http.Redirect(w, r, "/home", http.StatusSeeOther)
+		}
+
+		// if there is no error, we upload Form data into our Session
+		//WHAT to use here?
+	} else {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 
-	// Check if User is Presaent in the DB, ERR should be handled
-	result, _ := m.DB.UserPresent(registerData.UserName, registerData.Email)
-	fmt.Println("UserPresent: ", result)
-	if result {
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-	}
-
-	// if there is no error, we upload Form data into our Session
-	//WHAT to use here?
 }
 
 func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	// Parse the raw request body into r.Form
-	err := r.ParseForm()
-	if err != nil {
-		log.Println(err)
-	}
-	// Create a User struct with data from the HTTP request form
-	loginData := models.User{
-		FirstName: r.FormValue("firstName"),
-		LastName:  r.FormValue("lastName"),
-		UserName:  r.FormValue("nickName"),
-		Email:     r.FormValue("emailRegistr"),
-		Password:  r.FormValue("passwordReg"),
-	}
-
-	// Create a new form instance based on the HTTP request's PostForm
-	form := forms.NewForm(r.PostForm)
-
-	// Validation checks for required fields and their specific formats and lengths
-	form.Required("firstName", "lastName", "nickName", "emailRegistr", "passwordReg")
-	form.First_LastName_Min_Max_Len("firstName", 3, 12, r)
-	form.First_LastName_Min_Max_Len("lastName", 3, 12, r)
-	form.First_LastName_Min_Max_Len("nickName", 3, 12, r)
-	form.EmailFormat("emailRegistr", r)
-	form.PassFormat("passwordReg", 6, 15, r)
-
-	// Check if the form data is valid; if not, render the home page with error messages
-	if !form.Valid() {
+	if r.Method == http.MethodGet {
+		var emptyRegistration models.User
 		data := make(map[string]interface{})
-		data["loginData"] = loginData
+		data["registrationData"] = emptyRegistration
 		renderer.RendererTemplate(w, "register.page.html", &models.TemplateData{
-			Form: form,
+			Form: forms.NewForm(nil),
 			Data: data,
 		})
-		return
+
+	} else if r.Method == http.MethodPost {
+		// Parse the raw request body into r.Form
+		err := r.ParseForm()
+		if err != nil {
+			log.Println(err)
+		}
+		// Create a User struct with data from the HTTP request form
+		registrationData := models.User{
+			FirstName: r.FormValue("firstName"),
+			LastName:  r.FormValue("lastName"),
+			UserName:  r.FormValue("nickName"),
+			Email:     r.FormValue("emailRegistr"),
+			Password:  r.FormValue("passwordReg"),
+		}
+
+		// Create a new form instance based on the HTTP request's PostForm
+		form := forms.NewForm(r.PostForm)
+
+		// Validation checks for required fields and their specific formats and lengths
+		form.Required("firstName", "lastName", "nickName", "emailRegistr", "passwordReg")
+		form.First_LastName_Min_Max_Len("firstName", 3, 12, r)
+		form.First_LastName_Min_Max_Len("lastName", 3, 12, r)
+		form.First_LastName_Min_Max_Len("nickName", 3, 12, r)
+		form.EmailFormat("emailRegistr", r)
+		form.PassFormat("passwordReg", 6, 15, r)
+
+		// Check if the form data is valid; if not, render the home page with error messages
+		if !form.Valid() {
+			data := make(map[string]interface{})
+			data["registrationData"] = registrationData
+			renderer.RendererTemplate(w, "register.page.html", &models.TemplateData{
+				Form: form,
+				Data: data,
+			})
+			return
+		}
+
+		// Check if User is Presaent in the DB, ERR should be handled
+		result, _ := m.DB.UserPresent(registrationData.UserName, registrationData.Email)
+		fmt.Println("UserPresent: ", result)
+		if result {
+			http.Redirect(w, r, "/home", http.StatusSeeOther)
+		}
+
+		// if there is no error, we upload Form data into our Session
+		//WHAT to use here?
+	} else {
+		http.Error(w, "No such method", http.StatusMethodNotAllowed)
 	}
 
-	// Check if User is Presaent in the DB, ERR should be handled
-	result, _ := m.DB.UserPresent(loginData.UserName, loginData.Email)
-	if result {
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-	}
-
-	// if there is no error, we upload Form data into our Session
-	//WHAT to use here?
 }
 
 // MainHandler is a method of the Repository struct that handles requests to the main page.
