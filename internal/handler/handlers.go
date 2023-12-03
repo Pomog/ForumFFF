@@ -148,6 +148,25 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No such method", http.StatusMethodNotAllowed)
 	}
 
+	// Check if the form data is valid; if not, render the home page with error messages
+	if !form.Valid() {
+		data := make(map[string]interface{})
+		data["loginData"] = loginData
+		renderer.RendererTemplate(w, "log.page.html", &models.TemplateData{
+			Form: form,
+			Data: data,
+		})
+		return
+	}
+
+	// Check if User is Presaent in the DB, ERR should be handled
+	result, _ := m.DB.UserPresent(loginData.UserName, loginData.Email)
+	if result {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+	}
+
+	// if there is no error, we upload Form data into our Session
+	//WHAT to use here?
 }
 
 // MainHandler is a method of the Repository struct that handles requests to the main page.
