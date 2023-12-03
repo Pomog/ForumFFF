@@ -7,7 +7,7 @@ import (
 	"github.com/Pomog/ForumFFF/internal/models"
 )
 
-func (m *sqliteBDRepo) UserPresent(userName, email string) (bool, error) {
+func (m *SqliteBDRepo) UserPresent(userName, email string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -31,7 +31,7 @@ func (m *sqliteBDRepo) UserPresent(userName, email string) (bool, error) {
 	return true, nil
 }
 
-func (m *sqliteBDRepo) CreatetUser(r models.User) error {
+func (m *SqliteBDRepo) CreateUser(r models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -53,7 +53,7 @@ func (m *sqliteBDRepo) CreatetUser(r models.User) error {
 	return nil
 }
 
-func (m *sqliteBDRepo) CreatetThread(userID int, thread models.Thread) error {
+func (m *SqliteBDRepo) CreateThread(userID int, thread models.Thread) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 

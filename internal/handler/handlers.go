@@ -8,6 +8,8 @@ import (
 	"github.com/Pomog/ForumFFF/internal/forms"
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
+	"github.com/Pomog/ForumFFF/internal/repository"
+	"github.com/Pomog/ForumFFF/internal/repository/dbrepo"
 )
 
 // Repo the repository used by the handlers
@@ -16,12 +18,14 @@ var Repo *Repository
 // Repositroy is the repository type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseInt
 }
 
 // NewRepo creates a new repository
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *repository.DataBase) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewSQLiteRepo(a, db.SQL),
 	}
 }
 
@@ -66,12 +70,15 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
+
+	// Check if User is Presaent in the DB, ERR should be handled
+	result, _ := m.DB.UserPresent(loginData.UserName, loginData.Email)
+	if result {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+	}
+
 	// if there is no error, we upload Form data into our Session
 	//WHAT to use here?
-
-	//Redirecting when receiving POST request
-	http.Redirect(w, r, "/home", http.StatusSeeOther)
-
 }
 
 // MainHandler is a method of the Repository struct that handles requests to the main page.
