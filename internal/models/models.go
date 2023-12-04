@@ -23,6 +23,13 @@ type Thread struct {
 	UserID  int
 }
 
+type ThreadDataForMainPage struct {
+	Subject  string
+	Created  string
+	UserName string
+	Picture  string
+}
+
 type Post struct {
 	ID       int
 	Subject  string

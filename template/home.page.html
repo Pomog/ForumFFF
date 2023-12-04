@@ -38,20 +38,23 @@
         </tr>
       </thead>
       <tbody class="containerBody">
+        {{$threadinfo := index .Data "threads"}}
+        {{ range $threadinfo }}
         <tr>
             <td>
+              <!-- 1column -->
                 <a href="/theme">
 
-                  <img src="/static/logo/message_icon2.png" class="logo_img" alt="logo 4.jpg"><strong>&nbsp; Project TL: </strong>
-
-                  Project TL (Lineage 3 or Lineage Eternal) release date is a matter of speculation for nearly a decade. It was initially announced in 2011, but after delays and complications, the third installment in the Lineage series has not yet seen the light of day, nor do we have any vague release date set.
+                  <img src="/static/logo/message_icon2.png" class="logo_img" alt="logo 4.jpg"><strong>&nbsp;{{ .Subject }} </strong>
+                  Created: {{ .Created}}
                 </a>
               </td>
               
          
-          <td>From: Pomogadryg - I will play this game... <br> Posted: 10-12-2023</td>
-          <td>5 messages</td>
+          <td><!-- 2column -->From:<img src="{{ .Picture}}" class="logo_ava" alt="picture"> {{ .UserName }} - placeholder <br> Posted: </td>
+          <td><!-- 3column -->5 messages</td>
         </tr>
+        {{end}}
 
         <tr>
           <td> 
