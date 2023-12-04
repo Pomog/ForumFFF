@@ -181,10 +181,6 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 	data["threads"] = threadsInfo
 
-
-
-
-
 	renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
 		Data: data,
 	})
