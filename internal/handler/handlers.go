@@ -74,7 +74,7 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Check if User is Presaent in the DB, ERR should be handled
-		result, _ := m.DB.UserPresent(loginData.UserName, loginData.Email)
+		result, _ := m.DB.UserPresent(loginData.Password, loginData.Email)
 		fmt.Println("UserPresent: ", result)
 		if result {
 			http.Redirect(w, r, "/home", http.StatusSeeOther)
