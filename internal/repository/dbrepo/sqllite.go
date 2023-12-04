@@ -31,6 +31,25 @@ func (m *SqliteBDRepo) UserPresent(userName, email string) (bool, error) {
 	return true, nil
 }
 
+func (m *SqliteBDRepo) GetUserByID(ID int) (models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select * 
+	from users
+	where id = $1
+	`
+	var user models.User
+
+	row := m.DB.QueryRowContext(ctx, query, ID)
+
+	err := row.Scan(&user.ID, &user.UserName, &user.Password, &user.FirstName, &user.LastName, &user.Email, &user.Created, &user.Picture, &user.LastActivity)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
 func (m *SqliteBDRepo) CreateUser(r models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
