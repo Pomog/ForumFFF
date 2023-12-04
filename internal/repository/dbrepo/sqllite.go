@@ -198,3 +198,80 @@ func (m *SqliteBDRepo) GetAllThreads() ([]models.Thread, error) {
 
 	return threads, nil
 }
+
+// CreatePost insert post into SQLite DB
+func (m *SqliteBDRepo) CreatePost(post models.Post) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `insert into post
+	(subject, content, threadID, userID)
+	values ($1, $2, $3, $4
+	)
+	`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		post.Subject,
+		post.Content,
+		post.ThreadId,
+		post.UserID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// isThreadExist returns true if Thread with same Subject exist
+func (m *SqliteBDRepo) IsThreadExist(thread models.Thread) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select count(id) 
+	from thread
+	where subject = $1
+	`
+	var numRows int
+	row := m.DB.QueryRowContext(ctx, query, thread.Subject)
+
+	err := row.Scan(&numRows)
+	if err != nil {
+		return false, nil
+	}
+
+	if numRows == 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+// GetAllPostsFromThread returns all slice of all Posts with given ThreadID, nil if there are no Posts
+func (m *SqliteBDRepo) GetAllPostsFromThread(threadID int) ([]models.Post, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select * 
+	from post
+	where threadID = $1
+	`
+	rows, err := m.DB.QueryContext(ctx, query, threadID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []models.Post
+
+	for rows.Next() {
+		var post models.Post
+		err := rows.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}
