@@ -28,6 +28,7 @@ type ThreadDataForMainPage struct {
 	Created  string
 	UserName string
 	Picture  string
+	Posts    []Post
 }
 
 type Post struct {

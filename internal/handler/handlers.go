@@ -157,7 +157,6 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	
 	var threadsInfo []models.ThreadDataForMainPage
 	for _, thread := range threads {
@@ -168,12 +167,23 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		info.Created = thread.Created.Format("2006-01-02 15:04:05")
 		info.Picture = user.Picture
 		info.UserName = user.UserName
+		
+
+		posts, err := m.DB.GetAllPostsFromThread(thread.ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		info.Posts = posts
 		threadsInfo = append(threadsInfo, info)
 	}
 
 	data := make(map[string]interface{})
 
 	data["threads"] = threadsInfo
+
+
+
+
 
 	renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
 		Data: data,

@@ -28,3 +28,4 @@ getGitUdates.sh
 # corrected fileName
 getGitUpdates.sh
 mainDB.db
+*.db

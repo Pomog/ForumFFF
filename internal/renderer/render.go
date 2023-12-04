@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/Pomog/ForumFFF/internal/config"
 	"github.com/Pomog/ForumFFF/internal/models"
@@ -16,7 +17,24 @@ import (
 var app *config.AppConfig
 
 var pathToTemplates = "./template"
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"findLastPost": func(allPosts []models.Post) models.Post {
+		var latestPost models.Post
+		latestPost.Created, _ = time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
+		for _, post := range allPosts {
+			if post.Created.After(latestPost.Created) {
+				latestPost = post
+			}
+		}
+		return latestPost
+	},
+	"numberOfPosts": func(allPosts []models.Post) int {
+		return len(allPosts)
+	},
+	"convertTime": func(post models.Post) string {
+		return post.Created.Format("2006-01-02 15:04:05")
+	},
+}
 
 // NewTemplate sets the config for the template package
 func NewTemplate(a *config.AppConfig) {
