@@ -9,4 +9,6 @@ type DatabaseInt interface {
 	CreatePost(post models.Post) error
 	IsThreadExist(thread models.Thread) (bool, error)
 	GetAllPostsFromThread(threadID int) ([]models.Post, error)
+	GetUserByID(ID int) (models.User, error)
+	GetAllThreads() ([]models.Thread, error)
 }

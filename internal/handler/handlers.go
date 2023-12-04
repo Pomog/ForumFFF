@@ -153,8 +153,31 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 // MainHandler is a method of the Repository struct that handles requests to the main page.
 // It renders the "home.page.html" template to the provided HTTP response writer.
 func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
+	threads, err := m.DB.GetAllThreads()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{})
+	
+	var threadsInfo []models.ThreadDataForMainPage
+	for _, thread := range threads {
+		var user models.User
+		user, _ = m.DB.GetUserByID(thread.UserID)
+		var info models.ThreadDataForMainPage
+		info.Subject = thread.Subject
+		info.Created = thread.Created.Format("2006-01-02 15:04:05")
+		info.Picture = user.Picture
+		info.UserName = user.UserName
+		threadsInfo = append(threadsInfo, info)
+	}
+
+	data := make(map[string]interface{})
+
+	data["threads"] = threadsInfo
+
+	renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
+		Data: data,
+	})
 
 }
 
