@@ -50,9 +50,11 @@
                 </a>
               </td>
               
-         
-          <td><!-- 2column -->From:<img src="{{ .Picture}}" class="logo_ava" alt="picture"> {{ .UserName }} - placeholder <br> Posted: </td>
-          <td><!-- 3column -->5 messages</td>
+            {{ $lastPost := findLastPost .Posts}}
+            {{ $dateLastPostCreated := convertTime $lastPost}}
+          <td><!-- 2column -->From:<img src="{{ .Picture}}" class="logo_ava" alt="picture"> {{ .UserName }} - {{ $lastPost.Subject}} <br> Posted: {{$dateLastPostCreated}} </td>
+          {{ $numOfPosts := numberOfPosts .Posts}}
+          <td><!-- 3column -->{{ $numOfPosts}} messages</td>
         </tr>
         {{end}}
 

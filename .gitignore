@@ -30,3 +30,4 @@ getGitUpdates.sh
 
 mainDB.db
 mainDB.db
+*.db
