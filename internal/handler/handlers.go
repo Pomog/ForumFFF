@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/Pomog/ForumFFF/internal/config"
 	"github.com/Pomog/ForumFFF/internal/forms"
@@ -137,16 +138,16 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		userAlreadyExist, err := m.DB.UserPresent(registrationData.UserName, registrationData.Email)
 		if err != nil {
 			// Handle the error, e.g., display an error page or log it
-			http.Redirect(w, r, "/error-page", http.StatusSeeOther)
+			setErrorAndRedirect(w, r, "DB Error func UserPresent", "/error-page")
 			return
 		}
-		fmt.Println("UserPresent: ", userAlreadyExist)
+
 		if userAlreadyExist {
-			http.Redirect(w, r, "/home", http.StatusSeeOther)
+			setErrorAndRedirect(w, r, "User AlreadyExists", "/error-page")
 		} else {
 			err := m.DB.CreateUser(registrationData)
 			if err != nil {
-				http.Redirect(w, r, "/error-page", http.StatusSeeOther)
+				setErrorAndRedirect(w, r, "DB Error func CreateUser", "/error-page")
 			}
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 		}
@@ -197,4 +198,42 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 // It renders the "home.page.html" template to the provided HTTP response writer.
 func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{})
+}
+
+// ErrorPage handles the "/error-page" route
+func (m *Repository) ErrorPage(w http.ResponseWriter, r *http.Request) {
+	// Retrieve the error value from the query parameter
+	errorMessage := r.URL.Query().Get("error")
+
+	if errorMessage == "" {
+		// If the error value is not present, handle it accordingly
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	htmlContent := `
+		<!DOCTYPE html>
+		<html>
+		<head>
+			<title>Error Page</title>
+		</head>
+		<body>
+			<h1>Error</h1>
+			<p>An error occurred: ` + errorMessage + `</p>
+		</body>
+		</html>
+	`
+
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(htmlContent))
+}
+
+// setErrorContext sets the error message in the context and adds it to the redirect URL
+func setErrorAndRedirect(w http.ResponseWriter, r *http.Request, errorMessage string, redirectURL string) {
+	// Append the error message as a query parameter in the redirect URL
+	redirectURL += "?error=" + url.QueryEscape(errorMessage)
+
+	// Perform the redirect
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }
