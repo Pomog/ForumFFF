@@ -24,5 +24,9 @@ func routes(a *config.AppConfig) http.Handler {
 	mux.HandleFunc("/", handler.Repo.LoginHandler)
 	mux.HandleFunc("/home", handler.Repo.HomeHandler)
 	mux.HandleFunc("/theme", handler.Repo.ThemeHandler)
+	mux.HandleFunc("/registration", handler.Repo.RegisterHandler)
+	mux.HandleFunc("/error-page", handler.Repo.ErrorPage)
+
+	
 	return mux
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/Pomog/ForumFFF/internal/config"
 	"github.com/Pomog/ForumFFF/internal/forms"
@@ -77,13 +78,10 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		result, _ := m.DB.UserPresent(loginData.Password, loginData.Email)
 		fmt.Println("UserPresent: ", result)
 		if result {
-			http.Redirect(w, r, "/home", http.StatusSeeOther)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+		} else {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
-
-		// if there is no error, we upload Form data into our Session
-		//WHAT to use here?
-	} else {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 
 }
@@ -111,6 +109,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			UserName:  r.FormValue("nickName"),
 			Email:     r.FormValue("emailRegistr"),
 			Password:  r.FormValue("passwordReg"),
+			Picture:   r.FormValue("avatar"),
 		}
 
 		// Create a new form instance based on the HTTP request's PostForm
@@ -136,14 +135,23 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Check if User is Presaent in the DB, ERR should be handled
-		result, _ := m.DB.UserPresent(registrationData.UserName, registrationData.Email)
-		fmt.Println("UserPresent: ", result)
-		if result {
-			http.Redirect(w, r, "/home", http.StatusSeeOther)
+		userAlreadyExist, err := m.DB.UserPresent(registrationData.UserName, registrationData.Email)
+		if err != nil {
+			// Handle the error, e.g., display an error page or log it
+			setErrorAndRedirect(w, r, "DB Error func UserPresent", "/error-page")
+			return
 		}
 
-		// if there is no error, we upload Form data into our Session
-		//WHAT to use here?
+		if userAlreadyExist {
+			setErrorAndRedirect(w, r, "User AlreadyExists", "/error-page")
+		} else {
+			err := m.DB.CreateUser(registrationData)
+			if err != nil {
+				setErrorAndRedirect(w, r, "DB Error func CreateUser", "/error-page")
+			}
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+		}
+
 	} else {
 		http.Error(w, "No such method", http.StatusMethodNotAllowed)
 	}
@@ -157,7 +165,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	var threadsInfo []models.ThreadDataForMainPage
 	for _, thread := range threads {
 		var user models.User
@@ -167,7 +175,6 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		info.Created = thread.Created.Format("2006-01-02 15:04:05")
 		info.Picture = user.Picture
 		info.UserName = user.UserName
-		
 
 		posts, err := m.DB.GetAllPostsFromThread(thread.ID)
 		if err != nil {
@@ -181,10 +188,6 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 	data["threads"] = threadsInfo
 
-
-
-
-
 	renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
 		Data: data,
 	})
@@ -195,4 +198,42 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 // It renders the "home.page.html" template to the provided HTTP response writer.
 func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{})
+}
+
+// ErrorPage handles the "/error-page" route
+func (m *Repository) ErrorPage(w http.ResponseWriter, r *http.Request) {
+	// Retrieve the error value from the query parameter
+	errorMessage := r.URL.Query().Get("error")
+
+	if errorMessage == "" {
+		// If the error value is not present, handle it accordingly
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	htmlContent := `
+		<!DOCTYPE html>
+		<html>
+		<head>
+			<title>Error Page</title>
+		</head>
+		<body>
+			<h1>Error</h1>
+			<p>An error occurred: ` + errorMessage + `</p>
+		</body>
+		</html>
+	`
+
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(htmlContent))
+}
+
+// setErrorContext sets the error message in the context and adds it to the redirect URL
+func setErrorAndRedirect(w http.ResponseWriter, r *http.Request, errorMessage string, redirectURL string) {
+	// Append the error message as a query parameter in the redirect URL
+	redirectURL += "?error=" + url.QueryEscape(errorMessage)
+
+	// Perform the redirect
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }
