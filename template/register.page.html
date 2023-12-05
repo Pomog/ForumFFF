@@ -71,6 +71,13 @@
                         {{end}}
                         <input type="password" class="form-control {{with .Form.Errors.Get "passwordReg"}} is-invalid {{end}}" name="passwordReg" value="{{$res.Password}}" id="passwordReg">
                     </div>
+                    <div class="mb-3">
+                        <label for="avatar" class="col-form-label">Avatar Picture:</label>
+                        {{with .Form.Errors.Get "avatar"}}
+                        <label class="text-danger">{{.}}</label>
+                        {{end}}
+                        <input type="file" class="form-control {{with .Form.Errors.Get "avatar"}} is-invalid {{end}}" name="avatar" id="avatar">
+                    </div>
                     <button type="submit" class="btn btn-primary">Register</button>
                 </form>
             </div>
