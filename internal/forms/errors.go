@@ -15,3 +15,6 @@ func (e errors) Get(field string) string {
 	}
 	return errorString[0]
 }
+
+// errorKey is a custom type for the context key
+type ErrorKey string
