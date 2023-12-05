@@ -77,13 +77,10 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		result, _ := m.DB.UserPresent(loginData.Password, loginData.Email)
 		fmt.Println("UserPresent: ", result)
 		if result {
-			http.Redirect(w, r, "/home", http.StatusSeeOther)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+		} else {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
-
-		// if there is no error, we upload Form data into our Session
-		//WHAT to use here?
-	} else {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 
 }
@@ -111,6 +108,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			UserName:  r.FormValue("nickName"),
 			Email:     r.FormValue("emailRegistr"),
 			Password:  r.FormValue("passwordReg"),
+			Picture:   r.FormValue("avatar"),
 		}
 
 		// Create a new form instance based on the HTTP request's PostForm
@@ -136,14 +134,23 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Check if User is Presaent in the DB, ERR should be handled
-		result, _ := m.DB.UserPresent(registrationData.UserName, registrationData.Email)
-		fmt.Println("UserPresent: ", result)
-		if result {
+		userAlreadyExist, err := m.DB.UserPresent(registrationData.UserName, registrationData.Email)
+		if err != nil {
+			// Handle the error, e.g., display an error page or log it
+			http.Redirect(w, r, "/error-page", http.StatusSeeOther)
+			return
+		}
+		fmt.Println("UserPresent: ", userAlreadyExist)
+		if userAlreadyExist {
 			http.Redirect(w, r, "/home", http.StatusSeeOther)
+		} else {
+			err := m.DB.CreateUser(registrationData)
+			if err != nil {
+				http.Redirect(w, r, "/error-page", http.StatusSeeOther)
+			}
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
 		}
 
-		// if there is no error, we upload Form data into our Session
-		//WHAT to use here?
 	} else {
 		http.Error(w, "No such method", http.StatusMethodNotAllowed)
 	}
@@ -157,7 +164,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	var threadsInfo []models.ThreadDataForMainPage
 	for _, thread := range threads {
 		var user models.User
@@ -167,7 +174,6 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		info.Created = thread.Created.Format("2006-01-02 15:04:05")
 		info.Picture = user.Picture
 		info.UserName = user.UserName
-		
 
 		posts, err := m.DB.GetAllPostsFromThread(thread.ID)
 		if err != nil {
