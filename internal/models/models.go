@@ -26,8 +26,10 @@ type Thread struct {
 type ThreadDataForMainPage struct {
 	Subject  string
 	Created  string
-	UserName string
-	Picture  string
+	UserNameWhoCreatedThread string
+	UserNameWhoCreatedLastPost string
+	PictureUserWhoCreatedThread  string
+	PictureUserWhoCreatedLastPost  string
 	Posts    []Post
 }
 
