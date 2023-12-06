@@ -168,3 +168,6 @@ section {
         color: rgb(255, 255, 255); /* Color on hover */
     }
     
+    .modal-content {
+      background-color: rgb(54, 50, 74);
+  }
