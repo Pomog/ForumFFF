@@ -1,41 +1,14 @@
 {{template "body" .}}
 
 {{define "centralPart"}}
-    <div class="container custom-container">
-        <table class="table-borderless forumTable whiteLink mt-3">
-            <thead class="containerHead">
-                <tr>
-                    <th class="forumFirstCol" scope="col">Quick Links</th>
-                </tr>
-            </thead>
-            <tbody class="containerBody">
-                <tr>
-                    <td>
-                        <a class="whiteLink" href="rulles.html">Rulles; </a>&nbsp; 
-                        <a class="whiteLink" href="contact.html">Contact; </a>&nbsp; 
-                        <a class="whiteLink" href="support.html">Support;</a>&nbsp; 
-                        <a class="whiteLink" href="disscussion.html">Disscussion;</a>&nbsp;
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a class="whiteLink" href="lineage2.html">Lineage2; </a>&nbsp; 
-                        <a class="whiteLink" href="lineage3.html">Lineage3; </a>&nbsp; 
-                        <a class="whiteLink" href="newworld.html">New World; </a>&nbsp; 
-                        <a class="whiteLink" href="aion.html">AION;</a>&nbsp; 
-                        <a class="whiteLink" href="wow.html">WOW;</a>&nbsp;
-                        <a class="whiteLink" href="guildwars2.html">Guild Wars 2;</a>&nbsp; 
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+
 
         <div class="container">
             {{$res := index .Data "registrationData"}}
                 
             <div class="col-md-6">
                 <h1>Register</h1>
-                <form action="" method="post">
+                <form action="" method="post" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="firstName" class="col-form-label">First Name:</label>
                         {{with .Form.Errors.Get "firstName"}}
@@ -72,11 +45,10 @@
                         <input type="password" class="form-control {{with .Form.Errors.Get "passwordReg"}} is-invalid {{end}}" name="passwordReg" value="{{$res.Password}}" id="passwordReg">
                     </div>
                     <div class="mb-3">
-                        <label for="avatar" class="col-form-label">Avatar Picture:</label>
-                        {{with .Form.Errors.Get "avatar"}}
-                        <label class="text-danger">{{.}}</label>
-                        {{end}}
-                        <input type="file" class="form-control {{with .Form.Errors.Get "avatar"}} is-invalid {{end}}" name="avatar" id="avatar">
+                        <label for="avatar" class="col-form-label">Avatar Picture: (Max 1 megabyte)</label>
+
+          
+                        <input type="file" class="form-control" name="avatar" id="avatar">
                     </div>
                     <button type="submit" class="btn btn-primary">Register</button>
                 </form>
