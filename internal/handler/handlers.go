@@ -2,9 +2,13 @@ package handler
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
+	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/Pomog/ForumFFF/internal/config"
@@ -23,6 +27,15 @@ type Repository struct {
 	App *config.AppConfig
 	DB  repository.DatabaseInt
 }
+
+const (
+	dbErrorUserPresent   = "DB Error func UserPresent"
+	userAlreadyExistsMsg = "User Already Exists"
+	dbErrorCreateUser    = "DB Error func CreateUser"
+	fileRecivingErrorMsg = "file receiving error"
+	fileCreatingErrorMsg = "Unable to create file"
+	fileSaveingErrorMsg  = "Unable to save file"
+)
 
 // NewRepo creates a new repository
 func NewRepo(a *config.AppConfig, db *repository.DataBase) *Repository {
@@ -98,11 +111,13 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		})
 
 	} else if r.Method == http.MethodPost {
-		// Parse the raw request body into r.Form
-		err := r.ParseForm()
+		// Parse the form data, including files Need to Set Upper limit for DATA
+		err := r.ParseMultipartForm((1 << 20))
 		if err != nil {
-			log.Println(err)
+			setErrorAndRedirect(w, r, dbErrorUserPresent, "/error-page")
+			return
 		}
+
 		// Create a User struct with data from the HTTP request form
 		registrationData := models.User{
 			FirstName: r.FormValue("firstName"),
@@ -138,7 +153,6 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		// Check if User is Presaent in the DB, ERR should be handled
 		userAlreadyExist, err := m.DB.UserPresent(registrationData.UserName, registrationData.Email)
 		if err != nil {
-			// Handle the error, e.g., display an error page or log it
 			setErrorAndRedirect(w, r, "DB Error func UserPresent", "/error-page")
 			return
 		}
@@ -146,6 +160,32 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		if userAlreadyExist {
 			setErrorAndRedirect(w, r, "User AlreadyExists", "/error-page")
 		} else {
+			// Get the file from the form data
+			file, handler, errfileGet := r.FormFile("avatar")
+			if errfileGet != nil {
+				setErrorAndRedirect(w, r, fileRecivingErrorMsg, "/error-page")
+				return
+			}
+			defer file.Close()
+
+			// Create a new file in the "static/ava" directory
+			newFilePath := filepath.Join("static/ava", handler.Filename)
+			newFile, errfileCreate := os.Create(newFilePath)
+			if errfileCreate != nil {
+				setErrorAndRedirect(w, r, fileCreatingErrorMsg, "/error-page")
+				return
+			}
+			defer newFile.Close()
+
+			// Copy the uploaded file to the new file
+			_, err = io.Copy(newFile, file)
+			if err != nil {
+				setErrorAndRedirect(w, r, fileSaveingErrorMsg, "/error-page")
+				return
+			}
+
+			registrationData.Picture = path.Join("/", newFilePath)
+
 			err := m.DB.CreateUser(registrationData)
 			if err != nil {
 				setErrorAndRedirect(w, r, "DB Error func CreateUser", "/error-page")
@@ -249,6 +289,7 @@ func (m *Repository) ErrorPage(w http.ResponseWriter, r *http.Request) {
 
 // setErrorContext sets the error message in the context and adds it to the redirect URL
 func setErrorAndRedirect(w http.ResponseWriter, r *http.Request, errorMessage string, redirectURL string) {
+	log.Printf("Error: %s", errorMessage)
 	// Append the error message as a query parameter in the redirect URL
 	redirectURL += "?error=" + url.QueryEscape(errorMessage)
 
