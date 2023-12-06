@@ -45,14 +45,15 @@
               <!-- 1column -->
                 <a href="/theme">
 
-                  <img src="/static/logo/message_icon2.png" class="logo_img" alt="logo 4.jpg"><strong>&nbsp;{{ .Subject }} </strong>
-                  Created: {{ .Created}}
+                  <img src="{{ .PictureUserWhoCreatedThread}}" class="logo_img" alt="/static/logo/message_icon2.png"><strong>&nbsp;{{ .Subject }} </strong>
+                  <br>Created by: {{ .UserNameWhoCreatedThread}}<br>
+                  Topic created: {{ .Created}}
                 </a>
               </td>
               
             {{ $lastPost := findLastPost .Posts}}
             {{ $dateLastPostCreated := convertTime $lastPost}}
-          <td><!-- 2column -->From:<img src="{{ .Picture}}" class="logo_ava" alt="picture"> {{ .UserName }} - {{ $lastPost.Subject}} <br> Posted: {{$dateLastPostCreated}} </td>
+          <td><!-- 2column -->From:<br><img src="{{ .PictureUserWhoCreatedLastPost}}" class="logo_ava" alt="picture"> {{ .UserNameWhoCreatedLastPost }} - {{ $lastPost.Subject}} <br> Posted: {{$dateLastPostCreated}} </td>
           {{ $numOfPosts := numberOfPosts .Posts}}
           <td><!-- 3column -->{{ $numOfPosts}} messages</td>
         </tr>

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/Pomog/ForumFFF/internal/config"
 	"github.com/Pomog/ForumFFF/internal/forms"
@@ -75,12 +76,12 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Check if User is Presaent in the DB, ERR should be handled
-		result, _ := m.DB.UserPresent(loginData.Password, loginData.Email)
-		fmt.Println("UserPresent: ", result)
+		result, _ := m.DB.UserPresentLogin(loginData.Email, loginData.Password)
+		fmt.Println("UserPresentLogin: ", result)
 		if result {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
+			http.Redirect(w, r, "/home", http.StatusSeeOther)
 		} else {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			setErrorAndRedirect(w, r, "Wrong email or password", "/error-page")
 		}
 	}
 
@@ -173,14 +174,17 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		var info models.ThreadDataForMainPage
 		info.Subject = thread.Subject
 		info.Created = thread.Created.Format("2006-01-02 15:04:05")
-		info.Picture = user.Picture
-		info.UserName = user.UserName
+		info.PictureUserWhoCreatedThread = user.Picture
+		info.UserNameWhoCreatedThread = user.UserName
 
 		posts, err := m.DB.GetAllPostsFromThread(thread.ID)
 		if err != nil {
 			log.Fatal(err)
 		}
 		info.Posts = posts
+		userWhoCreatedLastPost, _ := m.DB.GetUserByID(getUserThatCreatedLastPost(posts))
+		info.PictureUserWhoCreatedLastPost = userWhoCreatedLastPost.Picture
+		info.UserNameWhoCreatedLastPost = userWhoCreatedLastPost.UserName
 		threadsInfo = append(threadsInfo, info)
 	}
 
@@ -192,6 +196,19 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		Data: data,
 	})
 
+}
+
+func getUserThatCreatedLastPost(posts []models.Post) int {
+	var id int
+	timeOfLastPost, _ := time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
+	for _, post := range posts {
+		if post.Created.After(timeOfLastPost) {
+			timeOfLastPost = post.Created
+			id = post.UserID
+		}
+
+	}
+	return id
 }
 
 // MainHandler is a method of the Repository struct that handles requests to the main page.

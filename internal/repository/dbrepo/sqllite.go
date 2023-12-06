@@ -31,6 +31,30 @@ func (m *SqliteBDRepo) UserPresent(userName, email string) (bool, error) {
 	return true, nil
 }
 
+func (m *SqliteBDRepo) UserPresentLogin(email, password string) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select count(id) 
+	from users
+	where email = $1 and
+	password = $2
+	`
+	var numRows int
+	row := m.DB.QueryRowContext(ctx, query, email, password)
+
+	err := row.Scan(&numRows)
+	if err != nil {
+		return false, nil
+	}
+
+	if numRows == 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
 func (m *SqliteBDRepo) GetUserByID(ID int) (models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
