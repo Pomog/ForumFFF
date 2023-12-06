@@ -202,40 +202,44 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 // MainHandler is a method of the Repository struct that handles requests to the main page.
 // It renders the "home.page.html" template to the provided HTTP response writer.
 func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
-	threads, err := m.DB.GetAllThreads()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var threadsInfo []models.ThreadDataForMainPage
-	for _, thread := range threads {
-		var user models.User
-		user, _ = m.DB.GetUserByID(thread.UserID)
-		var info models.ThreadDataForMainPage
-		info.Subject = thread.Subject
-		info.Created = thread.Created.Format("2006-01-02 15:04:05")
-
-		info.PictureUserWhoCreatedThread = user.Picture
-		info.UserNameWhoCreatedThread = user.UserName
-
-		posts, err := m.DB.GetAllPostsFromThread(thread.ID)
+	if r.Method == http.MethodGet {
+		threads, err := m.DB.GetAllThreads()
 		if err != nil {
 			log.Fatal(err)
 		}
-		info.Posts = posts
-		userWhoCreatedLastPost, _ := m.DB.GetUserByID(getUserThatCreatedLastPost(posts))
-		info.PictureUserWhoCreatedLastPost = userWhoCreatedLastPost.Picture
-		info.UserNameWhoCreatedLastPost = userWhoCreatedLastPost.UserName
-		threadsInfo = append(threadsInfo, info)
+
+		var threadsInfo []models.ThreadDataForMainPage
+		for _, thread := range threads {
+			var user models.User
+			user, _ = m.DB.GetUserByID(thread.UserID)
+			var info models.ThreadDataForMainPage
+			info.Subject = thread.Subject
+			info.Created = thread.Created.Format("2006-01-02 15:04:05")
+
+			info.PictureUserWhoCreatedThread = user.Picture
+			info.UserNameWhoCreatedThread = user.UserName
+
+			posts, err := m.DB.GetAllPostsFromThread(thread.ID)
+			if err != nil {
+				log.Fatal(err)
+			}
+			info.Posts = posts
+			userWhoCreatedLastPost, _ := m.DB.GetUserByID(getUserThatCreatedLastPost(posts))
+			info.PictureUserWhoCreatedLastPost = userWhoCreatedLastPost.Picture
+			info.UserNameWhoCreatedLastPost = userWhoCreatedLastPost.UserName
+			threadsInfo = append(threadsInfo, info)
+		}
+
+		data := make(map[string]interface{})
+
+		data["threads"] = threadsInfo
+
+		renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
+			Data: data,
+		})
+	} else if r.Method == http.MethodPost {
+		fmt.Println(r.FormValue("subject_of_topic"))
 	}
-
-	data := make(map[string]interface{})
-
-	data["threads"] = threadsInfo
-
-	renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
-		Data: data,
-	})
 
 }
 
