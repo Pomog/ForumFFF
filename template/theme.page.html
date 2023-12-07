@@ -91,15 +91,17 @@
   <table class="table-borderless forumTable whiteLink mt-3">
     <thead class="containerHead">
       <tr >
+{{/* info related to the main(mother)Thread */}}
         <th class="forumFirstColTheme" scope="col" colspan="2">
-          <img src="{{ .PictureUserWhoCreatedPost}}" class="logo_img" alt="/static/logo/message_icon2.png"><strong>&nbsp;{{ .Subject }} </strong>
-
+        {{index .Data "mainThreadName"}} <br>
+        Created: {{index .Data "mainThreadCreatedTime"}}
         </th>
+
         <th></th>
+
       </tr>
     </thead>
     <tbody class="containerBody">
-      <!-- placeholder for posts -->
       <tr>
         <td>
           <img src="static\ava\pomogadryg_ava.png" class="ava_img" alt="ava"><strong> &nbsp; Pomogadryg </strong><br>Date of Registration: 10.05.2015 <br> Total Messages: 211
