@@ -90,8 +90,6 @@
  
   <table class="table-borderless forumTable whiteLink mt-3">
     <thead class="containerHead">
-      {{$postinfo := index .Data "posts"}}
-      {{ range $postinfo}}
       <tr >
         <th class="forumFirstColTheme" scope="col" colspan="2">
           <img src="{{ .PictureUserWhoCreatedPost}}" class="logo_img" alt="/static/logo/message_icon2.png"><strong>&nbsp;{{ .Subject }} </strong>
