@@ -74,6 +74,25 @@ func (m *SqliteBDRepo) GetUserByID(ID int) (models.User, error) {
 	return user, nil
 }
 
+func (m *SqliteBDRepo) GetThreadByID(ID int) (models.Thread, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select * 
+	from thread
+	where id = $1
+	`
+	var thread models.Thread
+
+	row := m.DB.QueryRowContext(ctx, query, ID)
+
+	err := row.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID)
+	if err != nil {
+		return thread, err
+	}
+	return thread, nil
+}
+
 func (m *SqliteBDRepo) CreateUser(r models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -96,18 +115,18 @@ func (m *SqliteBDRepo) CreateUser(r models.User) error {
 	return nil
 }
 
-func (m *SqliteBDRepo) CreateThread(userID int, thread models.Thread) error {
+func (m *SqliteBDRepo) CreateThread(thread models.Thread) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	stmt := `insert into thread
 	(subject, userID)
-	values ($1, $2, )
+	values ($1, $2)
 	`
 
 	_, err := m.DB.ExecContext(ctx, stmt,
 		thread.Subject,
-		userID,
+		thread.UserID,
 	)
 
 	if err != nil {

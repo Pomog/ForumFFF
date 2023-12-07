@@ -91,10 +91,14 @@
   <table class="table-borderless forumTable whiteLink mt-3">
     <thead class="containerHead">
       <tr >
-
-        <th class="forumFirstColTheme" scope="col" colspan="2">Project TL</th>
+{{/* info related to the main(mother)Thread */}}
+        <th class="forumFirstColTheme" scope="col" colspan="2">
+        {{index .Data "mainThreadName"}} <br>
+        Created: {{index .Data "mainThreadCreatedTime"}}
+        </th>
 
         <th></th>
+
       </tr>
     </thead>
     <tbody class="containerBody">

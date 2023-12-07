@@ -24,13 +24,21 @@ type Thread struct {
 }
 
 type ThreadDataForMainPage struct {
-	Subject  string
-	Created  string
-	UserNameWhoCreatedThread string
-	UserNameWhoCreatedLastPost string
-	PictureUserWhoCreatedThread  string
-	PictureUserWhoCreatedLastPost  string
-	Posts    []Post
+	Subject                       string
+	Created                       string
+	UserNameWhoCreatedThread      string
+	UserNameWhoCreatedLastPost    string
+	PictureUserWhoCreatedThread   string
+	PictureUserWhoCreatedLastPost string
+	Posts                         []Post
+}
+
+type PostDataForThemePage struct {
+	Subject                   string
+	Content                   string
+	Created                   string
+	UserNameWhoCreatedPost    string
+	PictureUserWhoCreatedPost string
 }
 
 type Post struct {
