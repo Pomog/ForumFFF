@@ -238,9 +238,25 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			Data: data,
 		})
 	} else if r.Method == http.MethodPost {
-		fmt.Println(r.FormValue("subject_of_topic"))
+		thread := models.Thread{
+			Subject: r.FormValue("message-text"),
+			UserID:  getUserFromCookies(r),
+		}
+
+		err := m.DB.CreateThread(thread)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not create a thread", "/error-page")
+		}
+
 	}
 
+}
+
+func getUserFromCookies(r *http.Request) int {
+	beaves := models.User{
+		ID: 4,
+	}
+	return beaves.ID
 }
 
 func getUserThatCreatedLastPost(posts []models.Post) int {
@@ -256,10 +272,52 @@ func getUserThatCreatedLastPost(posts []models.Post) int {
 	return id
 }
 
+func getThreadIDFromCookies(r *http.Request) int {
+	return 2
+}
+
 // MainHandler is a method of the Repository struct that handles requests to the main page.
 // It renders the "home.page.html" template to the provided HTTP response writer.
 func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
-	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{})
+	if r.Method == http.MethodGet {
+		threadID := getThreadIDFromCookies(r)
+		posts, err := m.DB.GetAllPostsFromThread(threadID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get all posts from thread", "/error-page")
+		}
+
+		var postsInfo []models.PostDataForThemePage
+
+		mainThread, err := m.DB.GetThreadByID(getThreadIDFromCookies(r))
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get thread by id", "/error-page")
+		}
+
+		for _, post := range posts {
+			var user models.User
+			user, err = m.DB.GetUserByID(post.UserID)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get user by id", "/error-page")
+			}
+			var info models.PostDataForThemePage
+			info.Subject = post.Subject
+			info.Created = post.Created.Format("2006-01-02 15:04:05")
+			info.Content = post.Content
+			info.PictureUserWhoCreatedPost = user.Picture
+			info.UserNameWhoCreatedPost = user.UserName
+			postsInfo = append(postsInfo, info)
+		}
+
+		data := make(map[string]interface{})
+
+		data["posts"] = postsInfo
+		
+		data["creatorName"] = m.DB.GetUserByID(mainThread.UserID).UserName
+
+		renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
+			Data: data,
+		})
+	}
 }
 
 // ErrorPage handles the "/error-page" route
