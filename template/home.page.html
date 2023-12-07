@@ -5,9 +5,11 @@
     <table class="table-borderless forumTable whiteLink mt-3">
       <thead class="containerHead">
         <tr >
-          <th class="forumFirstCol" scope="col">Forums<br>
+          <!-- modal starts -->
+          <th class="forumFirstCol" scope="col">
+            Forums<br>
             <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createNewTopicModal" data-bs-whatever="@getbootstrap">Create New Topic</button>
-            
+          </th>
             <div class="modal fade text-bg-dark p-3" id="createNewTopicModal" tabindex="-1" aria-labelledby="createNewTopicModalLabel" aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content">
@@ -16,25 +18,21 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
-                    <form method="post" action="">
+                    <form method="post" action="/home">
                       <div class="mb-3">
-                        <label for="subject_of_topic" class="col-form-label">Subject:</label>
-                        <input type="text" class="form-control" id="subject_of_topic" name="subject_of_topic">
+                        <label for="message-text" class="col-form-label">Type your topic here:</label>
+                        <textarea class="form-control" id="message-text" name="message-text"></textarea>
                       </div>
-                      <div class="mb-3">
-                        <label for="message-text" class="col-form-label">The content:</label>
-                        <textarea class="form-control" id="message-text"></textarea>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-light">Publish new topic</button>
                       </div>
                     </form>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-light">Publish new topic</button>
                   </div>
                 </div>
               </div>
             </div>
-          </th>
+          <!-- modal ends -->
           <th scope="col">Latest Message</th>
           <th scope="col">Total Messages</th>
         </tr>
