@@ -1,6 +1,7 @@
 # FFForum
 Online forum for MMORPG fans and friends!
 ![Forum Home Page](static/readme_images/image.png)
+![Alt text](image.png)
 
 ## Project Overview
 
