@@ -1,124 +1,55 @@
 {{template "body" .}}
+
 {{define "centralPart"}}
 <div class="container custom-container">
+    <table class="table forumTable whiteLink mt-3">
+        <thead class="containerHead">
+            <tr>
+                <!-- modal starts -->
+                <th class="forumFirstCol" scope="col">
+                    <div class="d-flex justify-content-start align-items-center">
+                        <button type="button" class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#createNewTopicModal">Create New Topic</button>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <h3>Created Topics</h3>
+                    </div>
+                </th>
+                <!-- modal ends -->
+                <th scope="col">Latest Message</th>
+                <th scope="col">Total Messages</th>
+            </tr>
+        </thead>
+        <tbody class="containerBody">
+            {{$threadinfo := index .Data "threads"}}
+            {{ range $threadinfo }}
+            <tr>
+                <td>
+                    <!-- 1column -->
+                    <a href="/theme">
+                        <img src="{{ .PictureUserWhoCreatedThread }}" class="logo_img" alt="/static/logo/message_icon2.png"><strong>&nbsp;{{ .Subject }} </strong>
+                        <br>Created by: {{ .UserNameWhoCreatedThread}}<br>
+                        Topic created: {{ .Created}}
+                    </a>
+                </td>
+                {{ $lastPost := findLastPost .Posts }}
+                {{ $dateLastPostCreated := convertTime $lastPost }}
+                <td><!-- 2column -->From:<br><img src="{{ .PictureUserWhoCreatedLastPost }}" class="logo_ava" alt="picture"> {{ $lastPost.Subject}} <br>{{ .UserNameWhoCreatedLastPost }}<br> Posted: {{$dateLastPostCreated}} </td>
+                {{ $numOfPosts := numberOfPosts .Posts }}
+                <td><!-- 3column -->{{ $numOfPosts}} messages</td>
+            </tr>
+            {{ end }}
 
-    <table class="table  forumTable whiteLink mt-3">
-      <thead class="containerHead">
-        <tr >
-          <!-- modal starts -->
-          <th class="forumFirstCol" scope="col">
-            <div class="d-flex justify-content-start align-items-center">
-              <button type="button" class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#createNewTopicModal">Create New Topic</button>
-            </div>
-            <div class="d-flex justify-content-center">
-              <h3>Created Topics</h3>
-            </div>
-          </th>
-            <div class="modal fade text-bg-dark p-3" id="createNewTopicModal" tabindex="-1" aria-labelledby="createNewTopicModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="createNewTopicModalLabel">What this topic will be about?</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <form method="post" action="/home">
-                      <div class="mb-3">
-                        <label for="message-text" class="col-form-label">Type your topic here:</label>
-                        <textarea class="form-control" id="message-text" name="message-text"></textarea>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-light">Publish new topic</button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          <!-- modal ends -->
-          <th scope="col">Latest Message</th>
-          <th scope="col">Total Messages</th>
-        </tr>
-      </thead>
-      <tbody class="containerBody">
-        {{$threadinfo := index .Data "threads"}}
-        {{ range $threadinfo }}
-        <tr>
-            <td>
-              <!-- 1column -->
-                <a href="/theme">
+            <tr>
+                <td>
+                    <img src="/static/logo/message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp;WoW Classic: </strong>New Lost and Found NPC in Booty Bay - WoW Classic. In the latest update to WoW Classic, Patch 1.15.0, Blizzard has added a new NPC to Booty Bay named "Rix Xizzix" who is a Lost and Found Vendor.
+                </td>
+                <td>From: SomeOneElse - Another Comment here<br> Posted: 21-2-2023</td>
+                <td>1 message</td>
+            </tr>
 
-                  <img src="{{ .PictureUserWhoCreatedThread}}" class="logo_img" alt="/static/logo/message_icon2.png"><strong>&nbsp;{{ .Subject }} </strong>
-                  <br>Created by: {{ .UserNameWhoCreatedThread}}<br>
-                  Topic created: {{ .Created}}
-                </a>
-              </td>
-              
-            {{ $lastPost := findLastPost .Posts}}
-            {{ $dateLastPostCreated := convertTime $lastPost}}
-          <td><!-- 2column -->From:<br><img src="{{ .PictureUserWhoCreatedLastPost}}" class="logo_ava" alt="picture"> {{ .UserNameWhoCreatedLastPost }} - {{ $lastPost.Subject}} <br> Posted: {{$dateLastPostCreated}} </td>
-          {{ $numOfPosts := numberOfPosts .Posts}}
-          <td><!-- 3column -->{{ $numOfPosts}} messages</td>
-        </tr>
-        {{end}}
+            <!-- Other rows with similar content -->
 
-        <tr>
-          <td> 
-
-            <img src="/static/logo/message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp;WoW Classic: </strong>New Lost and Found NPC in Booty Bay - WoW Classic. In the latest update to WoW Classic, Patch 1.15.0, Blizzard has added a new NPC to Booty Bay named "Rix Xizzix" who is a Lost and Found Vendor.
-
-          </td>
-          <td>From: SomeOneElse - Another Comment here<br> Posted: 21-2-2023</td>
-          <td>1 message</td>
-        </tr>
-        <tr>
-          <td>
-
-            <img src="/static/logo/message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp; Project TL: </strong>Project TL (Lineage 3 or Lineage Eternal) release date is a matter of speculation for nearly a decade. It was initially announced in 2011, but after delays and complications, the third installment in the Lineage series has not yet seen the light of day, nor do we have any vague release date set.
-
-          </td>
-          <td>From: Pomogadryg - I will play this game...<br> Posted: 10-11-2022</td>
-          <td>5 messages</td>
-        </tr>
-        <tr>
-          <td>
-
-            <img src="/static/logo/message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp; Upcoming MMO: </strong>A new MMO titled "Legends of Eternia" has been teased by a renowned game studio. Little is known about the gameplay or setting, but rumors suggest it will revolutionize the genre.
-
-          </td>
-          <td>From: Adventurer88 - Excited for this one!<br> Posted: 22-12-2022</td>
-          <td>8 messages</td>
-        </tr>
-        <tr>
-          <td>
-
-            <img src="/static/logo/message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp; Fantasy RPG News: </strong>An unconfirmed leak reveals details about an upcoming fantasy RPG. Speculations about its vast open world and intricate storyline have sparked interest among gaming enthusiasts.
-
-          </td>
-          <td>From: QuestMaster21 - Can't wait to explore!<br> Posted: 21-11-2023</td>
-          <td>12 messages</td>
-        </tr>
-        <tr>
-          <td>
-
-            <img src="/static/logo/message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp; Sci-Fi MMO Announcement: </strong>A renowned game studio has officially announced the development of a new sci-fi MMO. The teaser trailer hints at futuristic worlds and advanced gameplay mechanics.
-
-          </td>
-          <td>From: SpaceExplorerX - Ready to embark on this journey!<br> Posted: 02-12-2023</td>
-          <td>6 messages</td>
-        </tr>
-        <tr>
-          <td>
-
-            <img src="/static/logo/message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp; MMORPG Update: </strong>An existing MMORPG is set to receive a major update, promising new quests, improved graphics, and enhanced gameplay mechanics.
-
-          </td>
-          <td>From: GamerGirl123 - Exciting times ahead!<br> Posted: 10-11-2022</td>
-          <td>10 messages</td>
-        </tr>
-
-      </tbody>
+        </tbody>
     </table>
-  </div>
+</div>
 {{end}}

@@ -288,11 +288,6 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 
 		var postsInfo []models.PostDataForThemePage
 
-		mainThread, err := m.DB.GetThreadByID(getThreadIDFromCookies(r))
-		if err != nil {
-			setErrorAndRedirect(w, r, "Could not get thread by id", "/error-page")
-		}
-
 		for _, post := range posts {
 			var user models.User
 			user, err = m.DB.GetUserByID(post.UserID)
@@ -312,8 +307,20 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 
 		data["posts"] = postsInfo
 
-		data["creatorName"],_ = m.DB.GetUserByID(mainThread.UserID)
+		mainThread, err := m.DB.GetThreadByID(getThreadIDFromCookies(r))
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get thread by id", "/error-page")
+		}
 
+		creator, err := m.DB.GetUserByID(mainThread.UserID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get user as creator", "/error-page")
+		}
+
+		data["creatorName"] = creator.UserName
+		data["creatorImg"] = creator.Picture
+		data["mainThreadName"] = mainThread.Subject
+		data["mainThreadCreatedTime"] = mainThread.Created.Format("2006-01-02 15:04:05")
 		renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
 			Data: data,
 		})

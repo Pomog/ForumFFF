@@ -90,17 +90,27 @@
  
   <table class="table-borderless forumTable whiteLink mt-3">
     <thead class="containerHead">
-      {{$postinfo := index .Data "posts"}}
-
-      <tr >
-{{/* info related to the main(mother)Thread */}}
+      <tr>
+        {{/* Info related to the main (mother) Thread */}}
         <th class="forumFirstColTheme" scope="col" colspan="2">
-        {{index .Data "mainThreadName"}} <br>
-        Created: {{index .Data "mainThreadCreatedTime"}}
+          {{$creatorImage := index .Data "creatorImg"}}
+          {{$creatorName := index .Data "creatorName"}}
+          <img src="{{$creatorImage}}" class="ava_img" alt="ava"><br>
+          <strong>&nbsp;{{$creatorName}}</strong><br>
+          Date of Registration: ...... <br>
+          Total Messages: ....
         </th>
+  
+        <th>
+          <div id="mainTheme">
+            <h3>Topic:</h3>
+            <hr>
+            {{index .Data "mainThreadName"}} <br>
+            <hr>
+            Created: {{index .Data "mainThreadCreatedTime"}}
+          </div>
 
-        <th></th>
-
+        </th>
       </tr>
     </thead>
     <tbody class="containerBody">
@@ -108,22 +118,23 @@
       {{ range $postinfo }}
       <tr>
         <td>
-          <img src="{{ .PictureUserWhoCreatedThread}}" class="logo_img" alt="/static/logo/message_icon2.png"><strong>&nbsp;{{ .Subject }} </strong>
-
-          <img src="{{ .PictureUserWhoCreatedPost}}" class="ava_img" alt="ava"><strong> &nbsp; {{ .UserNameWhoCreatedPost}} </strong><br>Date of Registration: ...... <br> Total Messages: ....
+          <img src="{{ .PictureUserWhoCreatedPost }}" class="ava_img" alt="ava">
+          <br><strong>&nbsp;{{ .UserNameWhoCreatedPost }}</strong><br>
+          Date of Registration: ...... <br>
+          Total Messages: ....
         </td>
-        <td> 
+        <td>
         </td>
-        <td> <em>...</em> 
-          <br>
-          <br>{{ .Content}}
-          <br> Posted: {{ .Created}}
-          <br>Like 0 👍&nbsp; &nbsp; Dislike 0 👎
-        
+        <td>
+          <em>...</em> <br><br>
+          {{ .Content }}<br>
+          Posted: {{ .Created }}<br>
+          Like 0 👍 &nbsp; &nbsp; Dislike 0 👎
         </td>
       </tr>
-      {{end}}
+      {{ end }}
     </tbody>
   </table>
+  
 </div>
 {{end}}
