@@ -2,13 +2,17 @@
 {{define "centralPart"}}
 <div class="container custom-container">
 
-    <table class="table-borderless forumTable whiteLink mt-3">
+    <table class="table  forumTable whiteLink mt-3">
       <thead class="containerHead">
         <tr >
           <!-- modal starts -->
           <th class="forumFirstCol" scope="col">
-            Created Topics<br>
-            <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createNewTopicModal" data-bs-whatever="@getbootstrap">Create New Topic</button>
+            <div class="d-flex justify-content-start align-items-center">
+              <button type="button" class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#createNewTopicModal">Create New Topic</button>
+            </div>
+            <div class="d-flex justify-content-center">
+              <h3>Created Topics</h3>
+            </div>
           </th>
             <div class="modal fade text-bg-dark p-3" id="createNewTopicModal" tabindex="-1" aria-labelledby="createNewTopicModalLabel" aria-hidden="true">
               <div class="modal-dialog">

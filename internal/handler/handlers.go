@@ -289,7 +289,6 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		var postsInfo []models.PostDataForThemePage
 
 		mainThread, err := m.DB.GetThreadByID(getThreadIDFromCookies(r))
-		fmt.Println(mainThread)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get thread by id", "/error-page")
 		}
@@ -313,7 +312,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 
 		data["posts"] = postsInfo
 
-		// data["creatorName"] = m.DB.GetUserByID(mainThread.UserID).UserName
+		data["creatorName"],_ = m.DB.GetUserByID(mainThread.UserID)
 
 		renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
 			Data: data,
