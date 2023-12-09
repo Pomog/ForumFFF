@@ -1,7 +1,6 @@
 # FFForum
 Online forum for MMORPG fans and friends!
 ![Forum Home Page](static/readme_images/image.png)
-![Alt text](image.png)
 
 ## Project Overview
 
@@ -35,63 +34,57 @@ This is a Web Application written in Golang, utilizing only standard [Go librari
 - [Denys Verves](https://github.com/TartuDen)
 - [Yurii Panasiuk](https://github.com/pomog)
 
-# Project Overview
+## Application Structure Overview
 
-This project encompasses a server-based application built using Go programming language. The structure and components of the application are as follows:
+### Main Function (`main()`)
 
-## Main Function (`main()`)
+- Sets up the server on a specified port.
+- Calls the `run()` function for initial setup tasks.
+- Configures the HTTP server to listen on the specified port and handle requests using the `routes()` function.
 
-- Starts the server.
-- Initializes the database connection.
-- Sets up routes and handlers.
-- Listens on a specified port for incoming HTTP requests.
+### `run()` Function
 
-## Database Initialization (`run()`)
+- Initializes the application configuration (`config.AppConfig`) and initial data.
+- Registers custom types for serialization with the `encoding/gob` package.
+- Sets up database tables using `repository.MakeDBTables()`.
+- Sets up the repository (`handler.Repo`) and initializes the template cache for HTML rendering.
 
-- Establishes a database connection and sets up necessary tables.
-- Registers custom types for encoding.
-- Initializes repositories and handlers.
+### `routes()` Function
 
-## Routing (`routes()`)
+- Defines routes and their respective handlers using `http.HandleFunc`.
+- Handles serving static files (CSS, logos, avatars) using `http.FileServer` and `http.StripPrefix`.
 
-- Defines the application routes and corresponding handler functions.
-- Handles serving static files and HTML templates.
+### Repository and AppConfig
 
-## Handlers (`LoginHandler`, `RegisterHandler`, `HomeHandler`, `ThemeHandler`, `ErrorPage`)
+- `Repository` holds application configuration and database connections.
+- `AppConfig` stores application-specific settings like cache configurations, loggers, and environment flags.
 
-- Perform various tasks based on HTTP requests:
-  - Handling user login and registration.
-  - Rendering templates.
-  - Processing form data and performing validations.
-  - Interacting with the database (creating users, threads, posts, etc.).
-  - Redirecting users based on certain conditions.
+### Handler Functions
 
-## Form Handling (`Form` and associated methods)
+- `LoginHandler`, `RegisterHandler`, `HomeHandler`, etc., manage specific HTTP endpoints.
+- Examples: `LoginHandler` handles login logic and redirects; `RegisterHandler` manages user registration and interactions with the database; `HomeHandler` deals with displaying home page content and thread creation.
 
-- Represents HTML form data.
-- Contains methods for form validation and error handling.
-- Checks for required fields, validates field lengths and formats (like email format or password length), and more.
+### `forms` Package
 
-## Configuration (`AppConfig`)
+- Contains functions for validating form data (e.g., email formats, password lengths).
 
-- Holds application configuration settings.
-- Manages caching, logging, and production mode status.
-- Stores template caches, loggers, and other configuration data.
+### Database Interaction (`SqliteBDRepo`)
 
-## Models (`User`, `Thread`, `Post`, `Votes`)
+- Implements methods to interact with the SQLite database.
+- Provides functions for user existence checks, fetching user details, creating threads, and handling thread/post queries.
 
-- Define structures representing entities in the application (users, threads, posts, etc.).
-- Provide data structures for storing and working with information retrieved from the database.
+### Template Rendering (`RendererTemplate` and `CreateTemplateCache`)
 
-## Template Rendering (`RendererTemplate`, `CreateTemplateCache`)
+- Utilizes Go's `html/template` package for rendering HTML templates.
+- `RendererTemplate` handles template rendering based on provided data.
+- `CreateTemplateCache` sets up and caches HTML templates for efficient rendering.
 
-- Renders HTML templates using Go's `html/template` package.
-- Caches templates for efficient rendering.
-- Implements default data and error handling for rendering templates.
+### Helper Functions and Structs
 
-## Database Repository (`Repository`, `SqliteBDRepo`, `DatabaseInt`)
+- Includes helper functions for error handling, template data setup, and managing HTTP responses.
+- Defined structs like `User`, `Thread`, `Post`, etc., represent data models used throughout the application.
 
-- Abstracts database interactions.
-- Provides methods for database operations such as user presence check, user creation, thread creation, post creation, etc.
-- Implements interfaces for different database interactions and functionality.
+### Database Initialization (`MakeDBTables` and `GetDB`)
 
+- Sets up the SQLite database by creating tables and ensuring a connection.
+- Initializes the database and performs checks to ensure connectivity.
