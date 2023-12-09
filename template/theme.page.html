@@ -90,6 +90,8 @@
  
   <table class="table-borderless forumTable whiteLink mt-3">
     <thead class="containerHead">
+      {{$postinfo := index .Data "posts"}}
+
       <tr >
 {{/* info related to the main(mother)Thread */}}
         <th class="forumFirstColTheme" scope="col" colspan="2">
