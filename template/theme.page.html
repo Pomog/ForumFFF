@@ -90,55 +90,51 @@
  
   <table class="table-borderless forumTable whiteLink mt-3">
     <thead class="containerHead">
-      <tr >
-{{/* info related to the main(mother)Thread */}}
+      <tr>
+        {{/* Info related to the main (mother) Thread */}}
         <th class="forumFirstColTheme" scope="col" colspan="2">
-        {{index .Data "mainThreadName"}} <br>
-        Created: {{index .Data "mainThreadCreatedTime"}}
+          {{$creatorImage := index .Data "creatorImg"}}
+          {{$creatorName := index .Data "creatorName"}}
+          <img src="{{$creatorImage}}" class="ava_img" alt="ava"><br>
+          <strong>&nbsp;{{$creatorName}}</strong><br>
+          Date of Registration: ...... <br>
+          Total Messages: ....
         </th>
+  
+        <th>
+          <div id="mainTheme">
+            <h3>Topic:</h3>
+            <hr>
+            {{index .Data "mainThreadName"}} <br>
+            <hr>
+            Created: {{index .Data "mainThreadCreatedTime"}}
+          </div>
 
-        <th></th>
-
+        </th>
       </tr>
     </thead>
     <tbody class="containerBody">
+      {{$postinfo := index .Data "posts"}}
+      {{ range $postinfo }}
       <tr>
         <td>
-          <img src="static\ava\pomogadryg_ava.png" class="ava_img" alt="ava"><strong> &nbsp; Pomogadryg </strong><br>Date of Registration: 10.05.2015 <br> Total Messages: 211
+          <img src="{{ .PictureUserWhoCreatedPost }}" class="ava_img" alt="ava">
+          <br><strong>&nbsp;{{ .UserNameWhoCreatedPost }}</strong><br>
+          Date of Registration: ...... <br>
+          Total Messages: ....
         </td>
-        <td> 
-        </td>
-        <td> <em>"Project TL (Lineage 3 or Lineage Eternal) release date 
-          is a matter of speculation for nearly a decade. It was 
-          initially announced in 2011, but after delays and complications, 
-          the third installment in the Lineage series has not yet seen the 
-          light of day, nor do we have any vague release date set."</em> 
-          <br>
-          <br>I will play this game, cuz it looks really cool. Who else is going to play it?
-          <br> Posted: 10-11-2023 [15:12]
-          <br>Like 0 👍&nbsp; &nbsp; Dislike 0 👎
-        
-        </td>
-      </tr>
-
-      <tr>
         <td>
-          <img src="static\ava\pomog_ava.png" class="ava_img" alt="ava"><strong> &nbsp; Pomog </strong><br>Date of Registration: 05.07.2017 <br> Total Messages: 121
         </td>
-        <td> 
-        </td>
-        <td> <em>From <strong>Pomogadryg:</strong>&nbsp;"I will play this game, cuz it looks really cool. 
-          Who else is going to play it?"</em> 
-          <br>
-          <br>And what about Kood Johvi? When you going to finish Form???
-          <br> Posted: 10-11-2023 [15:45]
-          <br>Like 1 👍&nbsp; &nbsp; Dislike 👎
-        
+        <td>
+          <em>...</em> <br><br>
+          {{ .Content }}<br>
+          Posted: {{ .Created }}<br>
+          Like 0 👍 &nbsp; &nbsp; Dislike 0 👎
         </td>
       </tr>
-
-
+      {{ end }}
     </tbody>
   </table>
+  
 </div>
 {{end}}

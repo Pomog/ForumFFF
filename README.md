@@ -1,5 +1,31 @@
-# ForumFFF
+# FFForum
 Online forum for MMORPG fans and friends!
+![Forum Home Page](static/readme_images/image.png)
+
+## Project Overview
+
+This project is one of the starting tasks from the Kood/Jõhvi Retraining Program. The description can be found [here](https://github.com/01-edu/public/tree/master/subjects/forum).
+
+## Features
+
+This is a Web Application written in Golang, utilizing only standard [Go libraries](https://pkg.go.dev/std) and the following external packages:
+- `github.com/google/uuid v1.4.0`
+- `github.com/mattn/go-sqlite3 v1.14.18`
+
+### Database
+- We are using the SQLite driver. However, our application implements The Repository pattern, and to switch databases, the `DatabaseInt` interface (located in the `repository` package) should be implemented for database systems.
+
+### Template Rendering
+-
+
+###  HTTP server `routes` - HTTP request multiplexer
+- sets up a basic HTTP server with route handlers for static files and various application endpoints, using the http.ServeMux as the multiplexer.
+- The handlers are defined in the handler package, and the `routes` function is responsible for configuring the routing logic for the application.
+
+## Unsolved Issues
+1. Not optimized requests to the Database. Sometimes there are several requests per function or method.
+2. No Middleware.
+3. User's passwords are stored as strings in the Database.
 
 ## Project Overview
 
@@ -32,3 +58,58 @@ This is a Web Application written in Golang, utilizing only standard [Go librari
 ## Authors
 - [Denys Verves](https://github.com/TartuDen)
 - [Yurii Panasiuk](https://github.com/pomog)
+
+## Application Structure Overview
+
+### Main Function (`main()`)
+
+- Sets up the server on a specified port.
+- Calls the `run()` function for initial setup tasks.
+- Configures the HTTP server to listen on the specified port and handle requests using the `routes()` function.
+
+### `run()` Function
+
+- Initializes the application configuration (`config.AppConfig`) and initial data.
+- Registers custom types for serialization with the `encoding/gob` package.
+- Sets up database tables using `repository.MakeDBTables()`.
+- Sets up the repository (`handler.Repo`) and initializes the template cache for HTML rendering.
+
+### `routes()` Function
+
+- Defines routes and their respective handlers using `http.HandleFunc`.
+- Handles serving static files (CSS, logos, avatars) using `http.FileServer` and `http.StripPrefix`.
+
+### Repository and AppConfig
+
+- `Repository` holds application configuration and database connections.
+- `AppConfig` stores application-specific settings like cache configurations, loggers, and environment flags.
+
+### Handler Functions
+
+- `LoginHandler`, `RegisterHandler`, `HomeHandler`, etc., manage specific HTTP endpoints.
+- Examples: `LoginHandler` handles login logic and redirects; `RegisterHandler` manages user registration and interactions with the database; `HomeHandler` deals with displaying home page content and thread creation.
+
+### `forms` Package
+
+- Contains functions for validating form data (e.g., email formats, password lengths).
+
+### Database Interaction (`SqliteBDRepo`)
+
+- Implements methods to interact with the SQLite database.
+- Provides functions for user existence checks, fetching user details, creating threads, and handling thread/post queries.
+
+### Template Rendering (`RendererTemplate` and `CreateTemplateCache`)
+
+- Utilizes Go's `html/template` package for rendering HTML templates.
+- `RendererTemplate` handles template rendering based on provided data.
+- `CreateTemplateCache` sets up and caches HTML templates for efficient rendering.
+
+### Helper Functions and Structs
+
+- Includes helper functions for error handling, template data setup, and managing HTTP responses.
+- Defined structs like `User`, `Thread`, `Post`, etc., represent data models used throughout the application.
+
+### Database Initialization (`MakeDBTables` and `GetDB`)
+
+- Sets up the SQLite database by creating tables and ensuring a connection.
+- Initializes the database and performs checks to ensure connectivity.
