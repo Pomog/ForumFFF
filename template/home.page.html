@@ -2,18 +2,40 @@
 
 {{define "centralPart"}}
 <div class="container custom-container">
-    <table class="table forumTable whiteLink mt-3">
+    <table class="table border-success forumTable whiteLink mt-3">
         <thead class="containerHead">
             <tr>
                 <!-- modal starts -->
                 <th class="forumFirstCol" scope="col">
-                    <div class="d-flex justify-content-start align-items-center">
-                        <button type="button" class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#createNewTopicModal">Create New Topic</button>
-                    </div>
-                    <div class="d-flex justify-content-center">
-                        <h3>Created Topics</h3>
-                    </div>
+                  <div class="d-flex justify-content-start align-items-center">
+                    <button type="button" class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#createNewTopicModal">Create New Topic</button>
+                  </div>
+                  <div class="d-flex justify-content-center">
+                    <h3>Created Topics</h3>
+                  </div>
                 </th>
+                  <div class="modal fade text-bg-dark p-3" id="createNewTopicModal" tabindex="-1" aria-labelledby="createNewTopicModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h1 class="modal-title fs-5" id="createNewTopicModalLabel">What this topic will be about?</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form method="post" action="/home">
+                            <div class="mb-3">
+                              <label for="message-text" class="col-form-label">Type your topic here:</label>
+                              <textarea class="form-control" id="message-text" name="message-text"></textarea>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-light">Publish new topic</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 <!-- modal ends -->
                 <th scope="col">Latest Message</th>
                 <th scope="col">Total Messages</th>
@@ -22,34 +44,26 @@
         <tbody class="containerBody">
             {{$threadinfo := index .Data "threads"}}
             {{ range $threadinfo }}
-            <tr>
-                <td>
-                    <!-- 1column -->
-                    <a href="/theme">
-                        <img src="{{ .PictureUserWhoCreatedThread }}" class="logo_img" alt="/static/logo/message_icon2.png"><strong>&nbsp;{{ .Subject }} </strong>
-                        <br>Created by: {{ .UserNameWhoCreatedThread}}<br>
-                        Topic created: {{ .Created}}
-                    </a>
-                </td>
-                {{ $lastPost := findLastPost .Posts }}
-                {{ $dateLastPostCreated := convertTime $lastPost }}
-                <td><!-- 2column -->From:<br><img src="{{ .PictureUserWhoCreatedLastPost }}" class="logo_ava" alt="picture"> {{ $lastPost.Subject}} <br>{{ .UserNameWhoCreatedLastPost }}<br> Posted: {{$dateLastPostCreated}} </td>
-                {{ $numOfPosts := numberOfPosts .Posts }}
-                <td><!-- 3column -->{{ $numOfPosts}} messages</td>
-            </tr>
+
+              <tr>
+                  <td>
+                      <!-- 1column -->
+                      <a href="/theme">
+                          <img src="{{ .PictureUserWhoCreatedThread }}" class="logo_img" alt="/static/logo/message_icon2.png"><strong>&nbsp;{{ .Subject }} </strong>
+                          <br>Created by: {{ .UserNameWhoCreatedThread}}<br>
+                          Topic created: {{ .Created}}
+                      </a>
+                  </td>
+                  {{ $lastPost := findLastPost .Posts }}
+                  {{ $dateLastPostCreated := convertTime $lastPost }}
+                  <td><!-- 2column -->From:<br><img src="{{ .PictureUserWhoCreatedLastPost }}" class="logo_ava" alt="picture"> {{ $lastPost.Subject}} <br>{{ .UserNameWhoCreatedLastPost }}<br> Posted: {{$dateLastPostCreated}} </td>
+                  {{ $numOfPosts := numberOfPosts .Posts }}
+                  <td><!-- 3column -->{{ $numOfPosts}} messages</td>
+              </tr>
+
             {{ end }}
-
-            <tr>
-                <td>
-                    <img src="/static/logo/message_icon2.png" class="logo_img" alt="logo"><strong> &nbsp;WoW Classic: </strong>New Lost and Found NPC in Booty Bay - WoW Classic. In the latest update to WoW Classic, Patch 1.15.0, Blizzard has added a new NPC to Booty Bay named "Rix Xizzix" who is a Lost and Found Vendor.
-                </td>
-                <td>From: SomeOneElse - Another Comment here<br> Posted: 21-2-2023</td>
-                <td>1 message</td>
-            </tr>
-
-            <!-- Other rows with similar content -->
-
         </tbody>
     </table>
+  </div>
 </div>
 {{end}}
