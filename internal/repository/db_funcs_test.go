@@ -6,7 +6,7 @@ import (
 )
 
 var ObligatoryTables = []string{
-	"users", "thread", "votes", "post",
+	"users", "thread", "votes", "post", "sessionId",
 }
 
 func Test_GetDB(t *testing.T) {
