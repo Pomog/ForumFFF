@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -9,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/Pomog/ForumFFF/internal/config"
@@ -17,6 +17,7 @@ import (
 	"github.com/Pomog/ForumFFF/internal/renderer"
 	"github.com/Pomog/ForumFFF/internal/repository"
 	"github.com/Pomog/ForumFFF/internal/repository/dbrepo"
+	"github.com/google/uuid"
 )
 
 // Repo the repository used by the handlers
@@ -89,9 +90,17 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Check if User is Presaent in the DB, ERR should be handled
-		result, _ := m.DB.UserPresentLogin(loginData.Email, loginData.Password)
-		fmt.Println("UserPresentLogin: ", result)
-		if result {
+		userID, _ := m.DB.UserPresentLogin(loginData.Email, loginData.Password)
+		if userID != 0 {
+			m.App.UserLogin = uuid.New()
+			m.DB.InsertSessionintoDB(m.App.UserLogin.String(), userID)
+
+			cookie := &http.Cookie{
+				Name:  strconv.Itoa(userID),
+				Value: m.App.UserLogin.String(),
+			}
+			http.SetCookie(w, cookie)
+
 			http.Redirect(w, r, "/home", http.StatusSeeOther)
 		} else {
 			setErrorAndRedirect(w, r, "Wrong email or password", "/error-page")
@@ -202,10 +211,25 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 // MainHandler is a method of the Repository struct that handles requests to the main page.
 // It renders the "home.page.html" template to the provided HTTP response writer.
 func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
+	var UserID int
+	for _, cookie := range r.Cookies() {
+		if cookie.Value != "" {
+			userID, err := m.DB.GetUserIDForSessionID(cookie.Value)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get UserID from Cookies m.DB.GetUserIDForSessionID", "/error-page")
+			}
+			UserID = userID
+		}
+	}
+
+	if UserID == 0 {
+		setErrorAndRedirect(w, r, "Could not verify User, Please LogIN", "/error-page")
+	}
+
 	if r.Method == http.MethodGet {
 		threads, err := m.DB.GetAllThreads()
 		if err != nil {
-			log.Fatal(err)
+			setErrorAndRedirect(w, r, "Could not get Threads m.DB.GetAllThreads", "/error-page")
 		}
 
 		var threadsInfo []models.ThreadDataForMainPage
@@ -240,23 +264,17 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == http.MethodPost {
 		thread := models.Thread{
 			Subject: r.FormValue("message-text"),
-			UserID:  getUserFromCookies(r),
+			UserID:  UserID,
 		}
 
 		err := m.DB.CreateThread(thread)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a thread", "/error-page")
 		}
+		http.Redirect(w, r, "/theme", http.StatusPermanentRedirect)
 
 	}
 
-}
-
-func getUserFromCookies(r *http.Request) int {
-	beaves := models.User{
-		ID: 4,
-	}
-	return beaves.ID
 }
 
 func getUserThatCreatedLastPost(posts []models.Post) int {

@@ -11,13 +11,11 @@ import (
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
 	"github.com/Pomog/ForumFFF/internal/repository"
-	"github.com/google/uuid"
 )
 
 const Port = ":8080"
 
 var app config.AppConfig
-var sessionID uuid.UUID
 
 func main() {
 
@@ -42,10 +40,6 @@ func main() {
 
 func run() (*repository.DataBase, error) {
 	fmt.Println("Starting application")
-
-	sessionID = uuid.New()
-
-	app.UserLogin = &sessionID
 
 	// gob.Register() function is used to inform the encoding/gob package about custom types that may be encoded or decoded using the gob encoding format.
 	gob.Register(models.User{})
