@@ -31,28 +31,25 @@ func (m *SqliteBDRepo) UserPresent(userName, email string) (bool, error) {
 	return true, nil
 }
 
-func (m *SqliteBDRepo) UserPresentLogin(email, password string) (bool, error) {
+func (m *SqliteBDRepo) UserPresentLogin(email, password string) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `select count(id) 
+	query := `select id 
 	from users
 	where email = $1 and
 	password = $2
 	`
-	var numRows int
+
 	row := m.DB.QueryRowContext(ctx, query, email, password)
 
-	err := row.Scan(&numRows)
+	userID := 0
+	err := row.Scan(&userID)
 	if err != nil {
-		return false, nil
+		return userID, err
 	}
 
-	if numRows == 0 {
-		return false, nil
-	}
-
-	return true, nil
+	return userID, nil
 }
 
 func (m *SqliteBDRepo) GetUserByID(ID int) (models.User, error) {
@@ -238,4 +235,66 @@ func (m *SqliteBDRepo) GetAllThreads() ([]models.Thread, error) {
 	}
 
 	return threads, nil
+}
+
+func (m *SqliteBDRepo) GetSessionIDForUserID(userID int) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select sessionID 
+	from sessionId WHERE
+	userID = $1
+	`
+	sessionID := ""
+
+	row := m.DB.QueryRowContext(ctx, query, userID)
+
+	err := row.Scan(&sessionID)
+	if err != nil {
+		return sessionID, err
+	}
+
+	return sessionID, nil
+}
+
+func (m *SqliteBDRepo) GetUserIDForSessionID(sessionID string) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select userID 
+	from sessionId WHERE
+	sessionID = $1
+	`
+	var userID int
+
+	row := m.DB.QueryRowContext(ctx, query, sessionID)
+
+	err := row.Scan(&userID)
+	if err != nil {
+		return 0, err
+	}
+
+	return userID, nil
+}
+
+func (m *SqliteBDRepo) InsertSessionintoDB(sessionID string, userID int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `insert into sessionId
+	(sessionID, userID)
+	values ($1, $2
+	)
+	`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		sessionID,
+		userID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
