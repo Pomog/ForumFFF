@@ -171,3 +171,8 @@ section {
     .modal-content {
       background-color: rgb(54, 50, 74);
   }
+
+  .border-success {
+    --bs-border-opacity: 1;
+    border-color: rgba(var(--bs-success-rgb), var(--bs-border-opacity)) !important;
+  }
