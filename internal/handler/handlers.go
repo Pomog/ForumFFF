@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -272,8 +273,8 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	} else if r.Method == http.MethodPost {
 		loggedUser, _ := m.DB.GetUserByID(UserID)
-		userName:=loggedUser.UserName
-		if userName == "guest"{
+		userName := loggedUser.UserName
+		if userName == "guest" {
 			setErrorAndRedirect(w, r, "Guests can not create Themes and Posts, please log in or register!", "/error-page")
 		}
 		thread := models.Thread{
@@ -287,8 +288,6 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		http.Redirect(w, r, fmt.Sprintf("/theme?threadID=%d", id), http.StatusPermanentRedirect)
-
-
 	}
 
 }
