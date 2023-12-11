@@ -1,6 +1,9 @@
 {{template "body" .}}
 
 {{define "centralPart"}}
+{{$loggedAs := index .Data "loggedAs"}}
+<br>
+ <h3> Logged As: {{$loggedAs}}</h3>
 <div class="container custom-container">
     <table class="table border-success forumTable whiteLink mt-3">
         <thead class="containerHead">
@@ -47,8 +50,8 @@
 
               <tr>
                   <td>
-                      <!-- 1column -->
-                      <a href="/theme">
+                      <!-- 1column --> 
+                      <a href="/theme?threadID={{ .ThreadID}}">
                           <img src="{{ .PictureUserWhoCreatedThread }}" class="logo_img" alt="/static/logo/message_icon2.png"><strong>&nbsp;{{ .Subject }} </strong>
                           <br>Created by: {{ .UserNameWhoCreatedThread}}<br>
                           Topic created: {{ .Created}}

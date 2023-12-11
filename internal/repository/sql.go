@@ -48,6 +48,11 @@ var sessionIdTable = `CREATE TABLE IF NOT EXISTS sessionId (
     FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );`
 
+var guestUser = `INSERT INTO users (username, password, first_name, last_name, email)
+VALUES ('guest', '123456', 'Guest', 'User', 'guest@gmail.com');
+);`
+
+
 func getQuerys() []string {
 	var sqlQuerys []string
 	sqlQuerys = append(sqlQuerys, userTable)

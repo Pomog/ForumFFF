@@ -32,6 +32,10 @@ func MakeDBTables() (*sql.DB, error) {
 			return dbConn.SQL, err
 		}
 	}
+	userExist,_:=userExists(dbConn.SQL, "guest")
+	if !userExist{
+		dbConn.SQL.Exec(guestUser)
+	}
 
 	return dbConn.SQL, nil
 }
@@ -55,4 +59,15 @@ func testDB(db *sql.DB) error {
 	//Ping verifies a connection to the database is still alive, establishing a connection if necessary.
 	err := db.Ping()
 	return err
+}
+
+func userExists(db *sql.DB, username string) (bool, error) {
+	// Check if the user with the given username exists.
+	query := "SELECT COUNT(*) FROM users WHERE username = ?"
+	var count int
+	err := db.QueryRow(query, username).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }

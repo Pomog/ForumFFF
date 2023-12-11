@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -212,13 +213,18 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 // It renders the "home.page.html" template to the provided HTTP response writer.
 func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	var UserID int
+	uuid := m.App.UserLogin
+	if uuid.String() == "" {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		m.App.InfoLog.Println("Could not get uuid in HomeHandler")
+	}
+
 	for _, cookie := range r.Cookies() {
-		if cookie.Value != "" {
-			userID, err := m.DB.GetUserIDForSessionID(cookie.Value)
-			if err != nil {
-				setErrorAndRedirect(w, r, "Could not get UserID from Cookies m.DB.GetUserIDForSessionID", "/error-page")
+		if cookie.Value == uuid.String() {
+			userID, _ := m.DB.GetUserIDForSessionID(cookie.Value)
+			if UserID = userID; UserID != 0 {
+				break
 			}
-			UserID = userID
 		}
 	}
 
@@ -237,6 +243,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			var user models.User
 			user, _ = m.DB.GetUserByID(thread.UserID)
 			var info models.ThreadDataForMainPage
+			info.ThreadID = thread.ID
 			info.Subject = thread.Subject
 			info.Created = thread.Created.Format("2006-01-02 15:04:05")
 
@@ -255,23 +262,29 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data := make(map[string]interface{})
-
+		loggedUser, _ := m.DB.GetUserByID(UserID)
 		data["threads"] = threadsInfo
+		data["loggedAs"] = loggedUser.UserName
 
 		renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
 			Data: data,
 		})
 	} else if r.Method == http.MethodPost {
+		loggedUser, _ := m.DB.GetUserByID(UserID)
+		userName:=loggedUser.UserName
+		if userName == "guest"{
+			setErrorAndRedirect(w, r, "Guests can not create Themes and Posts, please log in or register!", "/error-page")
+		}
 		thread := models.Thread{
 			Subject: r.FormValue("message-text"),
 			UserID:  UserID,
 		}
 
-		err := m.DB.CreateThread(thread)
+		id, err := m.DB.CreateThread(thread)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a thread", "/error-page")
 		}
-		http.Redirect(w, r, "/theme", http.StatusPermanentRedirect)
+		http.Redirect(w, r, fmt.Sprintf("/theme?threadID=%d", id), http.StatusPermanentRedirect)
 
 	}
 
@@ -290,59 +303,63 @@ func getUserThatCreatedLastPost(posts []models.Post) int {
 	return id
 }
 
-func getThreadIDFromCookies(r *http.Request) int {
-	return 2
+func getThreadIDFromURLquery(w http.ResponseWriter, r *http.Request) int {
+	threadID, err := strconv.Atoi(r.URL.Query().Get("threadID"))
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get all posts from thread", "/error-page")
+	}
+	return threadID
 }
 
 // MainHandler is a method of the Repository struct that handles requests to the main page.
 // It renders the "home.page.html" template to the provided HTTP response writer.
 func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		threadID := getThreadIDFromCookies(r)
-		posts, err := m.DB.GetAllPostsFromThread(threadID)
-		if err != nil {
-			setErrorAndRedirect(w, r, "Could not get all posts from thread", "/error-page")
-		}
+	threadID := getThreadIDFromURLquery(w, r)
 
-		var postsInfo []models.PostDataForThemePage
-
-		for _, post := range posts {
-			var user models.User
-			user, err = m.DB.GetUserByID(post.UserID)
-			if err != nil {
-				setErrorAndRedirect(w, r, "Could not get user by id", "/error-page")
-			}
-			var info models.PostDataForThemePage
-			info.Subject = post.Subject
-			info.Created = post.Created.Format("2006-01-02 15:04:05")
-			info.Content = post.Content
-			info.PictureUserWhoCreatedPost = user.Picture
-			info.UserNameWhoCreatedPost = user.UserName
-			postsInfo = append(postsInfo, info)
-		}
-
-		data := make(map[string]interface{})
-
-		data["posts"] = postsInfo
-
-		mainThread, err := m.DB.GetThreadByID(getThreadIDFromCookies(r))
-		if err != nil {
-			setErrorAndRedirect(w, r, "Could not get thread by id", "/error-page")
-		}
-
-		creator, err := m.DB.GetUserByID(mainThread.UserID)
-		if err != nil {
-			setErrorAndRedirect(w, r, "Could not get user as creator", "/error-page")
-		}
-
-		data["creatorName"] = creator.UserName
-		data["creatorImg"] = creator.Picture
-		data["mainThreadName"] = mainThread.Subject
-		data["mainThreadCreatedTime"] = mainThread.Created.Format("2006-01-02 15:04:05")
-		renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
-			Data: data,
-		})
+	posts, err := m.DB.GetAllPostsFromThread(threadID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get all posts from thread", "/error-page")
 	}
+
+	var postsInfo []models.PostDataForThemePage
+
+	for _, post := range posts {
+		var user models.User
+		user, err = m.DB.GetUserByID(post.UserID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get user by id", "/error-page")
+		}
+		var info models.PostDataForThemePage
+		info.Subject = post.Subject
+		info.Created = post.Created.Format("2006-01-02 15:04:05")
+		info.Content = post.Content
+		info.PictureUserWhoCreatedPost = user.Picture
+		info.UserNameWhoCreatedPost = user.UserName
+		postsInfo = append(postsInfo, info)
+	}
+
+	data := make(map[string]interface{})
+
+	data["posts"] = postsInfo
+
+	mainThread, err := m.DB.GetThreadByID(threadID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get thread by id", "/error-page")
+	}
+
+	creator, err := m.DB.GetUserByID(mainThread.UserID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get user as creator", "/error-page")
+	}
+
+	data["creatorName"] = creator.UserName
+	data["creatorImg"] = creator.Picture
+	data["mainThreadName"] = mainThread.Subject
+	data["mainThreadCreatedTime"] = mainThread.Created.Format("2006-01-02 15:04:05")
+	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
+		Data: data,
+	})
+
 }
 
 // ErrorPage handles the "/error-page" route

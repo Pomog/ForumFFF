@@ -31,6 +31,7 @@ type ThreadDataForMainPage struct {
 	PictureUserWhoCreatedThread   string
 	PictureUserWhoCreatedLastPost string
 	Posts                         []Post
+	ThreadID                      int
 }
 
 type PostDataForThemePage struct {
