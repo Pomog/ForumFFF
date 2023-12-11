@@ -14,5 +14,5 @@ type AppConfig struct {
 	InfoLog       *log.Logger
 	InProduction  bool
 	ErrorLog      *log.Logger
-	UserLogin     *uuid.UUID // This field can hold a UUID value
+	UserLogin     uuid.UUID // This field can hold a UUID value
 }

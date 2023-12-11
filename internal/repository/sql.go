@@ -41,11 +41,19 @@ var votesTable = `CREATE TABLE IF NOT EXISTS votes (
     FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );`
 
+var sessionIdTable = `CREATE TABLE IF NOT EXISTS sessionId (
+    id INTEGER PRIMARY KEY,
+    userID INTEGER,
+    sessionID TEXT,
+    FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+);`
+
 func getQuerys() []string {
 	var sqlQuerys []string
 	sqlQuerys = append(sqlQuerys, userTable)
 	sqlQuerys = append(sqlQuerys, threadTable)
 	sqlQuerys = append(sqlQuerys, postTable)
 	sqlQuerys = append(sqlQuerys, votesTable)
+	sqlQuerys = append(sqlQuerys, sessionIdTable)
 	return sqlQuerys
 }
