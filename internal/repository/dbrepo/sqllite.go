@@ -112,7 +112,7 @@ func (m *SqliteBDRepo) CreateUser(r models.User) error {
 	return nil
 }
 
-func (m *SqliteBDRepo) CreateThread(thread models.Thread) error {
+func (m *SqliteBDRepo) CreateThread(thread models.Thread) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -121,15 +121,19 @@ func (m *SqliteBDRepo) CreateThread(thread models.Thread) error {
 	values ($1, $2)
 	`
 
-	_, err := m.DB.ExecContext(ctx, stmt,
+	sqlRes, err := m.DB.ExecContext(ctx, stmt,
 		thread.Subject,
 		thread.UserID,
 	)
 
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	id, err := sqlRes.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
 }
 
 // CreatePost insert post into SQLite DB
