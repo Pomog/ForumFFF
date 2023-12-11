@@ -52,7 +52,6 @@ var guestUser = `INSERT INTO users (username, password, first_name, last_name, e
 VALUES ('guest', '123456', 'Guest', 'User', 'guest@gmail.com');
 );`
 
-
 func getQuerys() []string {
 	var sqlQuerys []string
 	sqlQuerys = append(sqlQuerys, userTable)

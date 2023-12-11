@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -213,6 +212,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 // It renders the "home.page.html" template to the provided HTTP response writer.
 func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	var UserID int
+
 	uuid := m.App.UserLogin
 	if uuid.String() == "" {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -225,6 +225,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			if UserID = userID; UserID != 0 {
 				break
 			}
+
 		}
 	}
 
@@ -284,7 +285,9 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a thread", "/error-page")
 		}
+
 		http.Redirect(w, r, fmt.Sprintf("/theme?threadID=%d", id), http.StatusPermanentRedirect)
+
 
 	}
 
