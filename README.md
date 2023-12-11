@@ -113,5 +113,3 @@ This is a Web Application written in Golang, utilizing only standard [Go librari
 
 - Sets up the SQLite database by creating tables and ensuring a connection.
 - Initializes the database and performs checks to ensure connectivity.
-
-### TEST
