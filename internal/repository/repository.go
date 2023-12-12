@@ -20,4 +20,5 @@ type DatabaseInt interface {
 	LikePostByUserIdAndPostId(userID, postID int) error
 	DislikePostByUserIdAndPostId(userID, postID int) error
 	CountLikesAndDislikesForPostByPostID(postID int) (likes, dislikes int, err error)
+	GetGuestID() (int, error)
 }

@@ -35,6 +35,7 @@ type ThreadDataForMainPage struct {
 }
 
 type PostDataForThemePage struct {
+	ID                        int
 	Subject                   string
 	Content                   string
 	Created                   string

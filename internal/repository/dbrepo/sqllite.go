@@ -386,12 +386,31 @@ func (m *SqliteBDRepo) CountLikesAndDislikesForPostByPostID(postID int) (likes, 
 
 	row := m.DB.QueryRowContext(ctx, query, postID)
 
-	err = row.Scan(&likes, &dislikes)
-	if err != nil {
-		return 0, 0, err
-	}
+	likes = 0
+	dislikes = 0
+
+	row.Scan(&likes, &dislikes)
 
 	err = nil
 
 	return
+}
+
+func (m *SqliteBDRepo) GetGuestID() (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select id 
+	from users
+	where email = 'guest@gmail.com'
+	`
+	var guestID int
+
+	row := m.DB.QueryRowContext(ctx, query)
+
+	err := row.Scan(&guestID)
+	if err != nil {
+		return guestID, err
+	}
+	return guestID, nil
 }
