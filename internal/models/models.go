@@ -35,11 +35,16 @@ type ThreadDataForMainPage struct {
 }
 
 type PostDataForThemePage struct {
+	ID                        int
 	Subject                   string
 	Content                   string
 	Created                   string
 	UserNameWhoCreatedPost    string
 	PictureUserWhoCreatedPost string
+	UserRegistrationDate      string
+	UserPostsAmmount          int
+	Likes                     int
+	Dislikes                  int
 }
 
 type Post struct {

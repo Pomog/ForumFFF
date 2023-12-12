@@ -97,8 +97,8 @@
           {{$creatorName := index .Data "creatorName"}}
           <img src="{{$creatorImage}}" class="ava_img" alt="ava"><br>
           <strong>&nbsp;{{$creatorName}}</strong><br>
-          Date of Registration: ...... <br>
-          Total Messages: ....
+          Date of Registration: {{index .Data "creatorRegistrationDate"}} <br>
+          Total Messages: {{index .Data "creatorPostsAmmount"}}
         </th>
   
         <th>
@@ -120,8 +120,8 @@
         <td>
           <img src="{{ .PictureUserWhoCreatedPost }}" class="ava_img" alt="ava">
           <br><strong>&nbsp;{{ .UserNameWhoCreatedPost }}</strong><br>
-          Date of Registration: ...... <br>
-          Total Messages: ....
+          Date of Registration: {{ .UserRegistrationDate}} <br>
+          Total Messages: {{ .UserPostsAmmount}}
         </td>
         <td>
         </td>
@@ -129,7 +129,16 @@
           <em>...</em> <br><br>
           {{ .Content }}<br>
           Posted: {{ .Created }}<br>
-          Like 0 👍 &nbsp; &nbsp; Dislike 0 👎
+          PostID: {{ .ID}}
+           <form method="POST" action="">
+            <input type="hidden" name="like" value="{{ .ID}}">
+            <button type="submit">Like👍&nbsp;{{ .Likes}}</button>
+          </form>
+        
+          <form method="POST" action="">
+            <input type="hidden" name="dislike" value="{{ .ID}}">
+            <button type="submit">Dislike👎&nbsp;{{ .Dislikes}}</button>
+          </form>
         </td>
       </tr>
       {{ end }}

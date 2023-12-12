@@ -316,7 +316,44 @@ func getThreadIDFromURLquery(w http.ResponseWriter, r *http.Request) int {
 // MainHandler is a method of the Repository struct that handles requests to the main page.
 // It renders the "home.page.html" template to the provided HTTP response writer.
 func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
+
+	visitorID, _ := m.DB.GetGuestID()
+
+	for _, cookie := range r.Cookies() {
+		if cookie.Value == m.App.UserLogin.String() {
+			userID, err := strconv.Atoi(cookie.Name)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get visitor ID", "/error-page")
+			}
+			if visitorID = userID; visitorID != 0 {
+				break
+			}
+
+		}
+	}
+
 	threadID := getThreadIDFromURLquery(w, r)
+
+	mainThread, err := m.DB.GetThreadByID(threadID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get thread by id", "/error-page")
+	}
+
+	creator, err := m.DB.GetUserByID(mainThread.UserID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get user as creator", "/error-page")
+	}
+
+	like := r.FormValue("like")
+	dislike := r.FormValue("dislike")
+	if like != "" {
+		postID, _ := strconv.Atoi(like)
+		m.DB.LikePostByUserIdAndPostId(visitorID, postID)
+	}
+	if dislike != "" {
+		postID, _ := strconv.Atoi(dislike)
+		m.DB.DislikePostByUserIdAndPostId(visitorID, postID)
+	}
 
 	posts, err := m.DB.GetAllPostsFromThread(threadID)
 	if err != nil {
@@ -331,12 +368,27 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get user by id", "/error-page")
 		}
+		userPostsAmmount, err := m.DB.GetTotalPostsAmmountByUserID(post.UserID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get ammount of Posts, GetTotalPostsAmmountByUserID", "/error-page")
+		}
+
+		likes, dislikes, err := m.DB.CountLikesAndDislikesForPostByPostID(post.ID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get Likes for Post, CountLikesAndDislikesForPostByPostID", "/error-page")
+		}
+
 		var info models.PostDataForThemePage
+		info.ID = post.ID
 		info.Subject = post.Subject
 		info.Created = post.Created.Format("2006-01-02 15:04:05")
 		info.Content = post.Content
 		info.PictureUserWhoCreatedPost = user.Picture
 		info.UserNameWhoCreatedPost = user.UserName
+		info.UserRegistrationDate = user.Created.Format("2006-01-02 15:04:05")
+		info.UserPostsAmmount = userPostsAmmount
+		info.Likes = likes
+		info.Dislikes = dislikes
 		postsInfo = append(postsInfo, info)
 	}
 
@@ -344,20 +396,18 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 
 	data["posts"] = postsInfo
 
-	mainThread, err := m.DB.GetThreadByID(threadID)
+	creatorPostsAmmount, err := m.DB.GetTotalPostsAmmountByUserID(mainThread.UserID)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get thread by id", "/error-page")
-	}
-
-	creator, err := m.DB.GetUserByID(mainThread.UserID)
-	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get user as creator", "/error-page")
+		setErrorAndRedirect(w, r, "Could not get ammount of Posts, GetTotalPostsAmmountByUserID", "/error-page")
 	}
 
 	data["creatorName"] = creator.UserName
+	data["creatorRegistrationDate"] = creator.Created.Format("2006-01-02 15:04:05")
+	data["creatorPostsAmmount"] = creatorPostsAmmount
 	data["creatorImg"] = creator.Picture
 	data["mainThreadName"] = mainThread.Subject
 	data["mainThreadCreatedTime"] = mainThread.Created.Format("2006-01-02 15:04:05")
+
 	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
 		Data: data,
 	})

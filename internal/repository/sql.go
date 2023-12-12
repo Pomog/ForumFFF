@@ -33,8 +33,8 @@ var postTable = `CREATE TABLE IF NOT EXISTS post (
 
 var votesTable = `CREATE TABLE IF NOT EXISTS votes (
     id INTEGER PRIMARY KEY,
-    upCount INTEGER,
-    downCount INTEGER,
+    like BOOLEAN DEFAULT FALSE,
+    dislike BOOLEAN DEFAULT FALSE,
     postID INTEGER,
     userID INTEGER,
     FOREIGN KEY (postID) REFERENCES post(id) ON DELETE CASCADE ON UPDATE CASCADE,
