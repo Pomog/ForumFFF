@@ -40,6 +40,8 @@ type PostDataForThemePage struct {
 	Created                   string
 	UserNameWhoCreatedPost    string
 	PictureUserWhoCreatedPost string
+	UserRegistrationDate      string
+	UserPostsAmmount          int
 }
 
 type Post struct {

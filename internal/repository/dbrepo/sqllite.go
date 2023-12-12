@@ -302,3 +302,20 @@ func (m *SqliteBDRepo) InsertSessionintoDB(sessionID string, userID int) error {
 	return nil
 
 }
+
+func (m *SqliteBDRepo) GetTotalPostsAmmountByUserID(userID int) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select count(*) from post where userID = $1;	`
+	var numberOfPosts int
+
+	row := m.DB.QueryRowContext(ctx, query, userID)
+
+	err := row.Scan(&numberOfPosts)
+	if err != nil {
+		return 0, err
+	}
+
+	return numberOfPosts, nil
+}

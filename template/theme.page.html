@@ -97,8 +97,8 @@
           {{$creatorName := index .Data "creatorName"}}
           <img src="{{$creatorImage}}" class="ava_img" alt="ava"><br>
           <strong>&nbsp;{{$creatorName}}</strong><br>
-          Date of Registration: ...... <br>
-          Total Messages: ....
+          Date of Registration: {{index .Data "creatorRegistrationDate"}} <br>
+          Total Messages: {{index .Data "creatorPostsAmmount"}}
         </th>
   
         <th>
@@ -120,8 +120,8 @@
         <td>
           <img src="{{ .PictureUserWhoCreatedPost }}" class="ava_img" alt="ava">
           <br><strong>&nbsp;{{ .UserNameWhoCreatedPost }}</strong><br>
-          Date of Registration: ...... <br>
-          Total Messages: ....
+          Date of Registration: {{ .UserRegistrationDate}} <br>
+          Total Messages: {{ .UserPostsAmmount}}
         </td>
         <td>
         </td>

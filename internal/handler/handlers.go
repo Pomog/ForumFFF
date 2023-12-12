@@ -331,12 +331,18 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get user by id", "/error-page")
 		}
+		userPostsAmmount, err := m.DB.GetTotalPostsAmmountByUserID(post.UserID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get ammount of Posts, GetTotalPostsAmmountByUserID", "/error-page")
+		}
 		var info models.PostDataForThemePage
 		info.Subject = post.Subject
 		info.Created = post.Created.Format("2006-01-02 15:04:05")
 		info.Content = post.Content
 		info.PictureUserWhoCreatedPost = user.Picture
 		info.UserNameWhoCreatedPost = user.UserName
+		info.UserRegistrationDate = user.Created.Format("2006-01-02 15:04:05")
+		info.UserPostsAmmount = userPostsAmmount
 		postsInfo = append(postsInfo, info)
 	}
 
@@ -353,8 +359,14 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get user as creator", "/error-page")
 	}
+	creatorPostsAmmount, err := m.DB.GetTotalPostsAmmountByUserID(mainThread.UserID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get ammount of Posts, GetTotalPostsAmmountByUserID", "/error-page")
+	}
 
 	data["creatorName"] = creator.UserName
+	data["creatorRegistrationDate"] = creator.Created.Format("2006-01-02 15:04:05")
+	data["creatorPostsAmmount"] = creatorPostsAmmount
 	data["creatorImg"] = creator.Picture
 	data["mainThreadName"] = mainThread.Subject
 	data["mainThreadCreatedTime"] = mainThread.Created.Format("2006-01-02 15:04:05")
