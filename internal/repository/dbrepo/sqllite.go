@@ -290,7 +290,6 @@ func (m *SqliteBDRepo) InsertSessionintoDB(sessionID string, userID int) error {
 	values ($1, $2
 	)
 	`
-
 	_, err := m.DB.ExecContext(ctx, stmt,
 		sessionID,
 		userID,
@@ -318,4 +317,81 @@ func (m *SqliteBDRepo) GetTotalPostsAmmountByUserID(userID int) (int, error) {
 	}
 
 	return numberOfPosts, nil
+}
+
+func (m *SqliteBDRepo) LikePostByUserIdAndPostId(userID, postID int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	//reverse posts like flag
+	stmt := `INSERT OR REPLACE INTO votes (id, like, dislike, postID, userID)
+	VALUES (
+		COALESCE((SELECT id FROM votes WHERE userID = $1 AND postID = $2), NULL),
+		1, -- Setting like to true
+		CASE WHEN NOT COALESCE((SELECT like FROM votes WHERE userID = $1 AND postID = $2), 0)
+		THEN 0 ELSE COALESCE((SELECT dislike FROM votes WHERE userID = $1 AND postID = $2), 0) END,
+		$2,	$1
+	);
+	`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		userID,
+		postID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *SqliteBDRepo) DislikePostByUserIdAndPostId(userID, postID int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	//reverse posts dislike flag
+	stmt := `INSERT OR REPLACE INTO votes (id, dislike, like, postID, userID)
+	VALUES (
+		COALESCE((SELECT id FROM votes WHERE userID = $1 AND postID = $2), NULL),
+		1, -- Setting dislike to true
+		CASE WHEN NOT COALESCE((SELECT dislike FROM votes WHERE userID = $1 AND postID = $2), 0)
+		THEN 0 
+		ELSE COALESCE((SELECT like FROM votes WHERE userID = $1 AND postID = $2), 0)
+		END,
+		$2,	$1
+	);
+	`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		userID,
+		postID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *SqliteBDRepo) CountLikesAndDislikesForPostByPostID(postID int) (likes, dislikes int, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+	SELECT 
+    SUM(CASE WHEN postID = $1 AND like = TRUE THEN 1 ELSE 0 END) AS like_count,
+    SUM(CASE WHEN postID = $1 AND dislike = TRUE THEN 1 ELSE 0 END) AS dislike_count
+	FROM votes;
+	`
+
+	row := m.DB.QueryRowContext(ctx, query, postID)
+
+	err = row.Scan(&likes, &dislikes)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	err = nil
+
+	return
 }

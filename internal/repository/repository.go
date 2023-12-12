@@ -17,4 +17,7 @@ type DatabaseInt interface {
 	GetUserIDForSessionID(sessionID string) (int, error)
 	InsertSessionintoDB(sessionID string, userID int) error
 	GetTotalPostsAmmountByUserID(userID int) (int, error)
+	LikePostByUserIdAndPostId(userID, postID int) error
+	DislikePostByUserIdAndPostId(userID, postID int) error
+	CountLikesAndDislikesForPostByPostID(postID int) (likes, dislikes int, err error)
 }

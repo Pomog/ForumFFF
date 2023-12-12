@@ -335,6 +335,14 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get ammount of Posts, GetTotalPostsAmmountByUserID", "/error-page")
 		}
+
+		fmt.Println("Post ID: ", post.ID)
+
+		likes, dislikes, err := m.DB.CountLikesAndDislikesForPostByPostID(post.ID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get Likes for Post, CountLikesAndDislikesForPostByPostID", "/error-page")
+		}
+
 		var info models.PostDataForThemePage
 		info.Subject = post.Subject
 		info.Created = post.Created.Format("2006-01-02 15:04:05")
@@ -343,6 +351,8 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		info.UserNameWhoCreatedPost = user.UserName
 		info.UserRegistrationDate = user.Created.Format("2006-01-02 15:04:05")
 		info.UserPostsAmmount = userPostsAmmount
+		info.Likes = likes
+		info.Dislikes = dislikes
 		postsInfo = append(postsInfo, info)
 	}
 
