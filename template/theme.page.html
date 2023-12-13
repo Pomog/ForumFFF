@@ -91,6 +91,13 @@
   <table class="table-borderless forumTable whiteLink mt-3">
     <thead class="containerHead">
       <tr>
+        <!-- Colling Modal -->
+        <div class="d-flex justify-content-start align-items-center">
+          <button type="button" class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#createNewPostModal">Create New Post</button>
+        </div>
+        <div class="d-flex justify-content-center">
+        </div>
+        <!-- End -->
         {{/* Info related to the main (mother) Thread */}}
         <th class="forumFirstColTheme" scope="col" colspan="2">
           {{$creatorImage := index .Data "creatorImg"}}
@@ -100,6 +107,30 @@
           Date of Registration: {{index .Data "creatorRegistrationDate"}} <br>
           Total Messages: {{index .Data "creatorPostsAmmount"}}
         </th>
+        <!-- Modal starts -->
+        <div class="modal fade text-bg-dark p-3" id="createNewPostModal" tabindex="-1" aria-labelledby="createNewPostModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="createNewPostModalLabel">Type your post and click "Post"</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form method="post" action="">
+                  <div class="mb-3">
+                    <label for="post-text" class="col-form-label">Type your topic here:</label>
+                    <textarea class="form-control" id="post-text" name="post-text"></textarea>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-light">Post</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal ends -->
   
         <th>
           <div id="mainTheme">
@@ -126,7 +157,7 @@
         <td>
         </td>
         <td>
-          <em>...</em> <br><br>
+          <em>{{ .Subject}}</em> <br><br>
           {{ .Content }}<br>
           Posted: {{ .Created }}<br>
           PostID: {{ .ID}}
@@ -144,6 +175,6 @@
       {{ end }}
     </tbody>
   </table>
-  
+</div>
 </div>
 {{end}}

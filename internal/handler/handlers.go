@@ -354,7 +354,20 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		postID, _ := strconv.Atoi(dislike)
 		m.DB.DislikePostByUserIdAndPostId(visitorID, postID)
 	}
-
+	//new post
+	if r.Method == http.MethodPost && len(r.FormValue("post-text")) != 0 {
+		post := models.Post{
+			Subject:  shortenerOfSubject(mainThread.Subject),
+			Content:  r.FormValue("post-text"),
+			UserID:   visitorID,
+			ThreadId: mainThread.ID,
+		}
+		err = m.DB.CreatePost(post)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not create a post", "/error-page")
+		}
+	}
+	//-------
 	posts, err := m.DB.GetAllPostsFromThread(threadID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get all posts from thread", "/error-page")
@@ -412,6 +425,13 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		Data: data,
 	})
 
+}
+
+func shortenerOfSubject(input string) string {
+	if len(input) <= 20 {
+		return input
+	}
+	return ("Topic:" + input[0:21] + "...")
 }
 
 // ErrorPage handles the "/error-page" route
