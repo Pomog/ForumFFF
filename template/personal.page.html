@@ -1,0 +1,25 @@
+{{template "body" .}}
+
+{{define "centralPart"}}
+    <h1>User Profile</h1>
+
+    <div class="content">
+        {{$person := index .Data "personal"}}
+        <h2>Personal Information</h2>
+        <form action="/update-profile" method="POST">
+            <img src="{{$person.Picture}}" alt="your_ava" class="ava_img">
+            <br>
+            <label for="username">Username: {{$person.UserName}}</label>
+            <br>
+            <label for="email">Email: {{$person.Email}}</label>
+            <br>
+            <label for="email">First Name: {{$person.FirstName}}</label>
+            <br>
+            <label for="email">Last Name: {{$person.LastName}}</label>
+            <br>
+            <label for="password">Created: {{$person.Created}}</label>
+            <br>
+            <input type="submit" value="Update">
+        </form>
+    </div>
+{{end}}
