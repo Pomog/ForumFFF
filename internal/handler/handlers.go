@@ -472,3 +472,83 @@ func setErrorAndRedirect(w http.ResponseWriter, r *http.Request, errorMessage st
 	// Perform the redirect
 	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }
+
+func (m *Repository) ContactUsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+
+		renderer.RendererTemplate(w, "contactUs.page.html", &models.TemplateData{})
+
+	} else {
+		http.Error(w, "No such method", http.StatusMethodNotAllowed)
+	}
+
+}
+
+func (m *Repository) ForumRulesHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+
+		renderer.RendererTemplate(w, "forumRules.page.html", &models.TemplateData{})
+
+	} else {
+		http.Error(w, "No such method", http.StatusMethodNotAllowed)
+	}
+}
+
+func (m *Repository) HelpHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+
+		renderer.RendererTemplate(w, "help.page.html", &models.TemplateData{})
+
+	} else {
+		http.Error(w, "No such method", http.StatusMethodNotAllowed)
+	}
+}
+
+func (m *Repository) PrivatPHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+
+		renderer.RendererTemplate(w, "privatP.page.html", &models.TemplateData{})
+
+	} else {
+		http.Error(w, "No such method", http.StatusMethodNotAllowed)
+	}
+}
+
+func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		visitorID, _ := m.DB.GetGuestID()
+
+		for _, cookie := range r.Cookies() {
+			if cookie.Value == m.App.UserLogin.String() {
+				userID, err := strconv.Atoi(cookie.Name)
+				if err != nil {
+					setErrorAndRedirect(w, r, "Could not get visitor ID", "/error-page")
+				}
+				if visitorID = userID; visitorID != 0 {
+					break
+				}
+
+			}
+		}
+		user, errUser := m.DB.GetUserByID(visitorID)
+		if errUser != nil {
+			setErrorAndRedirect(w, r, "Could not get User from  GetUserByID(visitorID)", "/error-page")
+		}
+		var personalInfo models.User
+		personalInfo.Email = user.Email
+		personalInfo.Created = user.Created
+		personalInfo.FirstName = user.FirstName
+		personalInfo.LastName = user.LastName
+		personalInfo.Picture = user.Picture
+		personalInfo.UserName = user.UserName
+		data := make(map[string]interface{})
+		data["personal"] = personalInfo
+
+		renderer.RendererTemplate(w, "personal.page.html", &models.TemplateData{
+			Data: data,
+		})
+
+	} else {
+		http.Error(w, "No such method", http.StatusMethodNotAllowed)
+	}
+}

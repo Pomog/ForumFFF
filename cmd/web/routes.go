@@ -26,7 +26,11 @@ func routes(a *config.AppConfig) http.Handler {
 	mux.HandleFunc("/theme", handler.Repo.ThemeHandler)
 	mux.HandleFunc("/registration", handler.Repo.RegisterHandler)
 	mux.HandleFunc("/error-page", handler.Repo.ErrorPage)
+	mux.HandleFunc("/contactUs", handler.Repo.ContactUsHandler)
+	mux.HandleFunc("/forum_rules", handler.Repo.ForumRulesHandler)
+	mux.HandleFunc("/help", handler.Repo.HelpHandler)
+	mux.HandleFunc("/privat_policy", handler.Repo.PrivatPHandler)
+	mux.HandleFunc("/personal_cabinet", handler.Repo.PersonaCabinetHandler)
 
-	
 	return mux
 }
