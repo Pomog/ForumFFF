@@ -6,7 +6,9 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// MakeDBTables creates DB tables and Guest User
+// MakeDBTables creates necessary database tables using the provided *sql.DB instance.
+// This function helps initialize database tables, and it's intended to be called with a fresh
+// database connection to ensure proper handling for multiple users.
 func MakeDBTables(db *sql.DB) error {
 	sqlQuerys := getQuerys()
 
@@ -35,7 +37,9 @@ func MakeDBTables(db *sql.DB) error {
 	return nil
 }
 
-// GetDB open or creates sqlite3 DataBase
+// GetDB returns a new instance of *DataBase and an error if any.
+// This function allows creating a new connection to the database for each instance of our application,
+// ensuring isolation and proper handling for multiple users.
 func GetDB() (*DataBase, error) {
 	database, err := sql.Open("sqlite3", "./mainDB.db")
 	if err != nil {
