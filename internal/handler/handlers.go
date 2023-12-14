@@ -24,19 +24,21 @@ import (
 // Repo the repository used by the handlers
 var Repo *Repository
 
-// Repositroy is the repository type
+// Repository handles the repository type, encapsulating the AppConfig and DatabaseInt dependencies.
 type Repository struct {
 	App *config.AppConfig
 	DB  repository.DatabaseInt
 }
 
 const (
-	dbErrorUserPresent   = "DB Error func UserPresent"
-	userAlreadyExistsMsg = "User Already Exists"
-	dbErrorCreateUser    = "DB Error func CreateUser"
-	fileRecivingErrorMsg = "file receiving error"
-	fileCreatingErrorMsg = "Unable to create file"
-	fileSaveingErrorMsg  = "Unable to save file"
+	dbErrorUserPresent    = "DB Error func UserPresent"
+	userAlreadyExistsMsg  = "User Already Exists"
+	dbErrorCreateUser     = "DB Error func CreateUser"
+	fileReceivingErrorMsg = "file receiving error"
+	fileCreatingErrorMsg  = "Unable to create file"
+	fileSavingErrorMsg    = "Unable to save file"
+
+	emptyUUID = "00000000-0000-0000-0000-000000000000"
 )
 
 // NewRepo creates a new repository
@@ -52,11 +54,12 @@ func NewHandlers(r *Repository) {
 	Repo = r
 }
 
+// LoginHandler handles both GET and POST requests for the login page.
 func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		var emtpyLogin models.User
+		var emptyLogin models.User
 		data := make(map[string]interface{})
-		data["loginData"] = emtpyLogin
+		data["loginData"] = emptyLogin
 		renderer.RendererTemplate(w, "login.page.html", &models.TemplateData{
 			Form: forms.NewForm(nil),
 			Data: data,
@@ -65,7 +68,7 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		// Parse the raw request body into r.Form
 		err := r.ParseForm()
 		if err != nil {
-			log.Println(err)
+			setErrorAndRedirect(w, r, err.Error(), "/error-page")
 		}
 		// Create a User struct with data from the HTTP request form
 		loginData := models.User{
@@ -90,11 +93,14 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Check if User is Presaent in the DB, ERR should be handled
+		// Check if User is Present in the DB, ERR should be handled
 		userID, _ := m.DB.UserPresentLogin(loginData.Email, loginData.Password)
 		if userID != 0 {
 			m.App.UserLogin = uuid.New()
-			m.DB.InsertSessionintoDB(m.App.UserLogin.String(), userID)
+			err := m.DB.InsertSessionintoDB(m.App.UserLogin.String(), userID)
+			if err != nil {
+				setErrorAndRedirect(w, r, err.Error(), "/error-page")
+			}
 
 			cookie := &http.Cookie{
 				Name:  strconv.Itoa(userID),
@@ -110,6 +116,7 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// RegisterHandler handles both GET and POST requests for the registration page.
 func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		var emptyRegistration models.User
@@ -122,7 +129,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	} else if r.Method == http.MethodPost {
 		// Parse the form data, including files Need to Set Upper limit for DATA
-		err := r.ParseMultipartForm((1 << 20))
+		err := r.ParseMultipartForm(1 << 20)
 		if err != nil {
 			setErrorAndRedirect(w, r, dbErrorUserPresent, "/error-page")
 			return
@@ -160,28 +167,28 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Check if User is Presaent in the DB, ERR should be handled
+		// Check if User is Present in the DB, ERR should be handled
 		userAlreadyExist, err := m.DB.UserPresent(registrationData.UserName, registrationData.Email)
 		if err != nil {
-			setErrorAndRedirect(w, r, "DB Error func UserPresent", "/error-page")
+			setErrorAndRedirect(w, r, userAlreadyExistsMsg, "/error-page")
 			return
 		}
 
 		if userAlreadyExist {
-			setErrorAndRedirect(w, r, "User AlreadyExists", "/error-page")
+			setErrorAndRedirect(w, r, dbErrorCreateUser, "/error-page")
 		} else {
 			// Get the file from the form data
-			file, handler, errfileGet := r.FormFile("avatar")
-			if errfileGet != nil {
-				setErrorAndRedirect(w, r, fileRecivingErrorMsg, "/error-page")
+			file, handler, errFileGet := r.FormFile("avatar")
+			if errFileGet != nil {
+				setErrorAndRedirect(w, r, fileReceivingErrorMsg, "/error-page")
 				return
 			}
 			defer file.Close()
 
 			// Create a new file in the "static/ava" directory
 			newFilePath := filepath.Join("static/ava", handler.Filename)
-			newFile, errfileCreate := os.Create(newFilePath)
-			if errfileCreate != nil {
+			newFile, errFileCreate := os.Create(newFilePath)
+			if errFileCreate != nil {
 				setErrorAndRedirect(w, r, fileCreatingErrorMsg, "/error-page")
 				return
 			}
@@ -190,7 +197,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			// Copy the uploaded file to the new file
 			_, err = io.Copy(newFile, file)
 			if err != nil {
-				setErrorAndRedirect(w, r, fileSaveingErrorMsg, "/error-page")
+				setErrorAndRedirect(w, r, fileSavingErrorMsg, "/error-page")
 				return
 			}
 
@@ -209,24 +216,23 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// MainHandler is a method of the Repository struct that handles requests to the main page.
-// It renders the "home.page.html" template to the provided HTTP response writer.
+// HomeHandler handles both GET and POST requests for the registration page.
 func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	var UserID int
 
-	uuid := m.App.UserLogin
-	if uuid.String() == "" {
+	loginUUID := m.App.UserLogin
+
+	if loginUUID.String() == emptyUUID {
+		m.App.InfoLog.Println("Could not get loginUUID in HomeHandler")
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		m.App.InfoLog.Println("Could not get uuid in HomeHandler")
 	}
 
 	for _, cookie := range r.Cookies() {
-		if cookie.Value == uuid.String() {
+		if cookie.Value == loginUUID.String() {
 			userID, _ := m.DB.GetUserIDForSessionID(cookie.Value)
 			if UserID = userID; UserID != 0 {
 				break
 			}
-
 		}
 	}
 
@@ -305,7 +311,7 @@ func getUserThatCreatedLastPost(posts []models.Post) int {
 	return id
 }
 
-func getThreadIDFromURLquery(w http.ResponseWriter, r *http.Request) int {
+func getThreadIDFromQuery(w http.ResponseWriter, r *http.Request) int {
 	threadID, err := strconv.Atoi(r.URL.Query().Get("threadID"))
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get all posts from thread", "/error-page")
@@ -313,8 +319,7 @@ func getThreadIDFromURLquery(w http.ResponseWriter, r *http.Request) int {
 	return threadID
 }
 
-// MainHandler is a method of the Repository struct that handles requests to the main page.
-// It renders the "home.page.html" template to the provided HTTP response writer.
+// ThemeHandler handles both GET and POST requests for the theme page
 func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 
 	visitorID, _ := m.DB.GetGuestID()
@@ -332,7 +337,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	threadID := getThreadIDFromURLquery(w, r)
+	threadID := getThreadIDFromQuery(w, r)
 
 	mainThread, err := m.DB.GetThreadByID(threadID)
 	if err != nil {
@@ -348,11 +353,17 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	dislike := r.FormValue("dislike")
 	if like != "" {
 		postID, _ := strconv.Atoi(like)
-		m.DB.LikePostByUserIdAndPostId(visitorID, postID)
+		err := m.DB.LikePostByUserIdAndPostId(visitorID, postID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not LikePostByUserIdAndPostId", "/error-page")
+		}
 	}
 	if dislike != "" {
 		postID, _ := strconv.Atoi(dislike)
-		m.DB.DislikePostByUserIdAndPostId(visitorID, postID)
+		err := m.DB.DislikePostByUserIdAndPostId(visitorID, postID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not DislikePostByUserIdAndPostId", "/error-page")
+		}
 	}
 	//new post
 	if r.Method == http.MethodPost && len(r.FormValue("post-text")) != 0 {
@@ -381,9 +392,9 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get user by id", "/error-page")
 		}
-		userPostsAmmount, err := m.DB.GetTotalPostsAmmountByUserID(post.UserID)
+		userPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(post.UserID)
 		if err != nil {
-			setErrorAndRedirect(w, r, "Could not get ammount of Posts, GetTotalPostsAmmountByUserID", "/error-page")
+			setErrorAndRedirect(w, r, "Could not get amount of Posts, GetTotalPostsAmountByUserID", "/error-page")
 		}
 
 		likes, dislikes, err := m.DB.CountLikesAndDislikesForPostByPostID(post.ID)
@@ -399,7 +410,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		info.PictureUserWhoCreatedPost = user.Picture
 		info.UserNameWhoCreatedPost = user.UserName
 		info.UserRegistrationDate = user.Created.Format("2006-01-02 15:04:05")
-		info.UserPostsAmmount = userPostsAmmount
+		info.UserPostsAmmount = userPostsAmount
 		info.Likes = likes
 		info.Dislikes = dislikes
 		postsInfo = append(postsInfo, info)
@@ -409,14 +420,14 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 
 	data["posts"] = postsInfo
 
-	creatorPostsAmmount, err := m.DB.GetTotalPostsAmmountByUserID(mainThread.UserID)
+	creatorPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(mainThread.UserID)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get ammount of Posts, GetTotalPostsAmmountByUserID", "/error-page")
+		setErrorAndRedirect(w, r, "Could not get amount of Posts, GetTotalPostsAmountByUserID", "/error-page")
 	}
 
 	data["creatorName"] = creator.UserName
 	data["creatorRegistrationDate"] = creator.Created.Format("2006-01-02 15:04:05")
-	data["creatorPostsAmmount"] = creatorPostsAmmount
+	data["creatorPostsAmount"] = creatorPostsAmount
 	data["creatorImg"] = creator.Picture
 	data["mainThreadName"] = mainThread.Subject
 	data["mainThreadCreatedTime"] = mainThread.Created.Format("2006-01-02 15:04:05")
@@ -424,14 +435,14 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
 		Data: data,
 	})
-
 }
 
+// shortenerOfSubject helper function to squeeze theme name
 func shortenerOfSubject(input string) string {
 	if len(input) <= 20 {
 		return input
 	}
-	return ("Topic:" + input[0:21] + "...")
+	return "Topic:" + input[0:21] + "..."
 }
 
 // ErrorPage handles the "/error-page" route
@@ -460,12 +471,14 @@ func (m *Repository) ErrorPage(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(htmlContent))
+	_, err := w.Write([]byte(htmlContent))
+	if err != nil {
+		setErrorAndRedirect(w, r, err.Error(), "/error-page")
+	}
 }
 
 // setErrorContext sets the error message in the context and adds it to the redirect URL
 func setErrorAndRedirect(w http.ResponseWriter, r *http.Request, errorMessage string, redirectURL string) {
-	log.Printf("Error: %s", errorMessage)
 	// Append the error message as a query parameter in the redirect URL
 	redirectURL += "?error=" + url.QueryEscape(errorMessage)
 
