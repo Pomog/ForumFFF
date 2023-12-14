@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// Form is a custom type that embeds url.Values and includes an Errors field.
 type Form struct {
 	url.Values
 	Errors errors
