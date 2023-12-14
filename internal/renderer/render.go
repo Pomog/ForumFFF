@@ -77,7 +77,7 @@ func RendererTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateDat
 
 }
 
-// create a template cache
+// CreateTemplateCache create a template cache
 func CreateTemplateCache() (map[string]*template.Template, error) {
 	myCache := map[string]*template.Template{}
 
