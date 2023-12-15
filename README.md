@@ -77,6 +77,7 @@ This is a Web Application written in Golang, utilizing only standard [Go librari
 1. Not optimized requests to the Database. Sometimes there are several requests per function or method.
 2. No Middleware.
 3. User's passwords are stored as strings in the Database.
+4. No pagination
 
 ## Authors
 - [Denys Verves](https://github.com/TartuDen)
