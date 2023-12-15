@@ -3,12 +3,13 @@ package main
 import (
 	"encoding/gob"
 	"fmt"
+	"github.com/Pomog/ForumFFF/internal/models"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Pomog/ForumFFF/internal/config"
 	"github.com/Pomog/ForumFFF/internal/handler"
-	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
 	"github.com/Pomog/ForumFFF/internal/repository"
 )
@@ -16,17 +17,20 @@ import (
 const Port = ":8080"
 
 var app config.AppConfig
+var infolog *log.Logger
+var errorlog *log.Logger
 
 func main() {
 
 	db, err := run()
 	if err != nil {
-		log.Fatal(err)
+		app.ErrorLog.Fatal(err)
 	}
 
+	app.InfoLog.Println("Trying to get DataBase connection")
 	defer db.SQL.Close()
 
-	fmt.Printf("Server starting on port %s\n", Port)
+	app.InfoLog.Printf("Server starting on port %s\n", Port)
 
 	srv := &http.Server{
 		Addr:    Port,
@@ -35,7 +39,6 @@ func main() {
 
 	err = srv.ListenAndServe()
 	log.Fatal(err)
-
 }
 
 func run() (*repository.DataBase, error) {
@@ -50,11 +53,25 @@ func run() (*repository.DataBase, error) {
 	// change this to true when in production
 	app.InProduction = false
 
-	//cookies should be set
+	// info log
+	infolog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infolog
 
-	repository.MakeDBTables()
+	// error log
+	errorlog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorlog
 
-	db, _ := repository.GetDB()
+	db, err := repository.GetDB()
+	if err != nil {
+		log.Fatal("cannot get database connection")
+		return nil, err
+	}
+
+	err = repository.MakeDBTables(db.SQL)
+	if err != nil {
+		log.Fatal("cannot create database tables")
+		return nil, err
+	}
 
 	repo := handler.NewRepo(&app, db)
 

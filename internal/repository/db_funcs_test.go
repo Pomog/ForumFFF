@@ -11,14 +11,18 @@ var ObligatoryTables = []string{
 
 func Test_GetDB(t *testing.T) {
 
-	db, err := MakeDBTables()
+	db, _ := GetDB()
+	err := MakeDBTables(db.SQL)
+	if err != nil {
+		return
+	}
 
 	if err != nil {
 		t.Errorf("Could not %s", "sql.Open(sqlite3, ./mainDB.db)")
 	}
-	defer db.Close()
+	defer db.SQL.Close()
 
-	rows, err := db.Query("SELECT name FROM sqlite_master WHERE type='table';")
+	rows, err := db.SQL.Query("SELECT name FROM sqlite_master WHERE type='table';")
 	if err != nil {
 		t.Error(err)
 	}
