@@ -37,6 +37,7 @@ const (
 	fileReceivingErrorMsg = "file receiving error"
 	fileCreatingErrorMsg  = "Unable to create file"
 	fileSavingErrorMsg    = "Unable to save file"
+	guestRestiction       = "Guests can not create Themes and Posts, please log in or register!"
 
 	emptyUUID = "00000000-0000-0000-0000-000000000000"
 )
@@ -291,7 +292,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		loggedUser, _ := m.DB.GetUserByID(UserID)
 		userName := loggedUser.UserName
 		if userName == "guest" {
-			setErrorAndRedirect(w, r, "Guests can not create Themes and Posts, please log in or register!", "/error-page")
+			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
 		}
 		thread := models.Thread{
 			Subject: r.FormValue("message-text"),
@@ -346,6 +347,8 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	visitor, _ := m.DB.GetUserByID(visitorID)
+
 	threadID := getThreadIDFromQuery(w, r)
 
 	mainThread, err := m.DB.GetThreadByID(threadID)
@@ -356,11 +359,15 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	creator, err := m.DB.GetUserByID(mainThread.UserID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get user as creator", "/error-page")
+		return
 	}
 
 	like := r.FormValue("like")
 	dislike := r.FormValue("dislike")
 	if like != "" {
+		if visitor.UserName == "guest" {
+			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
+		}
 		postID, _ := strconv.Atoi(like)
 		err := m.DB.LikePostByUserIdAndPostId(visitorID, postID)
 		if err != nil {
@@ -368,6 +375,10 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if dislike != "" {
+		if visitor.UserName == "guest" {
+			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
+			return
+		}
 		postID, _ := strconv.Atoi(dislike)
 		err := m.DB.DislikePostByUserIdAndPostId(visitorID, postID)
 		if err != nil {
@@ -376,6 +387,10 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	//new post
 	if r.Method == http.MethodPost && len(r.FormValue("post-text")) != 0 {
+		if visitor.UserName == "guest" {
+			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
+			return
+		}
 		post := models.Post{
 			Subject:  shortenerOfSubject(mainThread.Subject),
 			Content:  r.FormValue("post-text"),
