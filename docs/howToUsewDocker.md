@@ -44,13 +44,13 @@ docker info
 
 ### to build Container
 ```bash
-docker build -t FFforum .
+docker build -t ffforum .
 ```
   install requierments
 
 ### to run Container
 ```bash
-docker run --name=FFforum -p 80:8080 FFforum
+docker run --name=ffforum -p 80:8080 ffforum
 ```
 
 ## type in browser for Testing
@@ -60,7 +60,7 @@ localhost:80
 
 ### to stop Container
 ```bash
-docker stop FFforum
+docker stop ffforum
 ```
 
 ### to prune Container
