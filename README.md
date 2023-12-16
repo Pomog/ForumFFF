@@ -11,6 +11,12 @@ This is a Web Application written in Golang, utilizing only standard [Go librari
 - `github.com/mattn/go-sqlite3 v1.14.18`
 - To run locally use ```go run ./cmd/web .```
 
+### Session
+The session feature in this project is implemented using the `github.com/google/uuid` package. A unique UUID (Universally Unique Identifier) token is generated and stored in cookies. On the server side, this token is associated with the user's ID in the SQL database.
+
+#### Implementation Details
+1. **UUID Generation:** The `github.com/google/uuid` package is utilized to generate a universally unique identifier for each session.
+2. **Cookie Storage:** The generated UUID token is stored in cookies. Cookies provide a convenient and secure way to manage session data on the client side.
 
 ### Database
 - We are using the SQLite driver. However, our application implements The Repository pattern, and to switch databases, the `DatabaseInt` interface (located in the `repository` package) should be implemented for database systems.

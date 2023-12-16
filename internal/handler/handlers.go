@@ -175,7 +175,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if userAlreadyExist {
-			setErrorAndRedirect(w, r, dbErrorCreateUser, "/error-page")
+			setErrorAndRedirect(w, r, "User with such Email OR NickName Already Exist", "/error-page")
 		} else {
 			// Get the file from the form data
 			file, handler, errFileGet := r.FormFile("avatar")
@@ -241,9 +241,19 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		threads, err := m.DB.GetAllThreads()
-		if err != nil {
-			setErrorAndRedirect(w, r, "Could not get Threads m.DB.GetAllThreads", "/error-page")
+		search := r.FormValue("search")
+		var threads []models.Thread
+		var err error
+		if search != "" {
+			threads, err = m.DB.GetSearchedThreads(search)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get Threads m.DB.GetSearchedThreads", "/error-page")
+			}
+		} else {
+			threads, err = m.DB.GetAllThreads()
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get Threads m.DB.GetAllThreads", "/error-page")
+			}
 		}
 
 		var threadsInfo []models.ThreadDataForMainPage
@@ -333,7 +343,6 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 			if visitorID = userID; visitorID != 0 {
 				break
 			}
-
 		}
 	}
 
@@ -464,7 +473,7 @@ func (m *Repository) ErrorPage(w http.ResponseWriter, r *http.Request) {
 		</head>
 		<body>
 			<h1>Error</h1>
-			<p>An error occurred: ` + errorMessage + `</p>
+			<p>An error occurred: <strong>` + errorMessage + `</strong></p>
 		</body>
 		</html>
 	`
