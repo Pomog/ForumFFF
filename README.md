@@ -10,6 +10,7 @@ This is a Web Application written in Golang, utilizing only standard [Go librari
 - `github.com/google/uuid v1.4.0`
 - `github.com/mattn/go-sqlite3 v1.14.18`
 - To run locally use ```go run ./cmd/web .```
+- [How to use Docker](docs/howToUsewDocker.md)
 
 ### Session
 The session feature in this project is implemented using the `github.com/google/uuid` package. A unique UUID (Universally Unique Identifier) token is generated and stored in cookies. On the server side, this token is associated with the user's ID in the SQL database.
