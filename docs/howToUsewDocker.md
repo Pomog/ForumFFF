@@ -44,13 +44,13 @@ docker info
 
 ### to build Container
 ```bash
-docker build -t ascii-art-web-dockerize .
+docker build -t FFforum .
 ```
   install requierments
 
 ### to run Container
 ```bash
-docker run --name=ascii-art-web-dockerize -p 80:8080 ascii-art-web-dockerize
+docker run --name=FFforum -p 80:8080 FFforum
 ```
 
 ## type in browser for Testing
@@ -60,7 +60,7 @@ localhost:80
 
 ### to stop Container
 ```bash
-docker stop ascii-art-web-dockerize
+docker stop FFforum
 ```
 
 ### to prune Container
