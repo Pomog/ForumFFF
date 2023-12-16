@@ -8,8 +8,8 @@ ARG GOPATH=
 # Copy your Go application source code into the container
 COPY ./ ./
 # Build the Go application
-RUN go build -o main .
+RUN go build -o ffforum cmd/web/*.go
 # Expose a port (if your application listens on a specific port)
 EXPOSE 8080
 # Command to run your Go application
-CMD ["./main"]
+CMD ["./ffforum"]
