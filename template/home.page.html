@@ -60,7 +60,7 @@
                   </td>
                   {{ $lastPost := findLastPost .Posts }}
                   {{ $dateLastPostCreated := convertTime $lastPost }}
-                  <td><!-- 2column -->From:<br><img src="{{ .PictureUserWhoCreatedLastPost }}" class="logo_ava" alt="picture"> {{ $lastPost.Subject}} <br>{{ .UserNameWhoCreatedLastPost }}<br> Posted: {{$dateLastPostCreated}} </td>
+                  <td><!-- 2column -->From:<br><img src="{{ .PictureUserWhoCreatedLastPost }}" class="logo_ava" alt="picture"> {{ $lastPost.Content}} <br>{{ .UserNameWhoCreatedLastPost }}<br> Posted: {{$dateLastPostCreated}} </td>
                   {{ $numOfPosts := numberOfPosts .Posts }}
                   <td><!-- 3column -->{{ $numOfPosts}} messages</td>
               </tr>
