@@ -37,6 +37,7 @@ const (
 	fileReceivingErrorMsg = "file receiving error"
 	fileCreatingErrorMsg  = "Unable to create file"
 	fileSavingErrorMsg    = "Unable to save file"
+	guestRestiction       = "Guests can not create Themes and Posts, please log in or register!"
 
 	emptyUUID = "00000000-0000-0000-0000-000000000000"
 )
@@ -175,7 +176,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if userAlreadyExist {
-			setErrorAndRedirect(w, r, dbErrorCreateUser, "/error-page")
+			setErrorAndRedirect(w, r, "User with such Email OR NickName Already Exist", "/error-page")
 		} else {
 			// Get the file from the form data
 			file, handler, errFileGet := r.FormFile("avatar")
@@ -241,9 +242,19 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		threads, err := m.DB.GetAllThreads()
-		if err != nil {
-			setErrorAndRedirect(w, r, "Could not get Threads m.DB.GetAllThreads", "/error-page")
+		search := r.FormValue("search")
+		var threads []models.Thread
+		var err error
+		if search != "" {
+			threads, err = m.DB.GetSearchedThreads(search)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get Threads m.DB.GetSearchedThreads", "/error-page")
+			}
+		} else {
+			threads, err = m.DB.GetAllThreads()
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get Threads m.DB.GetAllThreads", "/error-page")
+			}
 		}
 
 		var threadsInfo []models.ThreadDataForMainPage
@@ -281,7 +292,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		loggedUser, _ := m.DB.GetUserByID(UserID)
 		userName := loggedUser.UserName
 		if userName == "guest" {
-			setErrorAndRedirect(w, r, "Guests can not create Themes and Posts, please log in or register!", "/error-page")
+			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
 		}
 		thread := models.Thread{
 			Subject: r.FormValue("message-text"),
@@ -333,9 +344,10 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 			if visitorID = userID; visitorID != 0 {
 				break
 			}
-
 		}
 	}
+
+	visitor, _ := m.DB.GetUserByID(visitorID)
 
 	threadID := getThreadIDFromQuery(w, r)
 
@@ -347,11 +359,15 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	creator, err := m.DB.GetUserByID(mainThread.UserID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get user as creator", "/error-page")
+		return
 	}
 
 	like := r.FormValue("like")
 	dislike := r.FormValue("dislike")
 	if like != "" {
+		if visitor.UserName == "guest" {
+			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
+		}
 		postID, _ := strconv.Atoi(like)
 		err := m.DB.LikePostByUserIdAndPostId(visitorID, postID)
 		if err != nil {
@@ -359,6 +375,10 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if dislike != "" {
+		if visitor.UserName == "guest" {
+			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
+			return
+		}
 		postID, _ := strconv.Atoi(dislike)
 		err := m.DB.DislikePostByUserIdAndPostId(visitorID, postID)
 		if err != nil {
@@ -367,6 +387,10 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	//new post
 	if r.Method == http.MethodPost && len(r.FormValue("post-text")) != 0 {
+		if visitor.UserName == "guest" {
+			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
+			return
+		}
 		post := models.Post{
 			Subject:  shortenerOfSubject(mainThread.Subject),
 			Content:  r.FormValue("post-text"),
@@ -464,7 +488,7 @@ func (m *Repository) ErrorPage(w http.ResponseWriter, r *http.Request) {
 		</head>
 		<body>
 			<h1>Error</h1>
-			<p>An error occurred: ` + errorMessage + `</p>
+			<p>An error occurred: <strong>` + errorMessage + `</strong></p>
 		</body>
 		</html>
 	`

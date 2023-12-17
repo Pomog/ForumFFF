@@ -13,7 +13,7 @@ func (m *SqliteBDRepo) UserPresent(userName, email string) (bool, error) {
 
 	query := `select count(id) 
 	from users
-	where username = $1 and
+	where username = $1 OR
 	email = $2
 	`
 	var numRows int
@@ -413,4 +413,32 @@ func (m *SqliteBDRepo) GetGuestID() (int, error) {
 		return guestID, err
 	}
 	return guestID, nil
+}
+
+func (m *SqliteBDRepo) GetSearchedThreads(search string) ([]models.Thread, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select * 
+	from thread
+	WHERE subject LIKE '%' || $1 || '%';
+	`
+	rows, err := m.DB.QueryContext(ctx, query, search)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var threads []models.Thread
+
+	for rows.Next() {
+		var thread models.Thread
+		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID)
+		if err != nil {
+			return nil, err
+		}
+		threads = append(threads, thread)
+	}
+
+	return threads, nil
 }
