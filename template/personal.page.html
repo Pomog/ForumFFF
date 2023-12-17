@@ -4,7 +4,6 @@
     <div class="content">
         {{$person := index .Data "personal"}}
         <h2>User Profile</h2>
-        <form action="/update-profile" method="POST">
             <div class="container ">
                 <table class="table table-borderless whiteLink">
                     <tbody>
@@ -38,18 +37,10 @@
                             {{$totalP := index .Data "totalPosts"}}
                             <td>{{$totalP}}</td>
                         </tr>
-                        <tr>
-                            <td colspan="2" class="text-center">
-                                <form action="/update-profile" method="POST">
-                                    <input type="submit" class="btn btn-primary" value="Update">
-                                </form>
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
             
-        </form>
     </div>
     </div>
 {{end}}
