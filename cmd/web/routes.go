@@ -30,7 +30,7 @@ func routes(a *config.AppConfig) http.Handler {
 	mux.HandleFunc("/contactUs", handler.Repo.ContactUsHandler)
 	mux.HandleFunc("/forum_rules", handler.Repo.ForumRulesHandler)
 	mux.HandleFunc("/help", handler.Repo.HelpHandler)
-	mux.HandleFunc("/privat_policy", handler.Repo.PrivatPHandler)
+	mux.HandleFunc("/privat_policy", handler.Repo.PrivatPolicyHandler)
 	mux.HandleFunc("/personal_cabinet", handler.Repo.PersonaCabinetHandler)
 
 	return mux

@@ -102,9 +102,10 @@
         <th class="forumFirstColTheme" scope="col" colspan="2">
           {{$creatorImage := index .Data "creatorImg"}}
           {{$creatorName := index .Data "creatorName"}}
+          {{$creatorID := index .Data "creatorID"}}
           <img src="{{$creatorImage}}" class="ava_img" alt="ava"><br>
-          <strong>&nbsp;{{$creatorName}}</strong><br>
-          Date of Registration: {{index .Data "creatorRegistrationDate"}} <br>
+          <br><a href="/personal_cabinet?userID={{$creatorID}}"><strong>&nbsp;{{$creatorName}}</strong></a><br>
+          Date of Registration:<br>{{index .Data "creatorRegistrationDate"}} <br>
           Total Messages: {{index .Data "creatorPostsAmmount"}}
         </th>
         <!-- Modal starts -->
@@ -150,8 +151,8 @@
       <tr>
         <td>
           <img src="{{ .PictureUserWhoCreatedPost }}" class="ava_img" alt="ava">
-          <br><strong>&nbsp;{{ .UserNameWhoCreatedPost }}</strong><br>
-          Date of Registration: {{ .UserRegistrationDate}} <br>
+          <br><a href="/personal_cabinet?userID={{ .UserIDWhoCreatedPost}}"><strong>&nbsp;{{ .UserNameWhoCreatedPost }}</strong></a><br>
+          Date of Registration:<br>{{ .UserRegistrationDate}} <br>
           Total Messages: {{ .UserPostsAmmount}}
         </td>
         <td>
