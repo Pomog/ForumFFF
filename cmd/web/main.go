@@ -68,13 +68,13 @@ func run() (*repository.DataBase, error) {
 
 	db, err := repository.GetDB()
 	if err != nil {
-		log.Fatal("cannot get database connection")
+		log.Fatal("cannot get database connection :" + err.Error())
 		return nil, err
 	}
 
 	err = repository.MakeDBTables(db.SQL)
 	if err != nil {
-		log.Fatal("cannot create database tables")
+		log.Fatal(err)
 		return nil, err
 	}
 
@@ -82,7 +82,7 @@ func run() (*repository.DataBase, error) {
 
 	tc, err := renderer.CreateTemplateCache()
 	if err != nil {
-		log.Fatal("cannot create template cache")
+		log.Fatal("cannot create template cache : " + err.Error())
 		return nil, err
 	}
 	app.TemplateCache = tc
