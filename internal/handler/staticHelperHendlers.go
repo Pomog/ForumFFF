@@ -136,26 +136,6 @@ func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Reques
 		if errUser != nil {
 			setErrorAndRedirect(w, r, "Could not get User from  GetUserByID(visitorID)", "/error-page")
 		}
-
-		// visitorID, _ := m.DB.GetGuestID()
-
-		// for _, cookie := range r.Cookies() {
-		// 	if cookie.Value == m.App.UserLogin.String() {
-		// 		userID, err := strconv.Atoi(cookie.Name)
-		// 		if err != nil {
-		// 			setErrorAndRedirect(w, r, "Could not get visitor ID", "/error-page")
-		// 		}
-		// 		if visitorID = userID; visitorID != 0 {
-		// 			break
-		// 		}
-
-		// 	}
-		// }
-		// user, errUser := m.DB.GetUserByID(visitorID)
-		// if errUser != nil {
-		// 	setErrorAndRedirect(w, r, "Could not get User from  GetUserByID(visitorID)", "/error-page")
-		// }
-		// var personalInfo models.User
 		personalInfo.Email = user.Email
 		personalInfo.ID = user.ID
 		personalInfo.Created = user.Created
@@ -175,4 +155,12 @@ func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Reques
 	} else {
 		http.Error(w, "No such method", http.StatusMethodNotAllowed)
 	}
+}
+
+// shortenerOfSubject helper function to squeeze theme name
+func ShortenerOfSubject(input string) string {
+	if len(input) <= 80 {
+		return input
+	}
+	return "Topic:" + input[0:81] + "..."
 }
