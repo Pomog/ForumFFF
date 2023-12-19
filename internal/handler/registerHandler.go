@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -8,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/Pomog/ForumFFF/internal/forms"
+	"github.com/Pomog/ForumFFF/internal/helper"
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
 )
@@ -103,6 +105,8 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				setErrorAndRedirect(w, r, "DB Error func CreateUser", "/error-page")
 			}
+			message := fmt.Sprintf("User %s is registered", registrationData.UserName)
+			helper.SendEmail(m.App.ServerEmail, message)
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 		}
 

@@ -2,8 +2,11 @@
 package helper
 
 import (
+	"fmt"
 	"net/http"
+	"net/smtp"
 	"runtime/debug"
+	"time"
 
 	"github.com/Pomog/ForumFFF/internal/config"
 )
@@ -27,4 +30,28 @@ func ClientError(w http.ResponseWriter, status int) {
 func ServerError(w http.ResponseWriter, err error) {
 	app.ErrorLog.Printf("%s\n%s", err.Error(), debug.Stack())
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+}
+
+// sendEmail to emailAdress with starting server time
+func SendEmail(emailAdress, message string) {
+	// test mail
+	from := "ffforumadm@gmail.com"
+	password := "wwop dffy xhnz rdbv"
+	to := emailAdress
+	subject := "Test Email"
+	time := time.Now().Format("2006-01-02 15:04:05")
+	body := fmt.Sprintf("%s at : %s", message, time)
+
+	msg := "To: " + to + "\r\n" +
+		"Subject: " + subject + "Test" + "\r\n" +
+		"\r\n" + body
+
+	auth := smtp.PlainAuth("", from, password, "smtp.gmail.com")
+
+	err := smtp.SendMail("smtp.gmail.com:587", auth, from, []string{to}, []byte(msg))
+	if err != nil {
+		app.ErrorLog.Println(err)
+	} else {
+		fmt.Println("Email sent successfully.")
+	}
 }

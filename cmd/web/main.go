@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/smtp"
 	"os"
-	"time"
 
+	"github.com/Pomog/ForumFFF/internal/helper"
 	"github.com/Pomog/ForumFFF/internal/models"
 
 	"github.com/Pomog/ForumFFF/internal/config"
@@ -39,34 +38,9 @@ func main() {
 		Handler: routes(&app),
 	}
 
-	sendEmail(app.ServerEmail)
+	helper.SendEmail(app.ServerEmail, "The FFForum Server started at")
 	err = srv.ListenAndServe()
 	log.Fatal(err)
-}
-
-// sendEmail to emailAdress with starting server time
-func sendEmail(emailAdress string) {
-	// test mail
-	from := "ffforumadm@gmail.com"
-	password := "wwop dffy xhnz rdbv"
-	to := emailAdress
-	subject := "Test Email"
-	time := time.Now().Format("2006-01-02 15:04:05")
-	body := fmt.Sprintf("The FFForum Server started at : %s", time)
-
-	msg := "To: " + to + "\r\n" +
-		"Subject: " + subject + "Test" + "\r\n" +
-		"\r\n" + body
-
-	auth := smtp.PlainAuth("", from, password, "smtp.gmail.com")
-
-	err := smtp.SendMail("smtp.gmail.com:587", auth, from, []string{to}, []byte(msg))
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		log.Println("Email sent successfully.")
-
-	}
 }
 
 func run() (*repository.DataBase, error) {
@@ -94,13 +68,13 @@ func run() (*repository.DataBase, error) {
 
 	db, err := repository.GetDB()
 	if err != nil {
-		log.Fatal("cannot get database connection")
+		log.Fatal("cannot get database connection :" + err.Error())
 		return nil, err
 	}
 
 	err = repository.MakeDBTables(db.SQL)
 	if err != nil {
-		log.Fatal("cannot create database tables")
+		log.Fatal(err)
 		return nil, err
 	}
 
@@ -108,7 +82,7 @@ func run() (*repository.DataBase, error) {
 
 	tc, err := renderer.CreateTemplateCache()
 	if err != nil {
-		log.Fatal("cannot create template cache")
+		log.Fatal("cannot create template cache : " + err.Error())
 		return nil, err
 	}
 	app.TemplateCache = tc
