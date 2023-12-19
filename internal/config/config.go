@@ -15,4 +15,5 @@ type AppConfig struct {
 	InProduction  bool
 	ErrorLog      *log.Logger
 	UserLogin     uuid.UUID // This field can hold a UUID value
+	ServerEmail   string
 }
