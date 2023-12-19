@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/smtp"
 	"os"
+	"time"
 
 	"github.com/Pomog/ForumFFF/internal/models"
 
@@ -23,9 +24,6 @@ var infolog *log.Logger
 var errorlog *log.Logger
 
 func main() {
-
-	sendEmail()
-
 	db, err := run()
 	if err != nil {
 		app.ErrorLog.Fatal(err)
@@ -41,18 +39,20 @@ func main() {
 		Handler: routes(&app),
 	}
 
+	sendEmail(app.ServerEmail)
 	err = srv.ListenAndServe()
 	log.Fatal(err)
 }
 
-func sendEmail() {
+// sendEmail to emailAdress with starting server time
+func sendEmail(emailAdress string) {
 	// test mail
-
 	from := "ffforumadm@gmail.com"
 	password := "wwop dffy xhnz rdbv"
-	to := "denver1033@gmail.com"
+	to := emailAdress
 	subject := "Test Email"
-	body := "Hello, this is a test email from Golang."
+	time := time.Now().Format("2006-01-02 15:04:05")
+	body := fmt.Sprintf("The FFForum Server started at : %s", time)
 
 	msg := "To: " + to + "\r\n" +
 		"Subject: " + subject + "Test" + "\r\n" +
@@ -80,6 +80,9 @@ func run() (*repository.DataBase, error) {
 
 	// change this to true when in production
 	app.InProduction = false
+
+	// set email adress for loggin
+	app.ServerEmail = "ffforumadm@gmail.com"
 
 	// info log
 	infolog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
