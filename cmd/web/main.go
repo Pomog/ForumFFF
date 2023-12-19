@@ -3,10 +3,12 @@ package main
 import (
 	"encoding/gob"
 	"fmt"
-	"github.com/Pomog/ForumFFF/internal/models"
 	"log"
 	"net/http"
+	"net/smtp"
 	"os"
+
+	"github.com/Pomog/ForumFFF/internal/models"
 
 	"github.com/Pomog/ForumFFF/internal/config"
 	"github.com/Pomog/ForumFFF/internal/handler"
@@ -21,6 +23,8 @@ var infolog *log.Logger
 var errorlog *log.Logger
 
 func main() {
+
+	sendEmail()
 
 	db, err := run()
 	if err != nil {
@@ -39,6 +43,30 @@ func main() {
 
 	err = srv.ListenAndServe()
 	log.Fatal(err)
+}
+
+func sendEmail() {
+	// test mail
+
+	from := "ffforumadm@gmail.com"
+	password := "wwop dffy xhnz rdbv"
+	to := "denver1033@gmail.com"
+	subject := "Test Email"
+	body := "Hello, this is a test email from Golang."
+
+	msg := "To: " + to + "\r\n" +
+		"Subject: " + subject + "Test" + "\r\n" +
+		"\r\n" + body
+
+	auth := smtp.PlainAuth("", from, password, "smtp.gmail.com")
+
+	err := smtp.SendMail("smtp.gmail.com:587", auth, from, []string{to}, []byte(msg))
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		log.Println("Email sent successfully.")
+
+	}
 }
 
 func run() (*repository.DataBase, error) {
