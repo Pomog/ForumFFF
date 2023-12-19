@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/Pomog/ForumFFF/internal/forms"
 	"github.com/Pomog/ForumFFF/internal/models"
@@ -28,7 +29,7 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		// Create a User struct with data from the HTTP request form
 		loginData := models.User{
-			Email:    r.FormValue("emailLogIn"),
+			Email:    strings.ToLower(r.FormValue("emailLogIn")),
 			Password: r.FormValue("passwordLogIn"),
 		}
 

@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/Pomog/ForumFFF/internal/forms"
 	"github.com/Pomog/ForumFFF/internal/helper"
@@ -38,7 +39,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			FirstName: r.FormValue("firstName"),
 			LastName:  r.FormValue("lastName"),
 			UserName:  r.FormValue("nickName"),
-			Email:     r.FormValue("emailRegistr"),
+			Email:     strings.ToLower(r.FormValue("emailRegistr")),
 			Password:  r.FormValue("passwordReg"),
 			Picture:   r.FormValue("avatar"),
 		}
