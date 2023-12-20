@@ -51,7 +51,7 @@ func (f *Form) First_LastName_Min_Max_Len(field string, minLen, maxLen int, r *h
 
 // EmailFormat checks if the specified field in the form data matches a valid email format
 func (f *Form) EmailFormat(field string, r *http.Request) bool {
-	inputData := r.FormValue(field)
+	inputData := strings.ToLower(r.FormValue(field))
 	if len(strings.Split(inputData, "@")) != 2 {
 		f.Errors.Add(field, "Wrong format of Email - wrong number of @ sign")
 		return false

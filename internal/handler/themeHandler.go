@@ -70,7 +70,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		post := models.Post{
-			Subject:  shortenerOfSubject(mainThread.Subject),
+			Subject:  ShortenerOfSubject(mainThread.Subject),
 			Content:  r.FormValue("post-text"),
 			UserID:   visitorID,
 			ThreadId: mainThread.ID,
@@ -141,10 +141,4 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// shortenerOfSubject helper function to squeeze theme name
-func shortenerOfSubject(input string) string {
-	if len(input) <= 40 {
-		return input
-	}
-	return "Topic:" + input[0:41] + "..."
-}
+

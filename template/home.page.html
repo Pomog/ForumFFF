@@ -53,14 +53,18 @@
                   <td>
                       <!-- 1column --> 
                       <a href="/theme?threadID={{ .ThreadID}}">
-                          <img src="{{ .PictureUserWhoCreatedThread }}" class="logo_img" alt="/static/logo/message_icon2.png"><strong>&nbsp;{{ .Subject }} </strong>
-                          <br>Created by: {{ .UserNameWhoCreatedThread}}<br>
-                          Topic created: {{ .Created}}
+                          <img src="{{ .PictureUserWhoCreatedThread }}" class="logo_img" alt="/static/logo/message_icon2.png">
+                          <br>Created by: {{ .UserNameWhoCreatedThread}}
+                          <br>Topic created: {{ .Created}}
+                          <br><strong>{{ .Subject }} </strong>
                       </a>
                   </td>
                   {{ $lastPost := findLastPost .Posts }}
                   {{ $dateLastPostCreated := convertTime $lastPost }}
-                  <td><!-- 2column -->From:<br><img src="{{ .PictureUserWhoCreatedLastPost }}" class="logo_ava" alt="picture"> {{ $lastPost.Content}} <br>{{ .UserNameWhoCreatedLastPost }}<br> Posted: {{$dateLastPostCreated}} </td>
+                  
+                  <td><!-- 2column -->From:<br><img src="{{ .PictureUserWhoCreatedLastPost }}" class="logo_ava" alt="picture"> <br>{{ .UserNameWhoCreatedLastPost }}<br> Posted: {{$dateLastPostCreated}}
+                    {{ $lastPostShorten := shortenPost .Posts}}
+                    <br><em>{{ $lastPostShorten}}</em></td>
                   {{ $numOfPosts := numberOfPosts .Posts }}
                   <td><!-- 3column -->{{ $numOfPosts}} messages</td>
               </tr>

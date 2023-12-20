@@ -34,6 +34,21 @@ var functions = template.FuncMap{
 	"convertTime": func(post models.Post) string {
 		return post.Created.Format("2006-01-02 15:04:05")
 	},
+	"shortenPost": func(allPosts []models.Post) string {
+		var latestPost2 models.Post
+		latestPost2.Created, _ = time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
+		for _, post := range allPosts {
+			if post.Created.After(latestPost2.Created) {
+				latestPost2 = post
+			}
+		}
+		pst := latestPost2.Content
+		if len(pst) <= 80 {
+			return pst
+		}
+		return pst[0:80]
+
+	},
 }
 
 // NewTemplate sets the config for the template package
