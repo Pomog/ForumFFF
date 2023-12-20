@@ -10,6 +10,7 @@ import (
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
 	"github.com/google/uuid"
+	"github.com/google/uuid"
 )
 
 // HomeHandler handles both GET and POST requests for the registration page.
@@ -18,6 +19,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 	loginUUID := m.App.UserLogin
 
+	if loginUUID == uuid.Nil {
 	if loginUUID == uuid.Nil {
 		m.App.InfoLog.Println("Could not get loginUUID in HomeHandler")
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -61,6 +63,12 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			user, err = m.DB.GetUserByID(thread.UserID)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID", "/error-page")
+				return
+			}
+
 			var info models.ThreadDataForMainPage
 			info.ThreadID = thread.ID
 			info.Subject = thread.Subject
@@ -91,6 +99,14 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			} else if userIDwhoCreatedLastPost == 0 || len(posts) == 0 {
 				info.Created = ""
 			}
+			userWhoCreatedLastPost, err := m.DB.GetUserByID(getUserThatCreatedLastPost(posts))
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(getUserThatCreatedLastPost(posts))", "/error-page")
+				return
+			}
+
+			info.PictureUserWhoCreatedLastPost = userWhoCreatedLastPost.Picture
+			info.UserNameWhoCreatedLastPost = userWhoCreatedLastPost.UserName
 			threadsInfo = append(threadsInfo, info)
 		}
 
@@ -109,6 +125,11 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	} else if r.Method == http.MethodPost {
 
+		loggedUser, err := m.DB.GetUserByID(UserID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(UserID), HomeHandler", "/error-page")
+			return
+		}
 		loggedUser, err := m.DB.GetUserByID(UserID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(UserID), HomeHandler", "/error-page")

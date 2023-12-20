@@ -74,6 +74,11 @@ func (m *SqliteBDRepo) GetUserByID(ID int) (models.User, error) {
 		return user, errors.New("wrong User Data")
 	}
 
+
+	if user.ID == 0 || user.UserName == "" || user.Email == "" {
+		return user, errors.New("wrong User Data")
+	}
+
 	return user, nil
 }
 
@@ -145,13 +150,9 @@ func (m *SqliteBDRepo) CreateThread(thread models.Thread) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	if thread.Subject == "" {
-		return 0, errors.New("you can not create empty thread")
-	}
-
 	user, err := m.GetUserByID(thread.UserID)
 	if err != nil {
-		return 0, errors.New("can not get user by ID (CreateThread)")
+		return 0, errors.New("guest can not create a thread")
 	}
 	userName := user.UserName
 
