@@ -2,6 +2,7 @@ package dbrepo
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/Pomog/ForumFFF/internal/models"
@@ -134,6 +135,13 @@ func (m *SqliteBDRepo) CreateUser(r models.User) error {
 func (m *SqliteBDRepo) CreateThread(thread models.Thread) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
+
+	user, _ := m.GetUserByID(thread.UserID)
+	userName := user.UserName
+
+	if userName == "guest" {
+		return 0, errors.New("guest can not create a thread")
+	}
 
 	stmt := `insert into thread
 	(subject, userID)
