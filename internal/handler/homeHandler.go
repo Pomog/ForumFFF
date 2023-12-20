@@ -84,6 +84,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			Data: data,
 		})
 	} else if r.Method == http.MethodPost {
+
 		loggedUser, _ := m.DB.GetUserByID(UserID)
 		userName := loggedUser.UserName
 		if userName == "guest" {
@@ -92,6 +93,12 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		thread := models.Thread{
 			Subject: r.FormValue("message-text"),
 			UserID:  UserID,
+		}
+
+		// checking if there is a text before thread creation
+		if thread.Subject == "" {
+			setErrorAndRedirect(w, r, "Empty thread can not be created", "/error-page")
+			return
 		}
 
 		id, err := m.DB.CreateThread(thread)

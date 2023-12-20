@@ -13,13 +13,7 @@ func routes(a *config.AppConfig) http.Handler {
 
 	mux := http.NewServeMux()
 
-	//Define a list of static directories (e.g., "css", "logo", "ava").
-	statics := []string{"css", "logo", "ava"}
-
-	// Register handlers for static content.
-	for _, static := range statics {
-		mux.Handle(fmt.Sprintf("/static/%s/", static), http.StripPrefix(fmt.Sprintf("/static/%s/", static), http.FileServer(http.Dir(fmt.Sprintf("static/%s", static)))))
-	}
+	registerStaticHandlers(mux)
 
 	// Register handlers for application-specific routes.
 	mux.HandleFunc("/", handler.Repo.LoginHandler)
@@ -34,4 +28,15 @@ func routes(a *config.AppConfig) http.Handler {
 	mux.HandleFunc("/personal_cabinet", handler.Repo.PersonaCabinetHandler)
 
 	return mux
+}
+
+// registerStaticHandlers registers handlers for static content.
+func registerStaticHandlers(mux *http.ServeMux) {
+	//Define a list of static directories (e.g., "css", "logo", "ava").
+	statics := []string{"css", "logo", "ava"}
+
+	// Register handlers for static content.
+	for _, static := range statics {
+		mux.Handle(fmt.Sprintf("/static/%s/", static), http.StripPrefix(fmt.Sprintf("/static/%s/", static), http.FileServer(http.Dir(fmt.Sprintf("static/%s", static)))))
+	}
 }
