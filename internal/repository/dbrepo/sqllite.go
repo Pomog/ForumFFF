@@ -69,6 +69,11 @@ func (m *SqliteBDRepo) GetUserByID(ID int) (models.User, error) {
 	if err != nil {
 		return user, err
 	}
+
+	if user.ID == 0 || user.UserName == "" || user.Email == "" {
+		return user, errors.New("wrong User Data")
+	}
+
 	return user, nil
 }
 
@@ -95,6 +100,10 @@ func (m *SqliteBDRepo) CreateUser(r models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
+	if r.UserName == "" || r.Email == "" || r.FirstName == "" {
+		return errors.New("wrong User Data")
+	}
+
 	stmt := `insert into users
 	(username, password, first_name, last_name, email, picture)
 	values ($1, $2, $3, $4, $5, $6)
@@ -117,7 +126,10 @@ func (m *SqliteBDRepo) CreateThread(thread models.Thread) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	user, _ := m.GetUserByID(thread.UserID)
+	user, err := m.GetUserByID(thread.UserID)
+	if err != nil {
+		return 0, errors.New("guest can not create a thread")
+	}
 	userName := user.UserName
 
 	if userName == "guest" || userName == "" {

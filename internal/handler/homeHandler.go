@@ -9,6 +9,7 @@ import (
 
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
+	"github.com/google/uuid"
 )
 
 // HomeHandler handles both GET and POST requests for the registration page.
@@ -17,7 +18,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 	loginUUID := m.App.UserLogin
 
-	if loginUUID.String() == emptyUUID {
+	if loginUUID == uuid.Nil {
 		m.App.InfoLog.Println("Could not get loginUUID in HomeHandler")
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	}
@@ -54,7 +55,12 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		var threadsInfo []models.ThreadDataForMainPage
 		for _, thread := range threads {
 			var user models.User
-			user, _ = m.DB.GetUserByID(thread.UserID)
+			user, err = m.DB.GetUserByID(thread.UserID)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID", "/error-page")
+				return
+			}
+
 			var info models.ThreadDataForMainPage
 			info.ThreadID = thread.ID
 			info.Subject = thread.Subject
@@ -68,14 +74,23 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 				log.Fatal(err)
 			}
 			info.Posts = posts
-			userWhoCreatedLastPost, _ := m.DB.GetUserByID(getUserThatCreatedLastPost(posts))
+			userWhoCreatedLastPost, err := m.DB.GetUserByID(getUserThatCreatedLastPost(posts))
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(getUserThatCreatedLastPost(posts))", "/error-page")
+				return
+			}
+
 			info.PictureUserWhoCreatedLastPost = userWhoCreatedLastPost.Picture
 			info.UserNameWhoCreatedLastPost = userWhoCreatedLastPost.UserName
 			threadsInfo = append(threadsInfo, info)
 		}
 
 		data := make(map[string]interface{})
-		loggedUser, _ := m.DB.GetUserByID(UserID)
+		loggedUser, err := m.DB.GetUserByID(UserID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(UserID)", "/error-page")
+			return
+		}
 		data["threads"] = threadsInfo
 		data["loggedAs"] = loggedUser.UserName
 		data["loggedAsID"] = loggedUser.ID
@@ -85,7 +100,11 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	} else if r.Method == http.MethodPost {
 
-		loggedUser, _ := m.DB.GetUserByID(UserID)
+		loggedUser, err := m.DB.GetUserByID(UserID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(UserID), HomeHandler", "/error-page")
+			return
+		}
 		userName := loggedUser.UserName
 		if userName == "guest" {
 			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
