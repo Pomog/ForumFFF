@@ -151,7 +151,7 @@ func (m *SqliteBDRepo) CreateThread(thread models.Thread) (int64, error) {
 
 	user, err := m.GetUserByID(thread.UserID)
 	if err != nil {
-		return 0, errors.New("guest can not create a thread")
+		return 0, errors.New("can not get user by ID (CreateThread)")
 	}
 	userName := user.UserName
 
