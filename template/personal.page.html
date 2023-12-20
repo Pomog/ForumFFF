@@ -4,43 +4,42 @@
     <div class="content">
         {{$person := index .Data "personal"}}
         <h2>User Profile</h2>
-            <div class="container ">
-                <table class="table table-borderless whiteLink">
-                    <tbody>
-                        <tr>
-                            <td colspan="2" class="text-center">
-                                <img src="{{$person.Picture}}" alt="your_ava" class="ava_img">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Username</th>
-                            <td>{{$person.UserName}}</td>
-                        </tr>
-                        <tr>
-                            <th>Email</th>
-                            <td>{{$person.Email}}</td>
-                        </tr>
-                        <tr>
-                            <th>First Name</th>
-                            <td>{{$person.FirstName}}</td>
-                        </tr>
-                        <tr>
-                            <th>Last Name</th>
-                            <td>{{$person.LastName}}</td>
-                        </tr>
-                        <tr>
-                            <th>Created</th>
-                            <td>{{$person.Created}}</td>
-                        </tr>
-                        <tr>
-                            <th>Total messages:</th>
-                            {{$totalP := index .Data "totalPosts"}}
-                            <td>{{$totalP}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-    </div>
+        <div class="container">
+            <table class="table table-borderless whiteLink">
+                <tbody>
+                    <tr>
+                        <td colspan="2" class="text-center">
+                            <img src="{{$person.Picture}}" alt="your_ava" class="ava_img">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Username</th>
+                        <td>{{$person.UserName}}</td>
+                    </tr>
+                    <tr>
+                        <th>Email</th>
+                        <td>{{$person.Email}}</td>
+                    </tr>
+                    <tr>
+                        <th>First Name</th>
+                        <td>{{$person.FirstName}}</td>
+                    </tr>
+                    <tr>
+                        <th>Last Name</th>
+                        <td>{{$person.LastName}}</td>
+                    </tr>
+                    <tr>
+                        <th>Created</th>
+                        <td>{{$person.Created}}</td>
+                    </tr>
+                    <tr>
+                        <th>Total messages:</th>
+                        {{$totalP := index .Data "totalPosts"}}
+                        <td>{{$totalP}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 {{end}}
+

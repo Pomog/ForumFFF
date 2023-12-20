@@ -65,7 +65,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	//new post
 	if r.Method == http.MethodPost && len(r.FormValue("post-text")) != 0 {
-		if visitor.UserName == "guest" {
+		if visitor.UserName == "guest" || visitor.UserName == "" {
 			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
 			return
 		}
@@ -75,6 +75,14 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 			UserID:   visitorID,
 			ThreadId: mainThread.ID,
 		}
+
+		// checking if there is a text before thread creation
+		if post.Content == "" {
+			setErrorAndRedirect(w, r, "Empty post can not be created", "/error-page")
+			return
+		}
+		
+
 		err = m.DB.CreatePost(post)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a post", "/error-page")
@@ -140,5 +148,3 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		Data: data,
 	})
 }
-
-

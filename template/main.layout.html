@@ -16,6 +16,21 @@
 
 </head>
 <body>
+
+{{$Lineage2 := "https://en.wikipedia.org/wiki/Lineage_II"}}
+
+{{$Lineage3 := "https://en.wikipedia.org/wiki/Throne_and_Liberty"}}
+
+{{$New_World := "https://en.wikipedia.org/wiki/New_World"}}
+
+{{$AION := "https://en.wikipedia.org/wiki/Aion_(video_game)"}}
+
+{{$Conan := "https://en.wikipedia.org/wiki/Conan_Exiles"}}
+
+{{$WoW := "https://en.wikipedia.org/wiki/World_of_Warcraft"}}
+
+{{$GW2 := "https://en.wikipedia.org/wiki/Guild_Wars_2"}}
+
   <nav id="navbarTop" class="navbar navbar-expand-lg navbar-dark navBar">
     <div class="container-fluid">
       <img src="static\logo\10.png" class="logo_img" alt="logo"><a class="navbar-brand" href="/">Fan.Forge.Forum.</a>
@@ -35,15 +50,14 @@
               Games
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="#">L2</a></li>
-              <li><a class="dropdown-item" href="#">L3</a></li>
-              <li><a class="dropdown-item" href="#">New World</a></li>
-              <li><a class="dropdown-item" href="#">AION</a></li>
-              <li><a class="dropdown-item" href="#">Conan</a></li>
-              <li><a class="dropdown-item" href="#">WoW</a></li>
-              <li><a class="dropdown-item" href="#">GW2</a></li>
+              <li><a class="dropdown-item" href={{$Lineage2}}>L2</a></li>
+              <li><a class="dropdown-item" href={{$Lineage3}}>L3</a></li>
+              <li><a class="dropdown-item" href={{$New_World}}>New World</a></li>
+              <li><a class="dropdown-item" href={{$AION}}>AION</a></li>
+              <li><a class="dropdown-item" href={{$Conan}}>Conan</a></li>
+              <li><a class="dropdown-item" href={{$WoW}}>WoW</a></li>
+              <li><a class="dropdown-item" href={{$GW2}}>GW2</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">Random Topic</a></li>
             </ul>
           </li>
           <!-- <li class="nav-item">
@@ -75,20 +89,21 @@
             <tbody class="containerBody">
                 <tr>
                     <td>
-                        <a class="whiteLink" href="rulles.html">Rulles; </a>&nbsp; 
-                        <a class="whiteLink" href="contact.html">Contact; </a>&nbsp; 
-                        <a class="whiteLink" href="support.html">Support;</a>&nbsp; 
-                        <a class="whiteLink" href="disscussion.html">Disscussion;</a>&nbsp;
+                        <a class="whiteLink" href="rulles.html">Rulles </a>&nbsp; 
+                        <a class="whiteLink" href="contact.html">Contact </a>&nbsp; 
+                        <a class="whiteLink" href="support.html">Support</a>&nbsp; 
+                        <a class="whiteLink" href="disscussion.html">Disscussion</a>&nbsp;
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <a class="whiteLink" href="lineage2.html">Lineage2; </a>&nbsp; 
-                        <a class="whiteLink" href="lineage3.html">Lineage3; </a>&nbsp; 
-                        <a class="whiteLink" href="newworld.html">New World; </a>&nbsp; 
-                        <a class="whiteLink" href="aion.html">AION;</a>&nbsp; 
-                        <a class="whiteLink" href="wow.html">WOW;</a>&nbsp;
-                        <a class="whiteLink" href="guildwars2.html">Guild Wars 2;</a>&nbsp; 
+                        <a class="whiteLink" href={{$Lineage2}}>Lineage2 </a>&nbsp; 
+                        <a class="whiteLink" href={{$Lineage3}}>Lineage3 </a>&nbsp; 
+                        <a class="whiteLink" href={{$New_World}}>New World </a>&nbsp; 
+                        <a class="whiteLink" href={{$AION}}>AION</a>&nbsp;
+                        <a class="whiteLink" href={{$Conan}}>Conan</a>&nbsp; 
+                        <a class="whiteLink" href={{$WoW}}>WOW</a>&nbsp;
+                        <a class="whiteLink" href={{$GW2}}>Guild Wars 2</a>&nbsp; 
                     </td>
                 </tr>
             </tbody>
