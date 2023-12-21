@@ -179,6 +179,28 @@ func (m *SqliteBDRepo) CreatePost(post models.Post) error {
 	return nil
 }
 
+func (m *SqliteBDRepo) EditPost(post models.Post) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `UPDATE post
+	SET subject = $1, content = $2, threadID = $3, userID = $4
+	WHERE postID = <YourPostID>;
+	`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		post.Subject,
+		post.Content,
+		post.ThreadId,
+		post.UserID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // isThreadExist returns true if Thread with same Subject exist
 func (m *SqliteBDRepo) IsThreadExist(thread models.Thread) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
