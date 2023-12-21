@@ -34,9 +34,9 @@
   <!-- Edit/Delete Section -->
   <div class="mt-4">
     <h3>Edit/Delete Your Post</h3>
-
+    <!-- /theme?threadID={{$contentInfo.ThreadId}} -->
       <div class="mt-3">
-        <form method="POST" action="/theme?threadID={{$contentInfo.ThreadId}}">
+        <form method="POST" action="/edit_topic_result?postID={{$contentInfo.ID}}">
           <div class="form-group">
             <label for="postContent">Your Post Content:</label>
             <textarea class="form-control" name="post-text" id="postContent" rows="10">{{$contentInfo.Content}}</textarea>
