@@ -53,6 +53,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		form.First_LastName_Min_Max_Len("lastName", 3, 12, r)
 		form.First_LastName_Min_Max_Len("nickName", 3, 12, r)
 		form.EmailFormat("emailRegistr", r)
+		form.First_LastName_Min_Max_Len("emailRegistr", 10, 30, r)
 		form.PassFormat("passwordReg", 6, 15, r)
 
 		// Check if the form data is valid; if not, render the home page with error messages
