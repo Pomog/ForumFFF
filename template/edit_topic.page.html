@@ -46,7 +46,7 @@
         </form>
 
 
-        <form method="POST" action="/delete_post">
+        <form method="POST" action="/delete_topic_result?postID={{$contentInfo.ID}}">
           <input type="hidden" name="postID" value="{{$contentInfo.ID}}">
           <button class="btn btn-danger" type="submit">Delete</button>
         </form>
