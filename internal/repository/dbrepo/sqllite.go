@@ -185,7 +185,7 @@ func (m *SqliteBDRepo) EditPost(post models.Post) error {
 
 	stmt := `UPDATE post
 	SET subject = $1, content = $2, threadID = $3, userID = $4
-	WHERE postID = <YourPostID>;
+	WHERE id = $5;
 	`
 
 	_, err := m.DB.ExecContext(ctx, stmt,
@@ -193,6 +193,7 @@ func (m *SqliteBDRepo) EditPost(post models.Post) error {
 		post.Content,
 		post.ThreadId,
 		post.UserID,
+		post.ID,
 	)
 
 	if err != nil {
