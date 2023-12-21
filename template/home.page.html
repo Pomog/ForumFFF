@@ -6,7 +6,7 @@
 <br>
  <h3> Logged As: <a href="/personal_cabinet?userID={{$loggedAsID}}"> {{$loggedAs}}.</a></h3>
 <div class="container custom-container">
-    <table class="table border-success forumTable whiteLink mt-3">
+    <table class="table-borderless forumTable whiteLink mt-3">
         <thead class="containerHead">
             <tr>
                 <!-- modal starts -->
@@ -56,7 +56,7 @@
                           <img src="{{ .PictureUserWhoCreatedThread }}" class="logo_img" alt="/static/logo/message_icon2.png">
                           <br>Created by: {{ .UserNameWhoCreatedThread}}
                           <br>Topic created: {{ .Created}}
-                          <br><strong>{{ .Subject }} </strong>
+                          <br><strong>{{ .Subject }} </strong><hr>
                       </a>
                   </td>
                   {{ $lastPost := findLastPost .Posts }}
