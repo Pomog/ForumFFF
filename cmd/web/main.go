@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Pomog/ForumFFF/internal/helper"
 	"github.com/Pomog/ForumFFF/internal/models"
 
 	"github.com/Pomog/ForumFFF/internal/config"
@@ -38,7 +37,7 @@ func main() {
 		Handler: routes(&app),
 	}
 
-	helper.SendEmail(app.ServerEmail, "The FFForum Server started at")
+	// helper.SendEmail(app.ServerEmail, "The FFForum Server started at")
 	err = srv.ListenAndServe()
 	log.Fatal(err)
 }

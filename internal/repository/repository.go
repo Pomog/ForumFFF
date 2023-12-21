@@ -22,4 +22,5 @@ type DatabaseInt interface {
 	CountLikesAndDislikesForPostByPostID(postID int) (likes, dislikes int, err error)
 	GetGuestID() (int, error)
 	GetSearchedThreads(search string) ([]models.Thread, error)
+	GetPostByID(ID int) (models.Post, error)
 }
