@@ -2,7 +2,6 @@ package dbrepo
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/Pomog/ForumFFF/internal/models"
@@ -210,7 +209,6 @@ func (m *SqliteBDRepo) DeletePost(post models.Post) error {
 	stmt := `DELETE FROM post
 	WHERE id = $1;
 	`
-	fmt.Println("postId", post.ID)
 	_, err := m.DB.ExecContext(ctx, stmt,
 		post.ID,
 	)
