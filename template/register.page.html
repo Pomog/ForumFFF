@@ -49,6 +49,8 @@
 
           
                         <input type="file" class="form-control" name="avatar" id="avatar">
+                        {{with .Form.Errors.Get "avatar"}}<label class="text-danger">{{.}}</label>{{end}}
+                        
                     </div>
                     <button type="submit" class="btn btn-light">Register</button>
                 </form>

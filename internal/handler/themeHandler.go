@@ -85,6 +85,12 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 			setErrorAndRedirect(w, r, "Empty post can not be created", "/error-page")
 			return
 		}
+
+		// checking text length
+		if len(post.Content) > 500 {
+			setErrorAndRedirect(w, r, "Only 500 symbols allowed", "/error-page")
+			return
+		}
 		
 
 		err = m.DB.CreatePost(post)

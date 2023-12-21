@@ -120,6 +120,12 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// checking text length
+		if len(thread.Subject) > 500 {
+			setErrorAndRedirect(w, r, "Only 500 symbols allowed", "/error-page")
+			return
+		}
+
 		id, err := m.DB.CreateThread(thread)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a thread", "/error-page")
