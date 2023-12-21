@@ -23,4 +23,5 @@ type DatabaseInt interface {
 	GetGuestID() (int, error)
 	GetSearchedThreads(search string) ([]models.Thread, error)
 	GetPostByID(ID int) (models.Post, error)
+	EditPost(post models.Post) error
 }

@@ -32,9 +32,11 @@ func (m *Repository) EditTopicHandler(w http.ResponseWriter, r *http.Request) {
 		renderer.RendererTemplate(w, "edit_topic.page.html", &models.TemplateData{
 			Data: data,
 		})
-
+		post.Content=r.FormValue("post-text")
 		fmt.Println(r.FormValue("post-text"))
 		fmt.Println("printing")
+
+		m.DB.EditPost(post)
 
 	} else {
 		http.Error(w, "No such method", http.StatusMethodNotAllowed)
