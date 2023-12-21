@@ -2,9 +2,6 @@
 Online forum for MMORPG fans and friends!
 ![Forum Home Page](static/readme_images/image.png)
 
-## Project Overview
-This project is one of the starting tasks from the Kood/Jõhvi Retraining Program. The description can be found [here](https://github.com/01-edu/public/tree/master/subjects/forum).
-
 ## Features
 This is a Web Application written in Golang, utilizing only standard [Go libraries](https://pkg.go.dev/std) and the following external packages:
 - `github.com/google/uuid v1.4.0`
