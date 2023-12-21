@@ -90,6 +90,25 @@ func (m *SqliteBDRepo) GetThreadByID(ID int) (models.Thread, error) {
 	return thread, nil
 }
 
+func (m *SqliteBDRepo) GetPostByID(ID int) (models.Post, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select * 
+	from post
+	where id = $1
+	`
+	var post models.Post
+
+	row := m.DB.QueryRowContext(ctx, query, ID)
+
+	err := row.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID)
+	if err != nil {
+		return post, err
+	}
+	return post, nil
+}
+
 func (m *SqliteBDRepo) CreateUser(r models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
