@@ -25,7 +25,11 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	visitor, _ := m.DB.GetUserByID(visitorID)
+	visitor, err := m.DB.GetUserByID(visitorID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get visitor ID, m.DB.GetUserByID(visitorID)", "/error-page")
+	}
+
 
 	threadID := getThreadIDFromQuery(w, r)
 
