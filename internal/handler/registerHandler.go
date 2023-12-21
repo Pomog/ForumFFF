@@ -84,6 +84,31 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			defer file.Close()
 
+			// Validate file size (1 MB limit)
+			if handler.Size > 1<<20 {
+				form.Errors.Add("avatar", "File size should be below 1 MB")
+				data := make(map[string]interface{})
+				data["registrationData"] = registrationData
+				renderer.RendererTemplate(w, "register.page.html", &models.TemplateData{
+					Form: form,
+					Data: data,
+				})
+				return
+			}
+
+			// Validate file type (must be an image)
+			contentType := handler.Header.Get("Content-Type")
+			if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
+				form.Errors.Add("avatar", "Invalid file type. Only JPEG, PNG, and GIF images are allowed")
+				data := make(map[string]interface{})
+				data["registrationData"] = registrationData
+				renderer.RendererTemplate(w, "register.page.html", &models.TemplateData{
+					Form: form,
+					Data: data,
+				})
+				return
+			}
+
 			// Create a new file in the "static/ava" directory
 			newFilePath := filepath.Join("static/ava", handler.Filename)
 			newFile, errFileCreate := os.Create(newFilePath)
@@ -105,6 +130,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			err := m.DB.CreateUser(registrationData)
 			if err != nil {
 				setErrorAndRedirect(w, r, "DB Error func CreateUser", "/error-page")
+				return
 			}
 			message := fmt.Sprintf("User %s is registered", registrationData.UserName)
 			helper.SendEmail(m.App.ServerEmail, message)
@@ -113,6 +139,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		http.Error(w, "No such method", http.StatusMethodNotAllowed)
+		return
 	}
 
 }
