@@ -165,19 +165,19 @@
 
             <form method="POST" action="/edit_topic?postID={{ .ID}}">
               <input type="hidden" name="topic_id" value="{{ .ID }}">
-              <button class="btn btn-danger btn-sm" type="submit">Edit / Delete Post</button>
+              <button class="btn btn-primary btn-sm" type="submit">Edit / Delete Post</button>
             </form>
           <br>
           Posted: {{ .Created }}<br>
           <div class="d-flex justify-content-start align-items-center">
             <form method="POST" action="">
               <input type="hidden" name="like" value="{{ .ID }}">
-              <button type="submit" class="btn btn-success btn-sm mr-2">Like➕&nbsp;{{ .Likes }}</button>
+              <button type="submit" class="btn btn-success btn-sm mr-2">Like👍&nbsp;{{ .Likes }}</button>
             </form>
             &nbsp;&nbsp;
             <form method="POST" action="">
               <input type="hidden" name="dislike" value="{{ .ID }}">
-              <button type="submit" class="btn btn-warning btn-sm">Dislike➖&nbsp;{{ .Dislikes }}</button>
+              <button type="submit" class="btn btn-danger btn-sm">Dislike👎&nbsp;{{ .Dislikes }}</button>
             </form>
           </div>
           <hr>

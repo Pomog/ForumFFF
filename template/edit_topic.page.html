@@ -41,16 +41,17 @@
             <label for="postContent">Your Post Content:</label>
             <textarea class="form-control" name="post-text" id="postContent" rows="10">{{$contentInfo.Content}}</textarea>
           </div>
+          <br>
           <input type="hidden" name="postID" value="{{$contentInfo.ID}}">
           <button class="btn btn-primary mr-2" type="submit">Edit</button>
         </form>
 
-
+        <br>
         <form method="POST" action="/delete_topic_result?postID={{$contentInfo.ID}}">
           <input type="hidden" name="postID" value="{{$contentInfo.ID}}">
           <button class="btn btn-danger" type="submit">Delete</button>
         </form>
-
+        </div>
       </div>
   </div>
 </div>
