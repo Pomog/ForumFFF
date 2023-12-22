@@ -132,7 +132,7 @@
           </div>
         </div>
         <!-- Modal ends -->
-  
+        <!-- Topic starts here -->
         <th>
           <div id="mainTheme">
             <h3>Topic:</h3>
@@ -143,8 +143,10 @@
           </div>
 
         </th>
+        <!-- Topic ends here -->
       </tr>
     </thead>
+    <!-- posts start here -->
     <tbody class="containerBody">
       {{$postinfo := index .Data "posts"}}
       {{ range $postinfo }}
@@ -159,21 +161,30 @@
         </td>
         <td>
           <em>{{ .Subject}}</em> <br><br>
-          {{ .Content }}<br>
+          {{ .Content }}&nbsp;
+
+            <form method="POST" action="/edit_topic?postID={{ .ID}}">
+              <input type="hidden" name="topic_id" value="{{ .ID }}">
+              <button class="btn btn-primary btn-sm" type="submit">Edit / Delete Post</button>
+            </form>
+          <br>
           Posted: {{ .Created }}<br>
-          PostID: {{ .ID}}
-           <form method="POST" action="">
-            <input type="hidden" name="like" value="{{ .ID}}">
-            <button type="submit">Like👍&nbsp;{{ .Likes}}</button>
-          </form>
-        
-          <form method="POST" action="">
-            <input type="hidden" name="dislike" value="{{ .ID}}">
-            <button type="submit">Dislike👎&nbsp;{{ .Dislikes}}</button>
-          </form>
+          <div class="d-flex justify-content-start align-items-center">
+            <form method="POST" action="">
+              <input type="hidden" name="like" value="{{ .ID }}">
+              <button type="submit" class="btn btn-success btn-sm mr-2">Like👍&nbsp;{{ .Likes }}</button>
+            </form>
+            &nbsp;&nbsp;
+            <form method="POST" action="">
+              <input type="hidden" name="dislike" value="{{ .ID }}">
+              <button type="submit" class="btn btn-danger btn-sm">Dislike👎&nbsp;{{ .Dislikes }}</button>
+            </form>
+          </div>
+          <hr>
         </td>
       </tr>
       {{ end }}
+      <!-- posts end here -->
     </tbody>
   </table>
 </div>

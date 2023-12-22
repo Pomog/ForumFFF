@@ -96,6 +96,25 @@ func (m *SqliteBDRepo) GetThreadByID(ID int) (models.Thread, error) {
 	return thread, nil
 }
 
+func (m *SqliteBDRepo) GetPostByID(ID int) (models.Post, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select * 
+	from post
+	where id = $1
+	`
+	var post models.Post
+
+	row := m.DB.QueryRowContext(ctx, query, ID)
+
+	err := row.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID)
+	if err != nil {
+		return post, err
+	}
+	return post, nil
+}
+
 func (m *SqliteBDRepo) CreateUser(r models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -176,6 +195,46 @@ func (m *SqliteBDRepo) CreatePost(post models.Post) error {
 		post.Content,
 		post.ThreadId,
 		post.UserID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *SqliteBDRepo) EditPost(post models.Post) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `UPDATE post
+	SET subject = $1, content = $2, threadID = $3, userID = $4
+	WHERE id = $5;
+	`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		post.Subject,
+		post.Content,
+		post.ThreadId,
+		post.UserID,
+		post.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *SqliteBDRepo) DeletePost(post models.Post) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `DELETE FROM post
+	WHERE id = $1;
+	`
+	_, err := m.DB.ExecContext(ctx, stmt,
+		post.ID,
 	)
 
 	if err != nil {
