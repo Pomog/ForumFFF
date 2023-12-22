@@ -59,8 +59,12 @@
                           <br><strong>{{ .Subject }} </strong><hr>
                       </a>
                   </td>
+                  {{ $lenPosts := postsLen .Posts}}
                   {{ $lastPost := findLastPost .Posts }}
-                  {{ $dateLastPostCreated := convertTime $lastPost }}
+                  {{ $dateLastPostCreated := "" }}
+                  {{ if gt $lenPosts 0 }}
+                    {{ $dateLastPostCreated = convertTime $lastPost }}
+                  {{ end }}
                   
                   <td><!-- 2column -->From:<br><img src="{{ .PictureUserWhoCreatedLastPost }}" class="logo_ava" alt="picture"> <br>{{ .UserNameWhoCreatedLastPost }}<br> Posted: {{$dateLastPostCreated}}
                     {{ $lastPostShorten := shortenPost .Posts}}

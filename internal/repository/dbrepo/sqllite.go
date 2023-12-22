@@ -145,6 +145,10 @@ func (m *SqliteBDRepo) CreateThread(thread models.Thread) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
+	if thread.Subject == "" {
+		return 0, errors.New("you can not create empty thread")
+	}
+
 	user, err := m.GetUserByID(thread.UserID)
 	if err != nil {
 		return 0, errors.New("guest can not create a thread")
