@@ -84,8 +84,8 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			info.Posts = posts
 
 			userIDwhoCreatedLastPost := getUserThatCreatedLastPost(posts)
-			fmt.Println("getUserThatCreatedLastPost " + strconv.Itoa(userIDwhoCreatedLastPost))
-			fmt.Println("len(posts) " + strconv.Itoa(len(posts)))
+			// fmt.Println("getUserThatCreatedLastPost " + strconv.Itoa(userIDwhoCreatedLastPost))
+			// fmt.Println("len(posts) " + strconv.Itoa(len(posts)))
 
 			if userIDwhoCreatedLastPost != 0 || len(posts) != 0 {
 				userWhoCreatedLastPost, err := m.DB.GetUserByID(userIDwhoCreatedLastPost)

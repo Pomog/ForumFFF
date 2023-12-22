@@ -6,11 +6,40 @@ import (
 
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
+	"github.com/google/uuid"
 )
+
+func (m *Repository) GetLoggedUser(w http.ResponseWriter, r *http.Request) int {
+	var UserID int
+	loginUUID := m.App.UserLogin
+
+	if loginUUID == uuid.Nil {
+		m.App.InfoLog.Println("Could not get loginUUID in HomeHandler")
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+	}
+
+	for _, cookie := range r.Cookies() {
+		if cookie.Value == loginUUID.String() {
+			userID, _ := m.DB.GetUserIDForSessionID(cookie.Value)
+			if UserID = userID; UserID != 0 {
+				break
+			}
+		}
+	}
+
+	if UserID == 0 {
+		setErrorAndRedirect(w, r, "Could not verify User, Please LogIN", "/error-page")
+	}
+	return UserID
+}
 
 // RegisterHandler handles both GET and POST requests for the registration page.
 func (m *Repository) EditTopicHandler(w http.ResponseWriter, r *http.Request) {
+	sessionUserID := m.GetLoggedUser(w, r)
+	user, _ := m.DB.GetUserByID(sessionUserID)
+
 	if r.Method == http.MethodPost {
+
 		var initialFormData models.Post
 
 		postID, err1 := strconv.Atoi(r.URL.Query().Get("postID"))
@@ -20,6 +49,12 @@ func (m *Repository) EditTopicHandler(w http.ResponseWriter, r *http.Request) {
 		post, err2 := m.DB.GetPostByID(postID)
 		if err2 != nil {
 			setErrorAndRedirect(w, r, "Could not get post from GetPostByID: "+err2.Error(), "/error-page")
+		}
+
+		if user.UserName == "guest" && user.ID == 1 {
+			setErrorAndRedirect(w, r, "Guests can not edit/delete posts", "/error-page")
+		} else if user.ID != post.UserID {
+			setErrorAndRedirect(w, r, "Only Admin or Creator of the Post can Edit / Delete it", "/error-page")
 		}
 		initialFormData.Content = post.Content
 		initialFormData.Subject = post.Subject
