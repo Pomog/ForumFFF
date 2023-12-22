@@ -74,14 +74,23 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 				log.Fatal(err)
 			}
 			info.Posts = posts
-			userWhoCreatedLastPost, err := m.DB.GetUserByID(getUserThatCreatedLastPost(posts))
-			if err != nil {
-				setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(getUserThatCreatedLastPost(posts))", "/error-page")
-				return
-			}
 
-			info.PictureUserWhoCreatedLastPost = userWhoCreatedLastPost.Picture
-			info.UserNameWhoCreatedLastPost = userWhoCreatedLastPost.UserName
+			userIDwhoCreatedLastPost := getUserThatCreatedLastPost(posts)
+			fmt.Println("getUserThatCreatedLastPost " + strconv.Itoa(userIDwhoCreatedLastPost))
+			fmt.Println("len(posts) " + strconv.Itoa(len(posts)))
+
+			if userIDwhoCreatedLastPost != 0 || len(posts) != 0 {
+				userWhoCreatedLastPost, err := m.DB.GetUserByID(userIDwhoCreatedLastPost)
+				if err != nil {
+					setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(getUserThatCreatedLastPost(posts))", "/error-page")
+					return
+				}
+
+				info.PictureUserWhoCreatedLastPost = userWhoCreatedLastPost.Picture
+				info.UserNameWhoCreatedLastPost = userWhoCreatedLastPost.UserName
+			} else if userIDwhoCreatedLastPost == 0 || len(posts) == 0 {
+				info.Created = ""
+			}
 			threadsInfo = append(threadsInfo, info)
 		}
 

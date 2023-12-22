@@ -18,6 +18,9 @@ var app *config.AppConfig
 
 var pathToTemplates = "./template"
 var functions = template.FuncMap{
+	"postsLen": func(allPosts []models.Post) int {
+		return len(allPosts)
+	},
 	"findLastPost": func(allPosts []models.Post) models.Post {
 		var latestPost models.Post
 		latestPost.Created, _ = time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
