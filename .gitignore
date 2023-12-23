@@ -27,5 +27,6 @@ go.work
 getGitUdates.sh
 # corrected fileName
 getGitUpdates.sh
+getGitUdates.sh
 mainDB.db
 *.db
