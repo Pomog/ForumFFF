@@ -133,6 +133,7 @@ func (m *Repository) DeleteTopicHandler(w http.ResponseWriter, r *http.Request) 
 		if err3 != nil {
 			setErrorAndRedirect(w, r, "Could not m.DB.DeletePost(post): "+err3.Error(), "/error-page")
 		}
+		
 		message := fmt.Sprintf("Post ID - %v deleted by User %s with email %s", post.ID, user.UserName, user.Email)
 		helper.SendEmail(m.App.ServerEmail, message)
 

@@ -133,8 +133,10 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 				setErrorAndRedirect(w, r, "DB Error func CreateUser", "/error-page")
 				return
 			}
+			
 			message := fmt.Sprintf("User %s is registered", registrationData.UserName)
 			helper.SendEmail(m.App.ServerEmail, message)
+
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 		}
 
