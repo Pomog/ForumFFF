@@ -38,6 +38,7 @@ type PostDataForThemePage struct {
 	ID                        int
 	Subject                   string
 	Content                   string
+	Image                     string
 	Created                   string
 	UserNameWhoCreatedPost    string
 	UserIDWhoCreatedPost      int
@@ -55,6 +56,7 @@ type Post struct {
 	Created  time.Time
 	ThreadId int
 	UserID   int
+	Image    string
 }
 
 type Votes struct {

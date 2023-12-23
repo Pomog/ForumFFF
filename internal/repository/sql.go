@@ -51,6 +51,12 @@ var sessionIdTable = `CREATE TABLE IF NOT EXISTS sessionId (
 var guestUser = `INSERT INTO users (username, password, first_name, last_name, email)
 VALUES ('guest', '123456', 'Guest', 'User', 'guest@gmail.com');`
 
+var alterPostTable = `
+ALTER TABLE post
+ADD COLUMN postImage TEXT DEFAULT "";
+`
+
+
 func getQuerys() []string {
 	var sqlQuerys []string
 	sqlQuerys = append(sqlQuerys, userTable)
@@ -58,5 +64,6 @@ func getQuerys() []string {
 	sqlQuerys = append(sqlQuerys, postTable)
 	sqlQuerys = append(sqlQuerys, votesTable)
 	sqlQuerys = append(sqlQuerys, sessionIdTable)
+    sqlQuerys = append(sqlQuerys, alterPostTable)
 	return sqlQuerys
 }
