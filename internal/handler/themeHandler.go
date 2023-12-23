@@ -99,54 +99,17 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// checking text length
-		if len(post.Content) > 500 {
-			setErrorAndRedirect(w, r, "Only 500 symbols allowed", "/error-page")
+		if len(post.Content) > 1500 {
+			setErrorAndRedirect(w, r, "Only 1500 symbols allowed", "/error-page")
 			return
 		}
-		// ADD IMAGE TO STATIC
-		// Get the file from the form data
-		file, handler, errFileGet := r.FormFile("image")
-		if errFileGet == nil {
-			defer file.Close()
-
-			// Validate file size (1 MB limit)
-			if handler.Size > 1<<20 {
-				setErrorAndRedirect(w, r, "File size should be below 1 MB", "/error-page")
-				return
-			}
-
-			// Validate file type (must be an image)
-			contentType := handler.Header.Get("Content-Type")
-			if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
-				setErrorAndRedirect(w, r, "Wrong File Formate, allowed jpeg, png, gif ", "/error-page")
-				return
-			}
-
-			// Create a new file in the "static/post_images" directory
-			newFilePath := filepath.Join("static/post_images", handler.Filename)
-			newFile, errFileCreate := os.Create(newFilePath)
-			if errFileCreate != nil {
-				setErrorAndRedirect(w, r, fileCreatingErrorMsg, "/error-page")
-				return
-			}
-			defer newFile.Close()
-
-			// Copy the uploaded file to the new file
-			_, err = io.Copy(newFile, file)
-			if err != nil {
-				setErrorAndRedirect(w, r, fileSavingErrorMsg, "/error-page")
-				return
-			}
-
-			post.Image = path.Join("/", newFilePath)
-		}
-
+		AttachFile(w, r, &post)
 		err = m.DB.CreatePost(post)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a post"+err.Error(), "/error-page")
 		}
 	}
-	//-------
+
 	posts, err := m.DB.GetAllPostsFromThread(threadID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get all posts from thread", "/error-page")
@@ -217,4 +180,45 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
 		Data: data,
 	})
+}
+
+func AttachFile(w http.ResponseWriter, r *http.Request, post *models.Post) {
+	// ADD IMAGE TO STATIC_________________________
+	// Get the file from the form data
+	file, handler, errFileGet := r.FormFile("image")
+	if errFileGet == nil {
+		defer file.Close()
+
+		// Validate file size (1 MB limit)
+		if handler.Size > 1<<20 {
+			setErrorAndRedirect(w, r, "File size should be below 1 MB", "/error-page")
+			return
+		}
+
+		// Validate file type (must be an image)
+		contentType := handler.Header.Get("Content-Type")
+		if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
+			setErrorAndRedirect(w, r, "Wrong File Formate, allowed jpeg, png, gif ", "/error-page")
+			return
+		}
+
+		// Create a new file in the "static/post_images" directory
+		newFilePath := filepath.Join("static/post_images", handler.Filename)
+		newFile, errFileCreate := os.Create(newFilePath)
+		if errFileCreate != nil {
+			setErrorAndRedirect(w, r, fileCreatingErrorMsg, "/error-page")
+			return
+		}
+		defer newFile.Close()
+
+		// Copy the uploaded file to the new file
+		_, err := io.Copy(newFile, file)
+		if err != nil {
+			setErrorAndRedirect(w, r, fileSavingErrorMsg, "/error-page")
+			return
+		}
+
+		post.Image = path.Join("/", newFilePath)
+	}
+	//_______________________________________
 }
