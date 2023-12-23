@@ -55,6 +55,7 @@ func (m *Repository) EditTopicHandler(w http.ResponseWriter, r *http.Request) {
 			setErrorAndRedirect(w, r, "Could not get post from GetPostByID: "+err2.Error(), "/error-page")
 		}
 
+
 		if user.UserName == "guest" || user.UserName == "" {
 			setErrorAndRedirect(w, r, "Guests can not edit/delete posts", "/error-page")
 		} else if user.ID != post.UserID {
