@@ -30,7 +30,6 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		setErrorAndRedirect(w, r, "Could not get visitor ID, m.DB.GetUserByID(visitorID)", "/error-page")
 	}
 
-
 	threadID := getThreadIDFromQuery(w, r)
 
 	mainThread, err := m.DB.GetThreadByID(threadID)
@@ -91,11 +90,10 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 			setErrorAndRedirect(w, r, "Only 500 symbols allowed", "/error-page")
 			return
 		}
-		
 
 		err = m.DB.CreatePost(post)
 		if err != nil {
-			setErrorAndRedirect(w, r, "Could not create a post", "/error-page")
+			setErrorAndRedirect(w, r, "Could not create a post"+err.Error(), "/error-page")
 		}
 	}
 	//-------

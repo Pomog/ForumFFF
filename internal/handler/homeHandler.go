@@ -5,11 +5,11 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
-	"github.com/google/uuid"
 	"github.com/google/uuid"
 )
 
@@ -19,7 +19,6 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 	loginUUID := m.App.UserLogin
 
-	if loginUUID == uuid.Nil {
 	if loginUUID == uuid.Nil {
 		m.App.InfoLog.Println("Could not get loginUUID in HomeHandler")
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -84,13 +83,11 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			info.Posts = posts
 
 			userIDwhoCreatedLastPost := getUserThatCreatedLastPost(posts)
-			// fmt.Println("getUserThatCreatedLastPost " + strconv.Itoa(userIDwhoCreatedLastPost))
-			// fmt.Println("len(posts) " + strconv.Itoa(len(posts)))
 
 			if userIDwhoCreatedLastPost != 0 || len(posts) != 0 {
 				userWhoCreatedLastPost, err := m.DB.GetUserByID(userIDwhoCreatedLastPost)
 				if err != nil {
-					setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(getUserThatCreatedLastPost(posts))", "/error-page")
+					setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(getUserThatCreatedLastPost(posts)) 95", "/error-page")
 					return
 				}
 
@@ -99,14 +96,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			} else if userIDwhoCreatedLastPost == 0 || len(posts) == 0 {
 				info.Created = ""
 			}
-			userWhoCreatedLastPost, err := m.DB.GetUserByID(getUserThatCreatedLastPost(posts))
-			if err != nil {
-				setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(getUserThatCreatedLastPost(posts))", "/error-page")
-				return
-			}
 
-			info.PictureUserWhoCreatedLastPost = userWhoCreatedLastPost.Picture
-			info.UserNameWhoCreatedLastPost = userWhoCreatedLastPost.UserName
 			threadsInfo = append(threadsInfo, info)
 		}
 
@@ -130,14 +120,11 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(UserID), HomeHandler", "/error-page")
 			return
 		}
-		loggedUser, err := m.DB.GetUserByID(UserID)
-		if err != nil {
-			setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(UserID), HomeHandler", "/error-page")
-			return
-		}
+
 		userName := loggedUser.UserName
-		if userName == "guest" {
+		if userName == "guest" || strings.TrimSpace(userName) == ""{
 			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
+			return
 		}
 		thread := models.Thread{
 			Subject: r.FormValue("message-text"),
@@ -145,7 +132,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// checking if there is a text before thread creation
-		if thread.Subject == "" {
+		if strings.TrimSpace(thread.Subject) == "" {
 			setErrorAndRedirect(w, r, "Empty thread can not be created", "/error-page")
 			return
 		}
@@ -158,7 +145,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 		id, err := m.DB.CreateThread(thread)
 		if err != nil {
-			setErrorAndRedirect(w, r, "Could not create a thread", "/error-page")
+			setErrorAndRedirect(w, r, "Could not create a thread: " + err.Error(), "/error-page")
 		}
 
 		http.Redirect(w, r, fmt.Sprintf("/theme?threadID=%d", id), http.StatusPermanentRedirect)
