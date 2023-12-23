@@ -113,7 +113,7 @@ func (m *SqliteBDRepo) GetPostByID(ID int) (models.Post, error) {
 
 	row := m.DB.QueryRowContext(ctx, query, ID)
 
-	err := row.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID)
+	err := row.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID, &post.Image)
 	if err != nil {
 		return post, err
 	}

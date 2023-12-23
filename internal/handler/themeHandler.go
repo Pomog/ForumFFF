@@ -106,42 +106,40 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		// ADD IMAGE TO STATIC
 		// Get the file from the form data
 		file, handler, errFileGet := r.FormFile("image")
-		if errFileGet != nil {
-			setErrorAndRedirect(w, r, fileReceivingErrorMsg, "/error-page")
-			return
-		}
-		defer file.Close()
+		if errFileGet == nil {
+			defer file.Close()
 
-		// Validate file size (1 MB limit)
-		if handler.Size > 1<<20 {
-			setErrorAndRedirect(w, r, "File size should be below 1 MB", "/error-page")
-			return
-		}
+			// Validate file size (1 MB limit)
+			if handler.Size > 1<<20 {
+				setErrorAndRedirect(w, r, "File size should be below 1 MB", "/error-page")
+				return
+			}
 
-		// Validate file type (must be an image)
-		contentType := handler.Header.Get("Content-Type")
-		if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
-			setErrorAndRedirect(w, r, "Wrong File Formate, allowed jpeg, png, gif ", "/error-page")
-			return
-		}
+			// Validate file type (must be an image)
+			contentType := handler.Header.Get("Content-Type")
+			if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
+				setErrorAndRedirect(w, r, "Wrong File Formate, allowed jpeg, png, gif ", "/error-page")
+				return
+			}
 
-		// Create a new file in the "static/post_images" directory
-		newFilePath := filepath.Join("static/post_images", handler.Filename)
-		newFile, errFileCreate := os.Create(newFilePath)
-		if errFileCreate != nil {
-			setErrorAndRedirect(w, r, fileCreatingErrorMsg, "/error-page")
-			return
-		}
-		defer newFile.Close()
+			// Create a new file in the "static/post_images" directory
+			newFilePath := filepath.Join("static/post_images", handler.Filename)
+			newFile, errFileCreate := os.Create(newFilePath)
+			if errFileCreate != nil {
+				setErrorAndRedirect(w, r, fileCreatingErrorMsg, "/error-page")
+				return
+			}
+			defer newFile.Close()
 
-		// Copy the uploaded file to the new file
-		_, err = io.Copy(newFile, file)
-		if err != nil {
-			setErrorAndRedirect(w, r, fileSavingErrorMsg, "/error-page")
-			return
-		}
+			// Copy the uploaded file to the new file
+			_, err = io.Copy(newFile, file)
+			if err != nil {
+				setErrorAndRedirect(w, r, fileSavingErrorMsg, "/error-page")
+				return
+			}
 
-		post.Image = path.Join("/", newFilePath)
+			post.Image = path.Join("/", newFilePath)
+		}
 
 		err = m.DB.CreatePost(post)
 		if err != nil {
