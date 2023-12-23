@@ -202,8 +202,8 @@ func (m *SqliteBDRepo) CreatePost(post models.Post) error {
 	}
 
 	stmt := `insert into post
-	(subject, content, threadID, userID)
-	values ($1, $2, $3, $4
+	(subject, content, threadID, userID, postImage)
+	values ($1, $2, $3, $4, $5
 	)
 	`
 
@@ -212,6 +212,7 @@ func (m *SqliteBDRepo) CreatePost(post models.Post) error {
 		post.Content,
 		post.ThreadId,
 		post.UserID,
+		post.Image,
 	)
 
 	if err != nil {
@@ -311,7 +312,7 @@ func (m *SqliteBDRepo) GetAllPostsFromThread(threadID int) ([]models.Post, error
 
 	for rows.Next() {
 		var post models.Post
-		err := rows.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID)
+		err := rows.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID, &post.Image)
 		if err != nil {
 			return nil, err
 		}
