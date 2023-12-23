@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Pomog/ForumFFF/internal/helper"
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
 	"github.com/google/uuid"
@@ -54,7 +55,7 @@ func (m *Repository) EditTopicHandler(w http.ResponseWriter, r *http.Request) {
 			setErrorAndRedirect(w, r, "Could not get post from GetPostByID: "+err2.Error(), "/error-page")
 		}
 
-		if user.UserName == "guest" && user.ID == 1 {
+		if user.UserName == "guest" || user.UserName == "" {
 			setErrorAndRedirect(w, r, "Guests can not edit/delete posts", "/error-page")
 		} else if user.ID != post.UserID {
 			setErrorAndRedirect(w, r, "Only Admin or Creator of the Post can Edit / Delete it", "/error-page")
@@ -77,9 +78,9 @@ func (m *Repository) EditTopicHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) EditTopicResultHandler(w http.ResponseWriter, r *http.Request) {
-	
+
 	if r.Method == http.MethodPost {
-		if strings.TrimSpace(r.FormValue("post-text")) == "" || len(r.FormValue("post-text")) > 500{
+		if strings.TrimSpace(r.FormValue("post-text")) == "" || len(r.FormValue("post-text")) > 500 {
 			setErrorAndRedirect(w, r, "The post is empty or too long", "/error-page")
 			return
 		}
@@ -114,11 +115,9 @@ func (m *Repository) EditTopicResultHandler(w http.ResponseWriter, r *http.Reque
 }
 
 func (m *Repository) DeleteTopicHandler(w http.ResponseWriter, r *http.Request) {
-
 	sessionUserID := m.GetLoggedUser(w, r)
 	user, _ := m.DB.GetUserByID(sessionUserID)
-	fmt.Println(user.Email)
-	
+
 	if r.Method == http.MethodPost {
 		postID, err1 := strconv.Atoi(r.URL.Query().Get("postID"))
 		if err1 != nil {
@@ -134,6 +133,8 @@ func (m *Repository) DeleteTopicHandler(w http.ResponseWriter, r *http.Request) 
 		if err3 != nil {
 			setErrorAndRedirect(w, r, "Could not m.DB.DeletePost(post): "+err3.Error(), "/error-page")
 		}
+		message := fmt.Sprintf("Post ID - %v deleted by User %s with email %s", post.ID, user.UserName, user.Email)
+		helper.SendEmail(m.App.ServerEmail, message)
 
 		data := make(map[string]interface{})
 		data["post"] = post.Content
