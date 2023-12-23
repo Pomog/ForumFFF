@@ -10,32 +10,11 @@ import (
 
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
-	"github.com/google/uuid"
 )
 
 // HomeHandler handles both GET and POST requests for the registration page.
 func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
-	var UserID int
-
-	loginUUID := m.App.UserLogin
-
-	if loginUUID == uuid.Nil {
-		m.App.InfoLog.Println("Could not get loginUUID in HomeHandler")
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-	}
-
-	for _, cookie := range r.Cookies() {
-		if cookie.Value == loginUUID.String() {
-			userID, _ := m.DB.GetUserIDForSessionID(cookie.Value)
-			if UserID = userID; UserID != 0 {
-				break
-			}
-		}
-	}
-
-	if UserID == 0 {
-		setErrorAndRedirect(w, r, "Could not verify User, Please LogIN", "/error-page")
-	}
+	sessionUserID := m.GetLoggedUser(w, r)
 
 	if r.Method == http.MethodGet {
 		search := r.FormValue("search")
@@ -101,7 +80,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data := make(map[string]interface{})
-		loggedUser, err := m.DB.GetUserByID(UserID)
+		loggedUser, err := m.DB.GetUserByID(sessionUserID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(UserID)", "/error-page")
 			return
@@ -115,20 +94,20 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	} else if r.Method == http.MethodPost {
 
-		loggedUser, err := m.DB.GetUserByID(UserID)
+		loggedUser, err := m.DB.GetUserByID(sessionUserID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(UserID), HomeHandler", "/error-page")
 			return
 		}
 
 		userName := loggedUser.UserName
-		if userName == "guest" || strings.TrimSpace(userName) == ""{
+		if userName == "guest" || strings.TrimSpace(userName) == "" {
 			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
 			return
 		}
 		thread := models.Thread{
 			Subject: r.FormValue("message-text"),
-			UserID:  UserID,
+			UserID:  sessionUserID,
 		}
 
 		// checking if there is a text before thread creation
@@ -145,7 +124,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 		id, err := m.DB.CreateThread(thread)
 		if err != nil {
-			setErrorAndRedirect(w, r, "Could not create a thread: " + err.Error(), "/error-page")
+			setErrorAndRedirect(w, r, "Could not create a thread: "+err.Error(), "/error-page")
 		}
 
 		http.Redirect(w, r, fmt.Sprintf("/theme?threadID=%d", id), http.StatusPermanentRedirect)

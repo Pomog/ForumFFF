@@ -190,6 +190,17 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 
 	data["posts"] = postsInfo
 
+	//to get user in Nav bar ______________
+	sessionUserID := m.GetLoggedUser(w, r)
+	loggedUser, err := m.DB.GetUserByID(sessionUserID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(UserID)", "/error-page")
+		return
+	}
+
+	data["loggedAs"] = loggedUser.UserName
+	data["loggedAsID"] = loggedUser.ID
+	//__________________________________
 	creatorPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(mainThread.UserID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get amount of Posts, GetTotalPostsAmountByUserID", "/error-page")

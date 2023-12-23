@@ -69,8 +69,16 @@
           <button class="btn btn-outline-light btn-sm" type="submit">Search in Topics</button>
         </form>
         <div>
+          {{$loggedAs := index .Data "loggedAs"}}
+          {{$loggedAsID := index .Data "loggedAsID"}}  
+          {{ if $loggedAs }}
+          <a class="" href="/personal_cabinet?userID={{$loggedAsID}}">{{$loggedAs}}</a>
+          <a class="btn btn-light login" href="/login">Logout</a>
+          {{ else }}
           <a class="btn btn-light login" href="/login">Login</a>
           <a class="btn btn-light register" href="/registration">Register</a>
+          {{ end }}
+ 
         </div>
       </div>
     </div>

@@ -1,10 +1,6 @@
 {{template "body" .}}
 
 {{define "centralPart"}}
-{{$loggedAs := index .Data "loggedAs"}}
-{{$loggedAsID := index .Data "loggedAsID"}}
-<br>
- <h3> Logged As: <a href="/personal_cabinet?userID={{$loggedAsID}}"> {{$loggedAs}}.</a></h3>
 <div class="container custom-container">
     <table class="table-borderless forumTable whiteLink mt-3">
         <thead class="containerHead">
