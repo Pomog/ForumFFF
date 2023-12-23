@@ -1,7 +1,11 @@
 package handler
 
 import (
+	"io"
 	"net/http"
+	"os"
+	"path"
+	"path/filepath"
 	"strconv"
 
 	"github.com/Pomog/ForumFFF/internal/models"
@@ -72,11 +76,20 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
 			return
 		}
+
+		// Parse the form data, including files Need to Set Upper limit for DATA
+		err := r.ParseMultipartForm(1 << 20)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Image is too large", "/error-page")
+			return
+		}
+
 		post := models.Post{
 			Subject:  ShortenerOfSubject(mainThread.Subject),
 			Content:  r.FormValue("post-text"),
 			UserID:   visitorID,
 			ThreadId: mainThread.ID,
+			Image:    r.FormValue("image"),
 		}
 
 		// checking if there is a text before thread creation
@@ -90,6 +103,45 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 			setErrorAndRedirect(w, r, "Only 500 symbols allowed", "/error-page")
 			return
 		}
+		// ADD IMAGE TO STATIC
+		// Get the file from the form data
+		file, handler, errFileGet := r.FormFile("image")
+		if errFileGet != nil {
+			setErrorAndRedirect(w, r, fileReceivingErrorMsg, "/error-page")
+			return
+		}
+		defer file.Close()
+
+		// Validate file size (1 MB limit)
+		if handler.Size > 1<<20 {
+			setErrorAndRedirect(w, r, "File size should be below 1 MB", "/error-page")
+			return
+		}
+
+		// Validate file type (must be an image)
+		contentType := handler.Header.Get("Content-Type")
+		if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
+			setErrorAndRedirect(w, r, "Wrong File Formate, allowed jpeg, png, gif ", "/error-page")
+			return
+		}
+
+		// Create a new file in the "static/post_images" directory
+		newFilePath := filepath.Join("static/post_images", handler.Filename)
+		newFile, errFileCreate := os.Create(newFilePath)
+		if errFileCreate != nil {
+			setErrorAndRedirect(w, r, fileCreatingErrorMsg, "/error-page")
+			return
+		}
+		defer newFile.Close()
+
+		// Copy the uploaded file to the new file
+		_, err = io.Copy(newFile, file)
+		if err != nil {
+			setErrorAndRedirect(w, r, fileSavingErrorMsg, "/error-page")
+			return
+		}
+
+		post.Image = path.Join("/", newFilePath)
 
 		err = m.DB.CreatePost(post)
 		if err != nil {
@@ -125,6 +177,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		info.Subject = post.Subject
 		info.Created = post.Created.Format("2006-01-02 15:04:05")
 		info.Content = post.Content
+		info.Image = post.Image
 		info.PictureUserWhoCreatedPost = user.Picture
 		info.UserNameWhoCreatedPost = user.UserName
 		info.UserIDWhoCreatedPost = user.ID

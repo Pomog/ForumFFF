@@ -35,8 +35,8 @@ func routes(a *config.AppConfig) http.Handler {
 
 // registerStaticHandlers registers handlers for static content.
 func registerStaticHandlers(mux *http.ServeMux) {
-	//Define a list of static directories (e.g., "css", "logo", "ava").
-	statics := []string{"css", "logo", "ava"}
+	//Define a list of static directories (e.g., "css", "logo", "ava", "post_images").
+	statics := []string{"css", "logo", "ava", "post_images"}
 
 	// Register handlers for static content.
 	for _, static := range statics {

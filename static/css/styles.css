@@ -80,6 +80,11 @@ section {
     max-height: auto;
   }
 
+  .post_img{
+    max-width: 40%;
+    max-height: auto;
+  }
+
   .logo_ava{
     max-width: 15%;
     max-height: auto;
