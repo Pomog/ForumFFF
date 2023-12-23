@@ -3,6 +3,7 @@ package dbrepo
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/Pomog/ForumFFF/internal/models"
@@ -68,6 +69,10 @@ func (m *SqliteBDRepo) GetUserByID(ID int) (models.User, error) {
 	err := row.Scan(&user.ID, &user.UserName, &user.Password, &user.FirstName, &user.LastName, &user.Email, &user.Created, &user.Picture, &user.LastActivity)
 	if err != nil {
 		return user, err
+	}
+
+	if user.ID == 0 || user.UserName == "" || user.Email == "" {
+		return user, errors.New("wrong User Data")
 	}
 
 	if user.ID == 0 || user.UserName == "" || user.Email == "" {
@@ -145,8 +150,12 @@ func (m *SqliteBDRepo) CreateThread(thread models.Thread) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	if thread.Subject == "" {
-		return 0, errors.New("you can not create empty thread")
+	if strings.TrimSpace(thread.Subject) == "" {
+		return 0, errors.New("empty thread can not be created")
+	}
+
+	if len(thread.Subject) > 500 {
+		return 0, errors.New("the text is to long, 500 syblos allowed")
 	}
 
 	user, err := m.GetUserByID(thread.UserID)
@@ -155,7 +164,7 @@ func (m *SqliteBDRepo) CreateThread(thread models.Thread) (int64, error) {
 	}
 	userName := user.UserName
 
-	if userName == "guest" || userName == "" {
+	if userName == "guest" || strings.TrimSpace(userName) == "" {
 		return 0, errors.New("guest can not create a thread")
 	}
 
@@ -184,6 +193,14 @@ func (m *SqliteBDRepo) CreatePost(post models.Post) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
+	if strings.TrimSpace(post.Content) == "" {
+		return errors.New("empty post can not be created")
+	}
+
+	if len(post.Content) > 500 {
+		return errors.New("the post is to long, 500 syblos allowed")
+	}
+
 	stmt := `insert into post
 	(subject, content, threadID, userID)
 	values ($1, $2, $3, $4
@@ -206,6 +223,14 @@ func (m *SqliteBDRepo) CreatePost(post models.Post) error {
 func (m *SqliteBDRepo) EditPost(post models.Post) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
+
+	if strings.TrimSpace(post.Content) == "" {
+		return errors.New("empty post can not be created")
+	}
+
+	if len(post.Content) > 500 {
+		return errors.New("the post is to long, 500 syblos allowed")
+	}
 
 	stmt := `UPDATE post
 	SET subject = $1, content = $2, threadID = $3, userID = $4
