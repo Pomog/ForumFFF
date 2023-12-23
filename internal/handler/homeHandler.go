@@ -109,6 +109,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			Subject: r.FormValue("message-text"),
 			UserID:  sessionUserID,
 		}
+		AttachFile(w, r, nil, &thread)
 
 		// checking if there is a text before thread creation
 		if strings.TrimSpace(thread.Subject) == "" {
@@ -117,8 +118,8 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// checking text length
-		if len(thread.Subject) > 500 {
-			setErrorAndRedirect(w, r, "Only 500 symbols allowed", "/error-page")
+		if len(thread.Subject) > 2500 {
+			setErrorAndRedirect(w, r, "Only 2500 symbols allowed", "/error-page")
 			return
 		}
 

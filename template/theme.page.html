@@ -61,6 +61,10 @@
           <div id="mainTheme">
             <h3>Topic:</h3>
             <hr>
+            {{$threadImage := index .Data "threadImg"}}
+            {{ if $threadImage  }}
+              <img src="{{$threadImage }}" class="post_img" alt="post_img">
+            {{ end }} <br><br>
             {{index .Data "mainThreadName"}} <br>
             <hr>
             Created: {{index .Data "mainThreadCreatedTime"}}

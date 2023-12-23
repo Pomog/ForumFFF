@@ -78,7 +78,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Parse the form data, including files Need to Set Upper limit for DATA
-		err := r.ParseMultipartForm(1 << 20)
+		err := r.ParseMultipartForm(2 << 20)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Image is too large", "/error-page")
 			return
@@ -103,7 +103,9 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 			setErrorAndRedirect(w, r, "Only 1500 symbols allowed", "/error-page")
 			return
 		}
-		AttachFile(w, r, &post)
+		//AttachFile attaches file to the post
+		AttachFile(w, r, &post, nil)
+
 		err = m.DB.CreatePost(post)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a post"+err.Error(), "/error-page")
@@ -170,6 +172,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data["creatorName"] = creator.UserName
+	data["threadImg"] = mainThread.Image
 	data["creatorID"] = creator.ID
 	data["creatorRegistrationDate"] = creator.Created.Format("2006-01-02 15:04:05")
 	data["creatorPostsAmount"] = creatorPostsAmount
@@ -182,7 +185,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func AttachFile(w http.ResponseWriter, r *http.Request, post *models.Post) {
+func AttachFile(w http.ResponseWriter, r *http.Request, post *models.Post, thread *models.Thread) {
 	// ADD IMAGE TO STATIC_________________________
 	// Get the file from the form data
 	file, handler, errFileGet := r.FormFile("image")
@@ -190,8 +193,8 @@ func AttachFile(w http.ResponseWriter, r *http.Request, post *models.Post) {
 		defer file.Close()
 
 		// Validate file size (1 MB limit)
-		if handler.Size > 1<<20 {
-			setErrorAndRedirect(w, r, "File size should be below 1 MB", "/error-page")
+		if handler.Size > 2<<20 {
+			setErrorAndRedirect(w, r, "File size should be below 2 MB", "/error-page")
 			return
 		}
 
@@ -217,8 +220,12 @@ func AttachFile(w http.ResponseWriter, r *http.Request, post *models.Post) {
 			setErrorAndRedirect(w, r, fileSavingErrorMsg, "/error-page")
 			return
 		}
+		if post != nil {
+			post.Image = path.Join("/", newFilePath)
+		} else if thread != nil {
+			thread.Image = path.Join("/", newFilePath)
+		}
 
-		post.Image = path.Join("/", newFilePath)
 	}
 	//_______________________________________
 }

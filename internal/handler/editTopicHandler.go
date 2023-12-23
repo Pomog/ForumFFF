@@ -54,7 +54,6 @@ func (m *Repository) EditTopicHandler(w http.ResponseWriter, r *http.Request) {
 			setErrorAndRedirect(w, r, "Could not get post from GetPostByID: "+err2.Error(), "/error-page")
 		}
 
-
 		if user.UserName == "guest" || user.UserName == "" {
 			setErrorAndRedirect(w, r, "Guests can not edit/delete posts", "/error-page")
 		} else if user.ID != post.UserID {
@@ -80,7 +79,7 @@ func (m *Repository) EditTopicHandler(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) EditTopicResultHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
-		if strings.TrimSpace(r.FormValue("post-text")) == "" || len(r.FormValue("post-text")) > 500 {
+		if strings.TrimSpace(r.FormValue("post-text")) == "" || len(r.FormValue("post-text")) > 2500 {
 			setErrorAndRedirect(w, r, "The post is empty or too long", "/error-page")
 			return
 		}
