@@ -118,7 +118,7 @@ func (m *Repository) EditTopicHandler(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) EditTopicResultHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
-		if strings.TrimSpace(r.FormValue("post-text")) == "" || len(r.FormValue("post-text")) > m.PostLen {
+		if strings.TrimSpace(r.FormValue("post-text")) == "" || len(r.FormValue("post-text")) > m.App.PostLen {
 			setErrorAndRedirect(w, r, "The post is empty or too long", "/error-page")
 			return
 		}

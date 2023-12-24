@@ -3,6 +3,7 @@ package dbrepo
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -198,8 +199,8 @@ func (m *SqliteBDRepo) CreatePost(post models.Post) error {
 		return errors.New("empty post can not be created")
 	}
 
-	if len(post.Content) > 500 {
-		return errors.New("the post is to long, 500 syblos allowed")
+	if len(post.Content) > m.App.PostLen {
+		return errors.New(fmt.Sprintf("the post is to long, %d syblos allowed", m.App.PostLen))
 	}
 
 	stmt := `insert into post
@@ -230,8 +231,8 @@ func (m *SqliteBDRepo) EditPost(post models.Post) error {
 		return errors.New("empty post can not be created")
 	}
 
-	if len(post.Content) > 2500 {
-		return errors.New("the post is to long, 2500 syblos allowed")
+	if len(post.Content) > m.App.PostLen {
+		return errors.New(fmt.Sprintf("the post is to long, %d syblos allowed", m.App.PostLen))
 	}
 
 	stmt := `UPDATE post

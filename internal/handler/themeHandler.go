@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -100,8 +101,8 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// checking text length
-		if len(post.Content) > 1500 {
-			setErrorAndRedirect(w, r, "Only 1500 symbols allowed", "/error-page")
+		if len(post.Content) > m.App.PostLen {
+			setErrorAndRedirect(w, r, fmt.Sprintf("Only %d symbols allowed", m.App.PostLen), "/error-page")
 			return
 		}
 
@@ -194,7 +195,7 @@ func AttachFile(w http.ResponseWriter, r *http.Request, post *models.Post, threa
 	if errFileGet == nil {
 		defer file.Close()
 
-		// Validate file size (1 MB limit)
+		// Validate file size (2 MB limit)
 		if handler.Size > 2<<20 {
 			setErrorAndRedirect(w, r, "File size should be below 2 MB", "/error-page")
 			return
