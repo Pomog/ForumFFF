@@ -75,6 +75,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 		if userAlreadyExist {
 			setErrorAndRedirect(w, r, "User with such Email OR NickName Already Exist", "/error-page")
+			return
 		} else {
 			// Get the file from the form data
 			file, handler, errFileGet := r.FormFile("avatar")

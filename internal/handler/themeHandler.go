@@ -23,6 +23,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 			userID, err := strconv.Atoi(cookie.Name)
 			if err != nil {
 				setErrorAndRedirect(w, r, "Could not get visitor ID", "/error-page")
+				return
 			}
 			if visitorID = userID; visitorID != 0 {
 				break
@@ -33,6 +34,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	visitor, err := m.DB.GetUserByID(visitorID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get visitor ID, m.DB.GetUserByID(visitorID)", "/error-page")
+		return
 	}
 
 	threadID := getThreadIDFromQuery(w, r)
@@ -40,6 +42,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	mainThread, err := m.DB.GetThreadByID(threadID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get thread by id", "/error-page")
+		return
 	}
 
 	creator, err := m.DB.GetUserByID(mainThread.UserID)
@@ -53,11 +56,13 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	if like != "" {
 		if visitor.UserName == "guest" {
 			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
+			return
 		}
 		postID, _ := strconv.Atoi(like)
 		err := m.DB.LikePostByUserIdAndPostId(visitorID, postID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not LikePostByUserIdAndPostId", "/error-page")
+			return
 		}
 	}
 	if dislike != "" {
@@ -69,6 +74,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		err := m.DB.DislikePostByUserIdAndPostId(visitorID, postID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not DislikePostByUserIdAndPostId", "/error-page")
+			return
 		}
 	}
 	//new post
@@ -111,12 +117,14 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		err = m.DB.CreatePost(post)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a post"+err.Error(), "/error-page")
+			return
 		}
 	}
 
 	posts, err := m.DB.GetAllPostsFromThread(threadID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get all posts from thread", "/error-page")
+		return
 	}
 
 	var postsInfo []models.PostDataForThemePage
@@ -126,15 +134,18 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		user, err = m.DB.GetUserByID(post.UserID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get user by id", "/error-page")
+			return
 		}
 		userPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(post.UserID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get amount of Posts, GetTotalPostsAmountByUserID", "/error-page")
+			return
 		}
 
 		likes, dislikes, err := m.DB.CountLikesAndDislikesForPostByPostID(post.ID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get Likes for Post, CountLikesAndDislikesForPostByPostID", "/error-page")
+			return
 		}
 
 		var info models.PostDataForThemePage
@@ -171,6 +182,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	creatorPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(mainThread.UserID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get amount of Posts, GetTotalPostsAmountByUserID", "/error-page")
+		return
 	}
 
 	data["creatorName"] = creator.UserName

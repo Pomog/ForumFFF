@@ -21,16 +21,21 @@ func (m *Repository) EditTopicHandler(w http.ResponseWriter, r *http.Request) {
 		topicID, err1 := strconv.Atoi(r.URL.Query().Get("topicID"))
 		if err1 != nil {
 			setErrorAndRedirect(w, r, "Could not convert topicID into integer: "+err1.Error(), "/error-page")
+			return
 		}
 		topic, err2 := m.DB.GetThreadByID(topicID)
 		if err2 != nil {
 			setErrorAndRedirect(w, r, "Could not get topic from m.DB.GetThreadByID(topicID): "+err2.Error(), "/error-page")
+			return
 		}
 
 		if user.UserName == "guest" || user.UserName == "" {
 			setErrorAndRedirect(w, r, "Guests can not edit/delete topics", "/error-page")
+			return
+
 		} else if user.ID != topic.UserID {
 			setErrorAndRedirect(w, r, "Only Admin or Creator of the Topic can Edit / Delete it", "/error-page")
+			return
 		}
 		initialFormData.Subject = topic.Subject
 		initialFormData.UserID = topic.UserID
@@ -59,16 +64,19 @@ func (m *Repository) EditTopicResultHandler(w http.ResponseWriter, r *http.Reque
 		topicID, err1 := strconv.Atoi(r.URL.Query().Get("topicID"))
 		if err1 != nil {
 			setErrorAndRedirect(w, r, "Could not convert topicID into integer: "+err1.Error(), "/error-page")
+			return
 		}
 		topic, err2 := m.DB.GetThreadByID(topicID)
 		if err2 != nil {
 			setErrorAndRedirect(w, r, "Could not get post from GetPostByID: "+err2.Error(), "/error-page")
+			return
 		}
 		topic.Subject = r.FormValue("post-text")
 		err3 := m.DB.EditTopic(topic)
 
 		if err3 != nil {
 			setErrorAndRedirect(w, r, "Could not edit post using EditPost(post): "+err3.Error(), "/error-page")
+			return
 		}
 
 		data := make(map[string]interface{})

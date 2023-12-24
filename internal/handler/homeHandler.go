@@ -24,11 +24,13 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			threads, err = m.DB.GetSearchedThreads(search)
 			if err != nil {
 				setErrorAndRedirect(w, r, "Could not get Threads m.DB.GetSearchedThreads", "/error-page")
+				return
 			}
 		} else {
 			threads, err = m.DB.GetAllThreads()
 			if err != nil {
 				setErrorAndRedirect(w, r, "Could not get Threads m.DB.GetAllThreads", "/error-page")
+				return
 			}
 		}
 
@@ -126,6 +128,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		id, err := m.DB.CreateThread(thread)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a thread: "+err.Error(), "/error-page")
+			return
 		}
 
 		http.Redirect(w, r, fmt.Sprintf("/theme?threadID=%d", id), http.StatusPermanentRedirect)

@@ -76,6 +76,7 @@ func (m *Repository) ErrorPage(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write([]byte(htmlContent))
 	if err != nil {
 		setErrorAndRedirect(w, r, err.Error(), "/error-page")
+		return
 	}
 }
 
@@ -136,6 +137,7 @@ func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Reques
 		user, errUser := m.DB.GetUserByID(userID)
 		if errUser != nil {
 			setErrorAndRedirect(w, r, "Could not get User from  GetUserByID(visitorID)", "/error-page")
+			return
 		}
 		personalInfo.Email = user.Email
 		personalInfo.ID = user.ID
