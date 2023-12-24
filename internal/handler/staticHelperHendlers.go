@@ -10,6 +10,7 @@ import (
 	"github.com/Pomog/ForumFFF/internal/renderer"
 	"github.com/Pomog/ForumFFF/internal/repository"
 	"github.com/Pomog/ForumFFF/internal/repository/dbrepo"
+	"github.com/google/uuid"
 )
 
 // Repo the repository used by the handlers
@@ -75,6 +76,7 @@ func (m *Repository) ErrorPage(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write([]byte(htmlContent))
 	if err != nil {
 		setErrorAndRedirect(w, r, err.Error(), "/error-page")
+		return
 	}
 }
 
@@ -135,6 +137,7 @@ func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Reques
 		user, errUser := m.DB.GetUserByID(userID)
 		if errUser != nil {
 			setErrorAndRedirect(w, r, "Could not get User from  GetUserByID(visitorID)", "/error-page")
+			return
 		}
 		personalInfo.Email = user.Email
 		personalInfo.ID = user.ID
@@ -163,4 +166,29 @@ func ShortenerOfSubject(input string) string {
 		return input
 	}
 	return "Topic:" + input[0:81] + "..."
+}
+
+func (m *Repository) GetLoggedUser(w http.ResponseWriter, r *http.Request) int {
+	var UserID int
+	loginUUID := m.App.UserLogin
+
+	if loginUUID == uuid.Nil {
+		m.App.InfoLog.Println("Could not get loginUUID in HomeHandler")
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+	}
+
+	for _, cookie := range r.Cookies() {
+		if cookie.Value == loginUUID.String() {
+			userID, _ := m.DB.GetUserIDForSessionID(cookie.Value)
+			if UserID = userID; UserID != 0 {
+				break
+			}
+		}
+	}
+
+	if UserID == 0 {
+		setErrorAndRedirect(w, r, "Could not verify User, Please LogIN", "/error-page")
+		return 0
+	}
+	return UserID
 }

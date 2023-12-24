@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -22,6 +23,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 			userID, err := strconv.Atoi(cookie.Name)
 			if err != nil {
 				setErrorAndRedirect(w, r, "Could not get visitor ID", "/error-page")
+				return
 			}
 			if visitorID = userID; visitorID != 0 {
 				break
@@ -32,6 +34,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	visitor, err := m.DB.GetUserByID(visitorID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get visitor ID, m.DB.GetUserByID(visitorID)", "/error-page")
+		return
 	}
 
 	threadID := getThreadIDFromQuery(w, r)
@@ -39,6 +42,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	mainThread, err := m.DB.GetThreadByID(threadID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get thread by id", "/error-page")
+		return
 	}
 
 	creator, err := m.DB.GetUserByID(mainThread.UserID)
@@ -52,11 +56,13 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	if like != "" {
 		if visitor.UserName == "guest" {
 			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
+			return
 		}
 		postID, _ := strconv.Atoi(like)
 		err := m.DB.LikePostByUserIdAndPostId(visitorID, postID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not LikePostByUserIdAndPostId", "/error-page")
+			return
 		}
 	}
 	if dislike != "" {
@@ -68,6 +74,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		err := m.DB.DislikePostByUserIdAndPostId(visitorID, postID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not DislikePostByUserIdAndPostId", "/error-page")
+			return
 		}
 	}
 	//new post
@@ -78,7 +85,8 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Parse the form data, including files Need to Set Upper limit for DATA
-		err := r.ParseMultipartForm(1 << 20)
+		err := r.ParseMultipartForm(m.App.FileSize << 20)
+
 		if err != nil {
 			setErrorAndRedirect(w, r, "Image is too large", "/error-page")
 			return
@@ -99,59 +107,24 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// checking text length
-		if len(post.Content) > 500 {
-			setErrorAndRedirect(w, r, "Only 500 symbols allowed", "/error-page")
-			return
-		}
-		// ADD IMAGE TO STATIC
-		// Get the file from the form data
-		file, handler, errFileGet := r.FormFile("image")
-		if errFileGet != nil {
-			setErrorAndRedirect(w, r, fileReceivingErrorMsg, "/error-page")
-			return
-		}
-		defer file.Close()
-
-		// Validate file size (1 MB limit)
-		if handler.Size > 1<<20 {
-			setErrorAndRedirect(w, r, "File size should be below 1 MB", "/error-page")
+		if len(post.Content) > m.App.PostLen {
+			setErrorAndRedirect(w, r, fmt.Sprintf("Only %d symbols allowed", m.App.PostLen), "/error-page")
 			return
 		}
 
-		// Validate file type (must be an image)
-		contentType := handler.Header.Get("Content-Type")
-		if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
-			setErrorAndRedirect(w, r, "Wrong File Formate, allowed jpeg, png, gif ", "/error-page")
-			return
-		}
-
-		// Create a new file in the "static/post_images" directory
-		newFilePath := filepath.Join("static/post_images", handler.Filename)
-		newFile, errFileCreate := os.Create(newFilePath)
-		if errFileCreate != nil {
-			setErrorAndRedirect(w, r, fileCreatingErrorMsg, "/error-page")
-			return
-		}
-		defer newFile.Close()
-
-		// Copy the uploaded file to the new file
-		_, err = io.Copy(newFile, file)
-		if err != nil {
-			setErrorAndRedirect(w, r, fileSavingErrorMsg, "/error-page")
-			return
-		}
-
-		post.Image = path.Join("/", newFilePath)
-
+		//AttachFile attaches file to the post
+		AttachFile(m, w, r, &post, nil)
 		err = m.DB.CreatePost(post)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a post"+err.Error(), "/error-page")
+			return
 		}
 	}
-	//-------
+
 	posts, err := m.DB.GetAllPostsFromThread(threadID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get all posts from thread", "/error-page")
+		return
 	}
 
 	var postsInfo []models.PostDataForThemePage
@@ -161,15 +134,18 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		user, err = m.DB.GetUserByID(post.UserID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get user by id", "/error-page")
+			return
 		}
 		userPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(post.UserID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get amount of Posts, GetTotalPostsAmountByUserID", "/error-page")
+			return
 		}
 
 		likes, dislikes, err := m.DB.CountLikesAndDislikesForPostByPostID(post.ID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get Likes for Post, CountLikesAndDislikesForPostByPostID", "/error-page")
+			return
 		}
 
 		var info models.PostDataForThemePage
@@ -192,20 +168,79 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 
 	data["posts"] = postsInfo
 
+	//to get user in Nav bar ______________
+	sessionUserID := m.GetLoggedUser(w, r)
+	loggedUser, err := m.DB.GetUserByID(sessionUserID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(UserID)", "/error-page")
+		return
+	}
+
+	data["loggedAs"] = loggedUser.UserName
+	data["loggedAsID"] = loggedUser.ID
+	//__________________________________
 	creatorPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(mainThread.UserID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get amount of Posts, GetTotalPostsAmountByUserID", "/error-page")
+		return
 	}
 
 	data["creatorName"] = creator.UserName
+	data["threadImg"] = mainThread.Image
 	data["creatorID"] = creator.ID
 	data["creatorRegistrationDate"] = creator.Created.Format("2006-01-02 15:04:05")
 	data["creatorPostsAmount"] = creatorPostsAmount
 	data["creatorImg"] = creator.Picture
 	data["mainThreadName"] = mainThread.Subject
+	data["mainThreadID"] = mainThread.ID
 	data["mainThreadCreatedTime"] = mainThread.Created.Format("2006-01-02 15:04:05")
 
 	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
 		Data: data,
 	})
+}
+
+func AttachFile(m *Repository, w http.ResponseWriter, r *http.Request, post *models.Post, thread *models.Thread) {
+	// ADD IMAGE TO STATIC_________________________
+	// Get the file from the form data
+	file, handler, errFileGet := r.FormFile("image")
+	if errFileGet == nil {
+		defer file.Close()
+
+		// Validate file size (2 MB limit)
+		if handler.Size > m.App.FileSize<<20 {
+			setErrorAndRedirect(w, r, "File size should be below 2 MB", "/error-page")
+			return
+		}
+
+		// Validate file type (must be an image)
+		contentType := handler.Header.Get("Content-Type")
+		if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
+			setErrorAndRedirect(w, r, "Wrong File Formate, allowed jpeg, png, gif ", "/error-page")
+			return
+		}
+
+		// Create a new file in the "static/post_images" directory
+		newFilePath := filepath.Join("static/post_images", handler.Filename)
+		newFile, errFileCreate := os.Create(newFilePath)
+		if errFileCreate != nil {
+			setErrorAndRedirect(w, r, fileCreatingErrorMsg, "/error-page")
+			return
+		}
+		defer newFile.Close()
+
+		// Copy the uploaded file to the new file
+		_, err := io.Copy(newFile, file)
+		if err != nil {
+			setErrorAndRedirect(w, r, fileSavingErrorMsg, "/error-page")
+			return
+		}
+		if post != nil {
+			post.Image = path.Join("/", newFilePath)
+		} else if thread != nil {
+			thread.Image = path.Join("/", newFilePath)
+		}
+
+	}
+	//_______________________________________
 }

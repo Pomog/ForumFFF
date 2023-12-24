@@ -26,6 +26,7 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
 			setErrorAndRedirect(w, r, err.Error(), "/error-page")
+			return
 		}
 		// Create a User struct with data from the HTTP request form
 		loginData := models.User{
@@ -57,6 +58,7 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 			err := m.DB.InsertSessionintoDB(m.App.UserLogin.String(), userID)
 			if err != nil {
 				setErrorAndRedirect(w, r, err.Error(), "/error-page")
+				return
 			}
 
 			cookie := &http.Cookie{
@@ -68,6 +70,7 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/home", http.StatusSeeOther)
 		} else {
 			setErrorAndRedirect(w, r, "Wrong email or password", "/error-page")
+			return
 		}
 	}
 

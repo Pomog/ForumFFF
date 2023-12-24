@@ -3,6 +3,7 @@ package dbrepo
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -94,7 +95,7 @@ func (m *SqliteBDRepo) GetThreadByID(ID int) (models.Thread, error) {
 
 	row := m.DB.QueryRowContext(ctx, query, ID)
 
-	err := row.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID)
+	err := row.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image)
 	if err != nil {
 		return thread, err
 	}
@@ -113,7 +114,7 @@ func (m *SqliteBDRepo) GetPostByID(ID int) (models.Post, error) {
 
 	row := m.DB.QueryRowContext(ctx, query, ID)
 
-	err := row.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID)
+	err := row.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID, &post.Image)
 	if err != nil {
 		return post, err
 	}
@@ -154,8 +155,8 @@ func (m *SqliteBDRepo) CreateThread(thread models.Thread) (int64, error) {
 		return 0, errors.New("empty thread can not be created")
 	}
 
-	if len(thread.Subject) > 500 {
-		return 0, errors.New("the text is to long, 500 syblos allowed")
+	if len(thread.Subject) > 1500 {
+		return 0, errors.New("the text is to long, 1500 syblos allowed")
 	}
 
 	user, err := m.GetUserByID(thread.UserID)
@@ -169,13 +170,14 @@ func (m *SqliteBDRepo) CreateThread(thread models.Thread) (int64, error) {
 	}
 
 	stmt := `insert into thread
-	(subject, userID)
-	values ($1, $2)
+	(subject, userID, threadImage)
+	values ($1, $2, $3)
 	`
 
 	sqlRes, err := m.DB.ExecContext(ctx, stmt,
 		thread.Subject,
 		thread.UserID,
+		thread.Image,
 	)
 
 	if err != nil {
@@ -197,8 +199,8 @@ func (m *SqliteBDRepo) CreatePost(post models.Post) error {
 		return errors.New("empty post can not be created")
 	}
 
-	if len(post.Content) > 500 {
-		return errors.New("the post is to long, 500 syblos allowed")
+	if len(post.Content) > m.App.PostLen {
+		return errors.New(fmt.Sprintf("the post is to long, %d syblos allowed", m.App.PostLen))
 	}
 
 	stmt := `insert into post
@@ -229,8 +231,8 @@ func (m *SqliteBDRepo) EditPost(post models.Post) error {
 		return errors.New("empty post can not be created")
 	}
 
-	if len(post.Content) > 500 {
-		return errors.New("the post is to long, 500 syblos allowed")
+	if len(post.Content) > m.App.PostLen {
+		return errors.New(fmt.Sprintf("the post is to long, %d syblos allowed", m.App.PostLen))
 	}
 
 	stmt := `UPDATE post
@@ -261,6 +263,39 @@ func (m *SqliteBDRepo) DeletePost(post models.Post) error {
 	`
 	_, err := m.DB.ExecContext(ctx, stmt,
 		post.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+
+
+func (m *SqliteBDRepo) EditTopic(topic models.Thread) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	if strings.TrimSpace(topic.Subject) == "" {
+		return errors.New("empty topic can not be created")
+	}
+
+	if len(topic.Subject) > m.App.PostLen {
+		return errors.New(fmt.Sprintf("the topic is to long, %d syblos allowed", m.App.PostLen))
+	}
+
+	stmt := `UPDATE thread
+	SET subject = $1, created = $2, userID = $3, threadImage = $4
+	WHERE id = $5;
+	`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		topic.Subject,
+		topic.Created,
+		topic.UserID,
+		topic.Image,
+		topic.ID,
 	)
 
 	if err != nil {
@@ -340,7 +375,7 @@ func (m *SqliteBDRepo) GetAllThreads() ([]models.Thread, error) {
 
 	for rows.Next() {
 		var thread models.Thread
-		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID)
+		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image)
 		if err != nil {
 			return nil, err
 		}
@@ -542,7 +577,7 @@ func (m *SqliteBDRepo) GetSearchedThreads(search string) ([]models.Thread, error
 
 	for rows.Next() {
 		var thread models.Thread
-		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID)
+		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image)
 		if err != nil {
 			return nil, err
 		}

@@ -16,4 +16,6 @@ type AppConfig struct {
 	ErrorLog      *log.Logger
 	UserLogin     uuid.UUID // This field can hold a UUID value
 	ServerEmail   string
+	PostLen       int //this parameter limits post and topic size
+	FileSize      int64
 }

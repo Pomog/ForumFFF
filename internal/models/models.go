@@ -21,6 +21,7 @@ type Thread struct {
 	Subject string
 	Created time.Time
 	UserID  int
+	Image   string
 }
 
 type ThreadDataForMainPage struct {
@@ -32,6 +33,7 @@ type ThreadDataForMainPage struct {
 	PictureUserWhoCreatedLastPost string
 	Posts                         []Post
 	ThreadID                      int
+	Image                         string
 }
 
 type PostDataForThemePage struct {
