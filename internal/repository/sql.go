@@ -55,12 +55,10 @@ var alterPostTable = `
 ALTER TABLE post
 ADD COLUMN postImage TEXT DEFAULT "";
 `
-
 var alterThreadTable = `
 ALTER TABLE thread
 ADD COLUMN threadImage TEXT DEFAULT "";
 `
-
 func getQuerys() []string {
 	var sqlQuerys []string
 	sqlQuerys = append(sqlQuerys, userTable)

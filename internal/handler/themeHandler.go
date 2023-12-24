@@ -79,6 +79,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Parse the form data, including files Need to Set Upper limit for DATA
 		err := r.ParseMultipartForm(2 << 20)
+
 		if err != nil {
 			setErrorAndRedirect(w, r, "Image is too large", "/error-page")
 			return
@@ -103,9 +104,9 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 			setErrorAndRedirect(w, r, "Only 1500 symbols allowed", "/error-page")
 			return
 		}
+
 		//AttachFile attaches file to the post
 		AttachFile(w, r, &post, nil)
-
 		err = m.DB.CreatePost(post)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a post"+err.Error(), "/error-page")
