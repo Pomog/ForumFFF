@@ -31,20 +31,14 @@
   <div class="mt-4">
     <h3>Edit/Delete Your Post</h3>
       <div class="mt-3">
-        <form method="POST" action="/edit_topic_result?postID={{$contentInfo.ID}}">
+        <form method="POST" action="/edit_topic_result?topicID={{$contentInfo.ID}}">
           <div class="form-group">
             <label for="postContent">Your Topic Content:</label>
             <textarea class="form-control" name="post-text" id="postContent" rows="10">{{$contentInfo.Subject}}</textarea>
           </div>
           <br>
-          <input type="hidden" name="postID" value="{{$contentInfo.ID}}">
+          <input type="hidden" name="topicID" value="{{$contentInfo.ID}}">
           <button class="btn btn-primary mr-2" type="submit">Edit</button>
-        </form>
-
-        <br>
-        <form method="POST" action="/delete_topic_result?postID={{$contentInfo.ID}}">
-          <input type="hidden" name="postID" value="{{$contentInfo.ID}}">
-          <button class="btn btn-danger" type="submit">Delete</button>
         </form>
         </div>
       </div>

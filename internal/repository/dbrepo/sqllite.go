@@ -271,6 +271,39 @@ func (m *SqliteBDRepo) DeletePost(post models.Post) error {
 	return nil
 }
 
+
+
+func (m *SqliteBDRepo) EditTopic(topic models.Thread) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	if strings.TrimSpace(topic.Subject) == "" {
+		return errors.New("empty topic can not be created")
+	}
+
+	if len(topic.Subject) > m.App.PostLen {
+		return errors.New(fmt.Sprintf("the topic is to long, %d syblos allowed", m.App.PostLen))
+	}
+
+	stmt := `UPDATE thread
+	SET subject = $1, created = $2, userID = $3, threadImage = $4
+	WHERE id = $5;
+	`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		topic.Subject,
+		topic.Created,
+		topic.UserID,
+		topic.Image,
+		topic.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // isThreadExist returns true if Thread with same Subject exist
 func (m *SqliteBDRepo) IsThreadExist(thread models.Thread) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
