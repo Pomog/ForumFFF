@@ -178,6 +178,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	data["creatorPostsAmount"] = creatorPostsAmount
 	data["creatorImg"] = creator.Picture
 	data["mainThreadName"] = mainThread.Subject
+	data["mainThreadID"] = mainThread.ID
 	data["mainThreadCreatedTime"] = mainThread.Created.Format("2006-01-02 15:04:05")
 
 	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{

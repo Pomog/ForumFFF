@@ -17,8 +17,9 @@ var Repo *Repository
 
 // Repository handles the repository type, encapsulating the AppConfig and DatabaseInt dependencies.
 type Repository struct {
-	App *config.AppConfig
-	DB  repository.DatabaseInt
+	App     *config.AppConfig
+	DB      repository.DatabaseInt
+	PostLen int
 }
 
 const (
@@ -36,8 +37,9 @@ const (
 // NewRepo creates a new repository
 func NewRepo(a *config.AppConfig, db *repository.DataBase) *Repository {
 	return &Repository{
-		App: a,
-		DB:  dbrepo.NewSQLiteRepo(a, db.SQL),
+		App:     a,
+		DB:      dbrepo.NewSQLiteRepo(a, db.SQL),
+		PostLen: 2500,
 	}
 }
 

@@ -118,8 +118,8 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// checking text length
-		if len(thread.Subject) > 2500 {
-			setErrorAndRedirect(w, r, "Only 2500 symbols allowed", "/error-page")
+		if len(thread.Subject) > m.PostLen {
+			setErrorAndRedirect(w, r, "Allowed " +strconv.Itoa(m.PostLen) + " symbols", "/error-page")
 			return
 		}
 

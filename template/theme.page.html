@@ -66,6 +66,12 @@
               <img src="{{$threadImage }}" class="post_img" alt="post_img">
             {{ end }} <br><br>
             {{index .Data "mainThreadName"}} <br>
+
+            {{$threadID :=index .Data "mainThreadID"}}
+            <form method="POST" action="/edit_topic?topicID={{$threadID}}">
+              <input type="hidden" name="topic_id" value="{{$threadID }}">
+              <button type="submit" style="background: none; border: none; padding: 0; font: inherit; cursor: pointer; text-decoration: underline; color:inherit;">✍🏻 Edit / Delete</button>
+            </form>
             <hr>
             Created: {{index .Data "mainThreadCreatedTime"}}
           </div>
@@ -96,7 +102,7 @@
 
           {{ .Content }}&nbsp;
 
-            <form method="POST" action="/edit_topic?postID={{ .ID}}">
+            <form method="POST" action="/edit_post?postID={{ .ID}}">
               <input type="hidden" name="topic_id" value="{{ .ID }}">
               <button type="submit" style="background: none; border: none; padding: 0; font: inherit; cursor: pointer; text-decoration: underline; color:inherit;">✍🏻 Edit / Delete</button>
             </form>
