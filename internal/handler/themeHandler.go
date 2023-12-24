@@ -79,7 +79,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Parse the form data, including files Need to Set Upper limit for DATA
-		err := r.ParseMultipartForm(2 << 20)
+		err := r.ParseMultipartForm(m.App.FileSize << 20)
 
 		if err != nil {
 			setErrorAndRedirect(w, r, "Image is too large", "/error-page")
@@ -107,7 +107,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		//AttachFile attaches file to the post
-		AttachFile(w, r, &post, nil)
+		AttachFile(m, w, r, &post, nil)
 		err = m.DB.CreatePost(post)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a post"+err.Error(), "/error-page")
@@ -188,7 +188,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func AttachFile(w http.ResponseWriter, r *http.Request, post *models.Post, thread *models.Thread) {
+func AttachFile(m *Repository, w http.ResponseWriter, r *http.Request, post *models.Post, thread *models.Thread) {
 	// ADD IMAGE TO STATIC_________________________
 	// Get the file from the form data
 	file, handler, errFileGet := r.FormFile("image")
@@ -196,7 +196,7 @@ func AttachFile(w http.ResponseWriter, r *http.Request, post *models.Post, threa
 		defer file.Close()
 
 		// Validate file size (2 MB limit)
-		if handler.Size > 2<<20 {
+		if handler.Size > m.App.FileSize<<20 {
 			setErrorAndRedirect(w, r, "File size should be below 2 MB", "/error-page")
 			return
 		}

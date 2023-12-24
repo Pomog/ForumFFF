@@ -34,6 +34,8 @@ func main() {
 
 	app.PostLen = 2500 //post and topic size
 
+	app.FileSize = 2 //here we set 2mb of file size
+
 	srv := &http.Server{
 		Addr:    Port,
 		Handler: routes(&app),

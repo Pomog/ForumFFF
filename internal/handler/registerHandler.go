@@ -27,7 +27,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	} else if r.Method == http.MethodPost {
 		// Parse the form data, including files Need to Set Upper limit for DATA
-		err := r.ParseMultipartForm(2 << 20)
+		err := r.ParseMultipartForm(m.App.FileSize << 20)
 		if err != nil {
 			setErrorAndRedirect(w, r, dbErrorUserPresent, "/error-page")
 			return
@@ -85,7 +85,7 @@ func (m *Repository) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			defer file.Close()
 
 			// Validate file size (2 MB limit)
-			if handler.Size > 2<<20 {
+			if handler.Size > m.App.FileSize<<20 {
 				form.Errors.Add("avatar", "File size should be below 2 MB")
 				data := make(map[string]interface{})
 				data["registrationData"] = registrationData

@@ -109,7 +109,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			Subject: r.FormValue("message-text"),
 			UserID:  sessionUserID,
 		}
-		AttachFile(w, r, nil, &thread)
+		AttachFile(m, w, r, nil, &thread)
 
 		// checking if there is a text before thread creation
 		if strings.TrimSpace(thread.Subject) == "" {
@@ -119,7 +119,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 		// checking text length
 		if len(thread.Subject) > m.App.PostLen {
-			setErrorAndRedirect(w, r, fmt.Sprintf("the post is to long, %d syblos allowed",m.App.PostLen), "/error-page")
+			setErrorAndRedirect(w, r, fmt.Sprintf("the post is to long, %d syblos allowed", m.App.PostLen), "/error-page")
 			return
 		}
 
