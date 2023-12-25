@@ -20,9 +20,6 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		search := r.FormValue("search")
 		category := r.URL.Query().Get("searchCategory")
 
-		fmt.Printf("search : %s\n", search)
-		fmt.Printf("searchCategory : %s\n", category)
-
 		var threads []models.Thread
 		var err error
 		if search != "" {
@@ -155,6 +152,9 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			setErrorAndRedirect(w, r, "Could not create a thread: "+err.Error(), "/error-page")
 			return
 		}
+
+		r.Form.Del("message-text")
+		r.Form.Del("category-text")
 
 		http.Redirect(w, r, fmt.Sprintf("/theme?threadID=%d", id), http.StatusPermanentRedirect)
 	}
