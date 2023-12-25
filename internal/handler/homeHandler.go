@@ -53,6 +53,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			info.ThreadID = thread.ID
 			info.Subject = thread.Subject
 			info.Created = thread.Created.Format("2006-01-02 15:04:05")
+			info.Category = thread.Category
 
 			info.PictureUserWhoCreatedThread = user.Picture
 			info.UserNameWhoCreatedThread = user.UserName
@@ -108,8 +109,9 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		thread := models.Thread{
-			Subject: r.FormValue("message-text"),
-			UserID:  sessionUserID,
+			Subject:  r.FormValue("message-text"),
+			Category: r.FormValue("category-text"),
+			UserID:   sessionUserID,
 		}
 		AttachFile(m, w, r, nil, &thread)
 
@@ -122,6 +124,18 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		// checking text length
 		if len(thread.Subject) > m.App.PostLen {
 			setErrorAndRedirect(w, r, fmt.Sprintf("the post is to long, %d syblos allowed", m.App.PostLen), "/error-page")
+			return
+		}
+
+		// checking if there is a category before thread creation
+		if strings.TrimSpace(thread.Category) == "" {
+			setErrorAndRedirect(w, r, "Empty category can not be created", "/error-page")
+			return
+		}
+
+		// checking category length
+		if len(thread.Category) > m.App.CategoryLen {
+			setErrorAndRedirect(w, r, fmt.Sprintf("the category is to long, %d syblos allowed", m.App.CategoryLen), "/error-page")
 			return
 		}
 

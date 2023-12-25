@@ -59,6 +59,12 @@ var alterThreadTable = `
 ALTER TABLE thread
 ADD COLUMN threadImage TEXT DEFAULT "";
 `
+
+var alter2ThreadTable = `
+ALTER TABLE thread
+ADD COLUMN category TEXT DEFAULT "";
+`
+
 func getQuerys() []string {
 	var sqlQuerys []string
 	sqlQuerys = append(sqlQuerys, userTable)
@@ -68,5 +74,6 @@ func getQuerys() []string {
 	sqlQuerys = append(sqlQuerys, sessionIdTable)
 	sqlQuerys = append(sqlQuerys, alterPostTable)
 	sqlQuerys = append(sqlQuerys, alterThreadTable)
+    sqlQuerys = append(sqlQuerys, alter2ThreadTable)
 	return sqlQuerys
 }

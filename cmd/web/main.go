@@ -32,7 +32,8 @@ func main() {
 
 	app.InfoLog.Printf("Server starting on port %s\n", Port)
 
-	app.PostLen = 2500 //post and topic size
+	app.PostLen = 2500    //post and topic size
+	app.CategoryLen = 100 //category size
 
 	app.FileSize = 2 //here we set 2mb of file size
 
