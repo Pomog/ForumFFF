@@ -73,11 +73,16 @@
                     {{ $dateLastPostCreated = convertTime $lastPost }}
                   {{ end }}
                   
-                  <td><!-- 2column -->From:<br><img src="{{ .PictureUserWhoCreatedLastPost }}" class="logo_ava" alt="picture"> <br>{{ .UserNameWhoCreatedLastPost }}<br> Posted: {{$dateLastPostCreated}}
+                  <td><!-- 2column -->
+                  {{ if .UserNameWhoCreatedLastPost}}
+                  From:<br><img src="{{ .PictureUserWhoCreatedLastPost }}" class="logo_ava" alt="picture"> <br>{{ .UserNameWhoCreatedLastPost }}<br> Posted: {{$dateLastPostCreated}}
                     {{ $lastPostShorten := shortenPost .Posts}}
                     <br><em>{{ $lastPostShorten}}</em></td>
+                  {{end}}
                   {{ $numOfPosts := numberOfPosts .Posts }}
+                  
                   <td><!-- 3column -->{{ $numOfPosts}} messages</td>
+                  
               </tr>
 
             {{ end }}

@@ -584,7 +584,35 @@ func (m *SqliteBDRepo) GetSearchedThreads(search string) ([]models.Thread, error
 
 	for rows.Next() {
 		var thread models.Thread
-		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, thread.Category)
+		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, &thread.Category)
+		if err != nil {
+			return nil, err
+		}
+		threads = append(threads, thread)
+	}
+
+	return threads, nil
+}
+
+func (m *SqliteBDRepo) GetSearchedThreadsByCategory(search string) ([]models.Thread, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select * 
+	from thread
+	WHERE category LIKE '%' || $1 || '%';
+	`
+	rows, err := m.DB.QueryContext(ctx, query, search)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var threads []models.Thread
+
+	for rows.Next() {
+		var thread models.Thread
+		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, &thread.Category)
 		if err != nil {
 			return nil, err
 		}

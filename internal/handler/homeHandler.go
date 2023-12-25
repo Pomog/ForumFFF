@@ -18,18 +18,29 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
 		search := r.FormValue("search")
+		category := r.URL.Query().Get("searchCategory")
+
+		fmt.Printf("search : %s\n", search)
+		fmt.Printf("searchCategory : %s\n", category)
+
 		var threads []models.Thread
 		var err error
 		if search != "" {
 			threads, err = m.DB.GetSearchedThreads(search)
 			if err != nil {
-				setErrorAndRedirect(w, r, "Could not get Threads m.DB.GetSearchedThreads", "/error-page")
+				setErrorAndRedirect(w, r, "Could not get Threads from search m.DB.GetSearchedThreads", "/error-page")
+				return
+			}
+		} else if category != "" {
+			threads, err = m.DB.GetSearchedThreadsByCategory(category)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get Threads for category m.DB.GetSearchedThreads", "/error-page")
 				return
 			}
 		} else {
 			threads, err = m.DB.GetAllThreads()
 			if err != nil {
-				setErrorAndRedirect(w, r, "Could not get Threads m.DB.GetAllThreads", "/error-page")
+				setErrorAndRedirect(w, r, "Could not get Threads from search  m.DB.GetAllThreads", "/error-page")
 				return
 			}
 		}
