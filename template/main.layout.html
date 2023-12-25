@@ -17,19 +17,23 @@
 </head>
 <body>
 
-{{$Lineage2 := "https://en.wikipedia.org/wiki/Lineage_II"}}
+{{$Lineage2 := "/home?searchCategory=Lineage 2"}}
 
-{{$Lineage3 := "https://en.wikipedia.org/wiki/Throne_and_Liberty"}}
+{{$Lineage3 := "/home?searchCategory=Lineage 3"}}
 
-{{$New_World := "https://en.wikipedia.org/wiki/New_World"}}
+{{$New_World := "/home?searchCategory=New World"}}
 
-{{$AION := "https://en.wikipedia.org/wiki/Aion_(video_game)"}}
+{{$AION := "/home?searchCategory=AION"}}
 
-{{$Conan := "https://en.wikipedia.org/wiki/Conan_Exiles"}}
+{{$Conan := "/home?searchCategory=Conan"}}
 
-{{$WoW := "https://en.wikipedia.org/wiki/World_of_Warcraft"}}
+{{$WoW := "/home?searchCategory=WOW"}}
 
-{{$GW2 := "https://en.wikipedia.org/wiki/Guild_Wars_2"}}
+{{$TL := "/home?searchCategory=TL"}}
+
+{{$GW2 := "/home?searchCategory=GW2"}}
+
+{{$PaxDei := "/home?searchCategory=Pax Dei"}}
 
   <nav id="navbarTop" class="navbar navbar-expand-lg navbar-dark navBar">
     <div class="container-fluid">
@@ -57,6 +61,8 @@
               <li><a class="dropdown-item" href={{$Conan}}>Conan</a></li>
               <li><a class="dropdown-item" href={{$WoW}}>WoW</a></li>
               <li><a class="dropdown-item" href={{$GW2}}>GW2</a></li>
+              <li><a class="dropdown-item" href={{$TL}}>Throne and Liberty</a></li>
+              <li><a class="dropdown-item" href={{$PaxDei}}>Pax Dei</a></li>
               <li><hr class="dropdown-divider"></li>
             </ul>
           </li>
@@ -97,10 +103,9 @@
             <tbody class="containerBody">
                 <tr>
                     <td>
-                        <a class="whiteLink" href="rulles.html">Rulles </a>&nbsp; 
-                        <a class="whiteLink" href="contact.html">Contact </a>&nbsp; 
-                        <a class="whiteLink" href="support.html">Support</a>&nbsp; 
-                        <a class="whiteLink" href="disscussion.html">Disscussion</a>&nbsp;
+                        <a class="whiteLink" href="/forum_rules">Rules </a>&nbsp; 
+                        <a class="whiteLink" href="/contactUs">Contact </a>&nbsp; 
+                        <a class="whiteLink" href="/help">Support</a>&nbsp; 
                     </td>
                 </tr>
                 <tr>
@@ -111,7 +116,9 @@
                         <a class="whiteLink" href={{$AION}}>AION</a>&nbsp;
                         <a class="whiteLink" href={{$Conan}}>Conan</a>&nbsp; 
                         <a class="whiteLink" href={{$WoW}}>WOW</a>&nbsp;
-                        <a class="whiteLink" href={{$GW2}}>Guild Wars 2</a>&nbsp; 
+                        <a class="whiteLink" href={{$GW2}}>Guild Wars 2</a>&nbsp;
+                        <a class="whiteLink" href={{$PaxDei}}>Pax Dei</a>&nbsp; 
+                        <a class="whiteLink" href={{$TL}}>Throne and Liberty</a>&nbsp; 
                     </td>
                 </tr>
             </tbody>

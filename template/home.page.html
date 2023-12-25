@@ -24,6 +24,10 @@
                         <div class="modal-body">
                           <form method="post" action="/home" enctype="multipart/form-data">
                             <div class="mb-3">
+                              <label for="category-text" class="col-form-label">Name of the Game:</label>
+                              <input class="form-control" id="category-text" name="category-text">
+
+
                               <label for="message-text" class="col-form-label">Type your topic here:</label>
                               <textarea class="form-control" id="message-text" name="message-text"></textarea>
                             </div>
@@ -58,6 +62,7 @@
                           <img src="{{ .PictureUserWhoCreatedThread }}" class="logo_img" alt="/static/logo/message_icon2.png">
                           <br>Created by: {{ .UserNameWhoCreatedThread}}
                           <br>Topic created: {{ .Created}}
+                          <br>Category: {{ .Category}}
                           <br><strong>{{ .Subject }} </strong><hr>
                       </a>
                   </td>
@@ -68,11 +73,16 @@
                     {{ $dateLastPostCreated = convertTime $lastPost }}
                   {{ end }}
                   
-                  <td><!-- 2column -->From:<br><img src="{{ .PictureUserWhoCreatedLastPost }}" class="logo_ava" alt="picture"> <br>{{ .UserNameWhoCreatedLastPost }}<br> Posted: {{$dateLastPostCreated}}
+                  <td><!-- 2column -->
+                  {{ if .UserNameWhoCreatedLastPost}}
+                  From:<br><img src="{{ .PictureUserWhoCreatedLastPost }}" class="logo_ava" alt="picture"> <br>{{ .UserNameWhoCreatedLastPost }}<br> Posted: {{$dateLastPostCreated}}
                     {{ $lastPostShorten := shortenPost .Posts}}
                     <br><em>{{ $lastPostShorten}}</em></td>
+                  {{end}}
                   {{ $numOfPosts := numberOfPosts .Posts }}
+                  
                   <td><!-- 3column -->{{ $numOfPosts}} messages</td>
+                  
               </tr>
 
             {{ end }}

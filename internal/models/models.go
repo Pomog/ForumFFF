@@ -17,11 +17,12 @@ type User struct {
 }
 
 type Thread struct {
-	ID      int
-	Subject string
-	Created time.Time
-	UserID  int
-	Image   string
+	ID       int
+	Subject  string
+	Created  time.Time
+	UserID   int
+	Image    string
+	Category string
 }
 
 type ThreadDataForMainPage struct {
@@ -34,6 +35,7 @@ type ThreadDataForMainPage struct {
 	Posts                         []Post
 	ThreadID                      int
 	Image                         string
+	Category                      string
 }
 
 type PostDataForThemePage struct {

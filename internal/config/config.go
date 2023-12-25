@@ -17,5 +17,6 @@ type AppConfig struct {
 	UserLogin     uuid.UUID // This field can hold a UUID value
 	ServerEmail   string
 	PostLen       int //this parameter limits post and topic size
+	CategoryLen   int //this parameter limits category size
 	FileSize      int64
 }
