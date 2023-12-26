@@ -33,9 +33,13 @@ func routes(a *config.AppConfig) http.Handler {
 	//handlers to edit delete whole topics
 	mux.HandleFunc("/edit_topic", handler.Repo.EditTopicHandler)
 	mux.HandleFunc("/edit_topic_result", handler.Repo.EditTopicResultHandler)
-	//
+	//handlers to get all threads and all posts for user id from personal cabinet
 	mux.HandleFunc("/personal_cabinet_threads", handler.Repo.GetAllThreadsForUserHandler)
 	mux.HandleFunc("/personal_cabinet_posts", handler.Repo.GetAllPostsForUserHandler)
+
+	mux.HandleFunc("/create_post_result", handler.Repo.CreatePostResultHandler)
+
+
 
 	return mux
 }

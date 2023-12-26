@@ -118,6 +118,11 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a post"+err.Error(), "/error-page")
 			return
+		} else{
+			path:=fmt.Sprintf("/create_post_result?threadID=%v",post.ThreadId)
+			fmt.Println("path:",path)
+			http.Redirect(w,r,path,http.StatusSeeOther)
+			return
 		}
 
 	}

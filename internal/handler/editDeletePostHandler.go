@@ -137,3 +137,21 @@ func (m *Repository) DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+func (m *Repository) CreatePostResultHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method == http.MethodGet {
+		threadID := r.URL.Query().Get("threadID")
+		data := make(map[string]interface{})
+		data["threadID"] = threadID
+		fmt.Println("threadID", threadID)
+
+		renderer.RendererTemplate(w, "edit_post_result.page.html", &models.TemplateData{
+			Data: data,
+		})
+
+	} else {
+		http.Error(w, "No such method", http.StatusMethodNotAllowed)
+	}
+
+}
