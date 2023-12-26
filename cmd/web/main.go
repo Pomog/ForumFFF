@@ -44,7 +44,7 @@ func main() {
 		"World Of Warcraft":        "WOW",
 		"New World":                "NW",
 		"AION":                     "AION",
-		"Conan":                    "Conan",
+		"Conan exiles":             "Conan",
 		"Guild Wars 2":             "GW2",
 		"Archeage":                 "Archeage",
 		"Black Desert Online":      "BDO",

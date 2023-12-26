@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -130,6 +131,7 @@ func (m *Repository) PrivatPolicyHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// PersonaCabinetHandler hanles the personal cabinet of selected user.
 func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		userID, _ := strconv.Atoi(r.URL.Query().Get("userID"))
@@ -157,6 +159,147 @@ func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Reques
 
 	} else {
 		http.Error(w, "No such method", http.StatusMethodNotAllowed)
+	}
+}
+
+// GetAllThreadsForUserHandler gets all threads from user (user id)
+func (m *Repository) GetAllThreadsForUserHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		userID, _ := strconv.Atoi(r.URL.Query().Get("userID"))
+		user, errUser := m.DB.GetUserByID(userID)
+		if errUser != nil {
+			setErrorAndRedirect(w, r, "Could not get User from  GetUserByID(visitorID)", "/error-page")
+			return
+		}
+		threads, err := m.DB.GetAllThreadsByUserID(user.ID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get threads from  GetAllThreadsByUserID(user.ID)", "/error-page")
+			return
+		}
+
+		var threadsInfo []models.ThreadDataForMainPage
+		for _, thread := range threads {
+			var user models.User
+			user, err = m.DB.GetUserByID(thread.UserID)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID", "/error-page")
+				return
+			}
+
+			user, err = m.DB.GetUserByID(thread.UserID)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID", "/error-page")
+				return
+			}
+
+			var info models.ThreadDataForMainPage
+			info.ThreadID = thread.ID
+			info.Subject = thread.Subject
+			info.Created = thread.Created.Format("2006-01-02 15:04:05")
+			info.Category = thread.Category
+
+			info.PictureUserWhoCreatedThread = user.Picture
+			info.UserNameWhoCreatedThread = user.UserName
+
+			posts, err := m.DB.GetAllPostsFromThread(thread.ID)
+			if err != nil {
+				log.Fatal(err)
+			}
+			info.Posts = posts
+
+			userIDwhoCreatedLastPost := getUserThatCreatedLastPost(posts)
+
+			if userIDwhoCreatedLastPost != 0 || len(posts) != 0 {
+				userWhoCreatedLastPost, err := m.DB.GetUserByID(userIDwhoCreatedLastPost)
+				if err != nil {
+					setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(getUserThatCreatedLastPost(posts)) 95", "/error-page")
+					return
+				}
+
+				info.PictureUserWhoCreatedLastPost = userWhoCreatedLastPost.Picture
+				info.UserNameWhoCreatedLastPost = userWhoCreatedLastPost.UserName
+			} else if userIDwhoCreatedLastPost == 0 || len(posts) == 0 {
+				info.Created = ""
+			}
+
+			threadsInfo = append(threadsInfo, info)
+		}
+
+		data := make(map[string]interface{})
+
+		data["games"] = m.App.GamesList
+		data["threads"] = threadsInfo
+
+		renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
+			Data: data,
+		})
+
+	} else {
+		http.Error(w, "No such method", http.StatusMethodNotAllowed)
+	}
+}
+
+// GetAllPostsForUserHandler gets all posts from user (user id)
+func (m *Repository) GetAllPostsForUserHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		userID, _ := strconv.Atoi(r.URL.Query().Get("userID"))
+		user, errUser := m.DB.GetUserByID(userID)
+		if errUser != nil {
+			setErrorAndRedirect(w, r, "Could not get User from  GetUserByID(visitorID)", "/error-page")
+			return
+		}
+
+		posts, err := m.DB.GetAllPostsByUserID(user.ID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get all posts from user ID", "/error-page")
+			return
+		}
+
+		var postsInfo []models.PostDataForThemePage
+
+		for _, post := range posts {
+			var user models.User
+			user, err = m.DB.GetUserByID(post.UserID)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get user by id", "/error-page")
+				return
+			}
+			userPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(post.UserID)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get amount of Posts, GetTotalPostsAmountByUserID", "/error-page")
+				return
+			}
+
+			likes, dislikes, err := m.DB.CountLikesAndDislikesForPostByPostID(post.ID)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get Likes for Post, CountLikesAndDislikesForPostByPostID", "/error-page")
+				return
+			}
+
+			var info models.PostDataForThemePage
+			info.ID = post.ID
+			info.Subject = post.Subject
+			info.Created = post.Created.Format("2006-01-02 15:04:05")
+			info.Content = post.Content
+			info.Image = post.Image
+			info.PictureUserWhoCreatedPost = user.Picture
+			info.UserNameWhoCreatedPost = user.UserName
+			info.UserIDWhoCreatedPost = user.ID
+			info.UserRegistrationDate = user.Created.Format("2006-01-02 15:04:05")
+			info.UserPostsAmmount = userPostsAmount
+			info.Likes = likes
+			info.Dislikes = dislikes
+			postsInfo = append(postsInfo, info)
+		}
+
+		data := make(map[string]interface{})
+
+		data["posts"] = postsInfo
+		data["games"] = m.App.GamesList
+
+		renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
+			Data: data,
+		})
 	}
 }
 

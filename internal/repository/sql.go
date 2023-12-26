@@ -17,6 +17,8 @@ var threadTable = `CREATE TABLE IF NOT EXISTS thread (
     subject TEXT,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     userID INTEGER,
+    threadImage TEXT DEFAULT "",
+    category TEXT DEFAULT "",
     FOREIGN KEY (userID) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
 );`
 
@@ -27,6 +29,7 @@ var postTable = `CREATE TABLE IF NOT EXISTS post (
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     threadID INTEGER,
     userID INTEGER,
+    postImage TEXT DEFAULT "",
     FOREIGN KEY (threadID) REFERENCES thread(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );`
@@ -51,19 +54,6 @@ var sessionIdTable = `CREATE TABLE IF NOT EXISTS sessionId (
 var guestUser = `INSERT INTO users (username, password, first_name, last_name, email)
 VALUES ('guest', '123456', 'Guest', 'User', 'guest@gmail.com');`
 
-var alterPostTable = `
-ALTER TABLE post
-ADD COLUMN postImage TEXT DEFAULT "";
-`
-var alterThreadTable = `
-ALTER TABLE thread
-ADD COLUMN threadImage TEXT DEFAULT "";
-`
-
-var alter2ThreadTable = `
-ALTER TABLE thread
-ADD COLUMN category TEXT DEFAULT "";
-`
 
 func getQuerys() []string {
 	var sqlQuerys []string
@@ -72,8 +62,5 @@ func getQuerys() []string {
 	sqlQuerys = append(sqlQuerys, postTable)
 	sqlQuerys = append(sqlQuerys, votesTable)
 	sqlQuerys = append(sqlQuerys, sessionIdTable)
-	sqlQuerys = append(sqlQuerys, alterPostTable)
-	sqlQuerys = append(sqlQuerys, alterThreadTable)
-    sqlQuerys = append(sqlQuerys, alter2ThreadTable)
 	return sqlQuerys
 }
