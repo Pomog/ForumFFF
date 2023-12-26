@@ -29,4 +29,5 @@ type DatabaseInt interface {
 	GetSearchedThreadsByCategory(search string) ([]models.Thread, error)
 	GetAllThreadsByUserID(userID int) ([]models.Thread, error)
 	GetAllPostsByUserID(userID int) ([]models.Post, error)
+	GetAllLikedPostsByUserID(userID int) ([]models.Post, error)
 }

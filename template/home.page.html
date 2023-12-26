@@ -78,6 +78,8 @@
                   From:<br><img src="{{ .PictureUserWhoCreatedLastPost }}" class="logo_ava" alt="picture"> <br>{{ .UserNameWhoCreatedLastPost }}<br> Posted: {{$dateLastPostCreated}}
                     {{ $lastPostShorten := shortenPost .Posts}}
                     <br><em>{{ $lastPostShorten}}</em></td>
+                  {{ else }}
+                  <h8><em>Be the first one to add post here...</em></h8>
                   {{end}}
                   {{ $numOfPosts := numberOfPosts .Posts }}
                   

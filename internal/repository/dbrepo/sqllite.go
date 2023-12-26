@@ -393,6 +393,35 @@ func (m *SqliteBDRepo) GetAllPostsByUserID(userID int) ([]models.Post, error) {
 	return posts, nil
 }
 
+func (m *SqliteBDRepo) GetAllLikedPostsByUserID(userID int) ([]models.Post, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `SELECT post.id, post.subject, post.content, post.created, post.threadID, post.userID, post.postImage
+	FROM votes
+	JOIN post ON votes.postID = post.id
+	WHERE votes.like = 1 AND votes.userID = $1;
+	`
+	rows, err := m.DB.QueryContext(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []models.Post
+
+	for rows.Next() {
+		var post models.Post
+		err := rows.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID, &post.Image)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}
+
 // GetAllThreadsByUserID returns all Threads of one user, nil if there are no threads in DB
 func (m *SqliteBDRepo) GetAllThreadsByUserID(userID int) ([]models.Thread, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
