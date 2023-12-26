@@ -2,6 +2,14 @@
 Online forum for MMORPG fans and friends!
 ![Forum Home Page](static/readme_images/image.png)
 
+## Access the Web Application
+
+The web application can be accessed at the following URLs:
+
+- [AWS Instance](http://ec2-52-91-213-117.compute-1.amazonaws.com/)
+- [Direct IP](http://52.91.213.117/login)
+
+
 ## Features
 This is a Web Application written in Golang, utilizing only standard [Go libraries](https://pkg.go.dev/std) and the following external packages:
 - `github.com/google/uuid v1.4.0`

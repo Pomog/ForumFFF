@@ -17,24 +17,6 @@
 </head>
 <body>
 
-{{$Lineage2 := "/home?searchCategory=Lineage 2"}}
-
-{{$Lineage3 := "/home?searchCategory=Lineage 3"}}
-
-{{$New_World := "/home?searchCategory=New World"}}
-
-{{$AION := "/home?searchCategory=AION"}}
-
-{{$Conan := "/home?searchCategory=Conan"}}
-
-{{$WoW := "/home?searchCategory=WOW"}}
-
-{{$TL := "/home?searchCategory=TL"}}
-
-{{$GW2 := "/home?searchCategory=GW2"}}
-
-{{$PaxDei := "/home?searchCategory=Pax Dei"}}
-
   <nav id="navbarTop" class="navbar navbar-expand-lg navbar-dark navBar">
     <div class="container-fluid">
       <img src="static\logo\10.png" class="logo_img" alt="logo"><a class="navbar-brand" href="/">Fan.Forge.Forum.</a>
@@ -54,16 +36,12 @@
               Games
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href={{$Lineage2}}>L2</a></li>
-              <li><a class="dropdown-item" href={{$Lineage3}}>L3</a></li>
-              <li><a class="dropdown-item" href={{$New_World}}>New World</a></li>
-              <li><a class="dropdown-item" href={{$AION}}>AION</a></li>
-              <li><a class="dropdown-item" href={{$Conan}}>Conan</a></li>
-              <li><a class="dropdown-item" href={{$WoW}}>WoW</a></li>
-              <li><a class="dropdown-item" href={{$GW2}}>GW2</a></li>
-              <li><a class="dropdown-item" href={{$TL}}>Throne and Liberty</a></li>
-              <li><a class="dropdown-item" href={{$PaxDei}}>Pax Dei</a></li>
-              <li><hr class="dropdown-divider"></li>
+              {{$games := index .Data "games"}}
+
+              {{range $key, $value := $games}}
+                  {{$route := printf "/home?searchCategory=%s" $key}}
+                  <li><a class="dropdown-item" href={{$route}}>{{$key}}</a></li>
+              {{end}}
             </ul>
           </li>
           <!-- <li class="nav-item">
@@ -110,15 +88,13 @@
                 </tr>
                 <tr>
                     <td>
-                        <a class="whiteLink" href={{$Lineage2}}>Lineage2 </a>&nbsp; 
-                        <a class="whiteLink" href={{$Lineage3}}>Lineage3 </a>&nbsp; 
-                        <a class="whiteLink" href={{$New_World}}>New World </a>&nbsp; 
-                        <a class="whiteLink" href={{$AION}}>AION</a>&nbsp;
-                        <a class="whiteLink" href={{$Conan}}>Conan</a>&nbsp; 
-                        <a class="whiteLink" href={{$WoW}}>WOW</a>&nbsp;
-                        <a class="whiteLink" href={{$GW2}}>Guild Wars 2</a>&nbsp;
-                        <a class="whiteLink" href={{$PaxDei}}>Pax Dei</a>&nbsp; 
-                        <a class="whiteLink" href={{$TL}}>Throne and Liberty</a>&nbsp; 
+                      {{$games := index .Data "games"}}
+
+                      {{range $key, $value := $games}}
+                          {{$route := printf "/home?searchCategory=%s" $key}}
+                          <a class="whiteLink" href={{$route}}>{{$key}} </a>&nbsp; 
+                      {{end}}
+
                     </td>
                 </tr>
             </tbody>

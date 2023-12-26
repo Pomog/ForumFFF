@@ -96,6 +96,7 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 			setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(UserID)", "/error-page")
 			return
 		}
+		data["games"] = m.App.GamesList
 		data["threads"] = threadsInfo
 		data["loggedAs"] = loggedUser.UserName
 		data["loggedAsID"] = loggedUser.ID

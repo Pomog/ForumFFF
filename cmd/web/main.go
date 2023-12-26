@@ -37,6 +37,22 @@ func main() {
 
 	app.FileSize = 2 //here we set 2mb of file size
 
+	//the list of games that are represented and will be covered on site.
+	app.GamesList = map[string]string{
+		"Lineage 2":                "L2",
+		"Lineage 3":                "L3",
+		"World Of Warcraft":        "WOW",
+		"New World":                "NW",
+		"AION":                     "AION",
+		"Conan":                    "Conan",
+		"Guild Wars 2":             "GW2",
+		"Archeage":                 "Archeage",
+		"Black Desert Online":      "BDO",
+		"World of Tanks":           "WOT",
+		"EVE Online":               "EVE",
+		"The Elder Scrolls Online": "ESO",
+	}
+
 	srv := &http.Server{
 		Addr:    Port,
 		Handler: routes(&app),
