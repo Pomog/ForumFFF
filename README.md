@@ -64,7 +64,7 @@ The session feature in this project is implemented using the `github.com/google/
 - Initializes the database and performs checks to ensure connectivity.
 
 ### SQL schema
-<img src="https://github.com/Pomog/ForumFFF/blob/yurii_dev/static/readme_images/shema.png?raw=true" alt="example" style="width:50%;">
+<img src="static/readme_images/shema.png.jpg?raw=true" alt="example" style="width:30%;">
 
 ### Template Rendering
 - We are using in-memory cache to parse HTML templates
