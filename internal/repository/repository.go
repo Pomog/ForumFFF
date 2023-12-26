@@ -27,4 +27,6 @@ type DatabaseInt interface {
 	EditTopic(topic models.Thread) error
 	DeletePost(post models.Post) error
 	GetSearchedThreadsByCategory(search string) ([]models.Thread, error)
+	GetAllThreadsByUserID(userID int) ([]models.Thread, error)
+	GetAllPostsByUserID(userID int) ([]models.Post, error)
 }
