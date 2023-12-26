@@ -36,10 +36,9 @@ func routes(a *config.AppConfig) http.Handler {
 	//handlers to get all threads and all posts for user id from personal cabinet
 	mux.HandleFunc("/personal_cabinet_threads", handler.Repo.GetAllThreadsForUserHandler)
 	mux.HandleFunc("/personal_cabinet_posts", handler.Repo.GetAllPostsForUserHandler)
+	mux.HandleFunc("/personal_cabinet_likes", handler.Repo.GetAllLikedPostsByUserIDHandler)
 
 	mux.HandleFunc("/create_post_result", handler.Repo.CreatePostResultHandler)
-
-
 
 	return mux
 }

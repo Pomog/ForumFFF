@@ -303,6 +303,69 @@ func (m *Repository) GetAllPostsForUserHandler(w http.ResponseWriter, r *http.Re
 	}
 }
 
+func (m *Repository) GetAllLikedPostsByUserIDHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		userID, _ := strconv.Atoi(r.URL.Query().Get("userID"))
+		user, errUser := m.DB.GetUserByID(userID)
+		if errUser != nil {
+			setErrorAndRedirect(w, r, "Could not get User from  GetUserByID(visitorID)"+errUser.Error(), "/error-page")
+			return
+		}
+
+		posts, err := m.DB.GetAllLikedPostsByUserID(user.ID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get all posts from user ID GetAllLikedPostsByUserID(user.ID)"+err.Error(), "/error-page")
+			return
+		}
+
+		var postsInfo []models.PostDataForThemePage
+
+		for _, post := range posts {
+			var user models.User
+			user, err = m.DB.GetUserByID(post.UserID)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get user by id"+err.Error(), "/error-page")
+				return
+			}
+			userPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(post.UserID)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get amount of Posts, GetTotalPostsAmountByUserID"+err.Error(), "/error-page")
+				return
+			}
+
+			likes, dislikes, err := m.DB.CountLikesAndDislikesForPostByPostID(post.ID)
+			if err != nil {
+				setErrorAndRedirect(w, r, "Could not get Likes for Post, CountLikesAndDislikesForPostByPostID"+err.Error(), "/error-page")
+				return
+			}
+
+			var info models.PostDataForThemePage
+			info.ID = post.ID
+			info.Subject = post.Subject
+			info.Created = post.Created.Format("2006-01-02 15:04:05")
+			info.Content = post.Content
+			info.Image = post.Image
+			info.PictureUserWhoCreatedPost = user.Picture
+			info.UserNameWhoCreatedPost = user.UserName
+			info.UserIDWhoCreatedPost = user.ID
+			info.UserRegistrationDate = user.Created.Format("2006-01-02 15:04:05")
+			info.UserPostsAmmount = userPostsAmount
+			info.Likes = likes
+			info.Dislikes = dislikes
+			postsInfo = append(postsInfo, info)
+		}
+
+		data := make(map[string]interface{})
+
+		data["posts"] = postsInfo
+		data["games"] = m.App.GamesList
+
+		renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
+			Data: data,
+		})
+	}
+}
+
 // shortenerOfSubject helper function to squeeze theme name
 func ShortenerOfSubject(input string) string {
 	if len(input) <= 80 {
