@@ -19,4 +19,5 @@ type AppConfig struct {
 	PostLen       int //this parameter limits post and topic size
 	CategoryLen   int //this parameter limits category size
 	FileSize      int64
+	GamesList     (map[string]string)
 }

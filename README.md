@@ -2,12 +2,50 @@
 Online forum for MMORPG fans and friends!
 ![Forum Home Page](static/readme_images/image.png)
 
+## Access the Web Application
+
+The web application can be accessed at the following URLs:
+
+- [AWS Instance](http://ec2-52-91-213-117.compute-1.amazonaws.com/)
+- [Direct IP](http://52.91.213.117/login)
+
+
 ## Features
 This is a Web Application written in Golang, utilizing only standard [Go libraries](https://pkg.go.dev/std) and the following external packages:
 - `github.com/google/uuid v1.4.0`
 - `github.com/mattn/go-sqlite3 v1.14.18`
 - To run locally use ```go run ./cmd/web .```
 - [How to use Docker](docs/howToUsewDocker.md)
+
+### User Management:
+- User Registration: Users can create new accounts.
+- Guest Registration: Allow guest users to access limited features or explore the platform without registration.
+- Login System: Users can log in using their email and password credentials.
+
+### Content Creation:
+- Topic Creation: Users can create new discussion topics.
+  - Topic Creation with Image: Option to include images when creating topics.
+- Post Creation: Users can contribute to discussions by creating posts.
+  - Post Creation with Image: Ability to attach images to posts.
+
+### Interaction Features:
+- Like/Dislike System: Users can like or dislike posts.
+  - User Post Reactions: Each user can react (like/dislike) to a post only once.
+- Post and Topic Management:
+  - Edit Permissions: Authors can edit their posts and topics.
+  - Deletion Permissions: Post authors can delete their posts.
+
+### Search and Sorting:
+- Search Bar: Includes a search bar to find topics or content.
+- Sorting by Category: Dropdown menu and quick links for sorting topics by category.
+
+### Personal Cabinet:
+- User Personal Cabinet: Provides a personal space for each user.
+  - Sorting Options:
+    - Liked Posts: Users can view posts they've liked.
+    - Created Posts: View a list of posts authored by the user.
+    - Created Topics: Access topics authored by the user.
+
 
 ### Session
 The session feature in this project is implemented using the `github.com/google/uuid` package. A unique UUID (Universally Unique Identifier) token is generated and stored in cookies. On the server side, this token is associated with the user's ID in the SQL database.

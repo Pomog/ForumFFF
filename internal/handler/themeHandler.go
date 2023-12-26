@@ -118,7 +118,13 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not create a post"+err.Error(), "/error-page")
 			return
+		} else{
+			path:=fmt.Sprintf("/create_post_result?threadID=%v",post.ThreadId)
+			fmt.Println("path:",path)
+			http.Redirect(w,r,path,http.StatusSeeOther)
+			return
 		}
+
 	}
 
 	posts, err := m.DB.GetAllPostsFromThread(threadID)
@@ -194,6 +200,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	data["mainThreadName"] = mainThread.Subject
 	data["mainThreadID"] = mainThread.ID
 	data["mainThreadCreatedTime"] = mainThread.Created.Format("2006-01-02 15:04:05")
+	data["games"] = m.App.GamesList
 
 	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
 		Data: data,
