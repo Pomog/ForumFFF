@@ -14,6 +14,7 @@ import (
 	"github.com/Pomog/ForumFFF/internal/renderer"
 )
 
+// ThemeHandler handles the main functionality of the theme page.
 func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	visitorID, err := getVisitorID(m, w, r)
 	if err != nil {
@@ -59,6 +60,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// getVisitorID retrieves the visitor ID from cookies or generates a guest ID.
 func getVisitorID(m *Repository, w http.ResponseWriter, r *http.Request) (int, error) {
 	visitorID, err := m.DB.GetGuestID()
 	if err != nil {
@@ -80,6 +82,7 @@ func getVisitorID(m *Repository, w http.ResponseWriter, r *http.Request) (int, e
 	return visitorID, nil
 }
 
+// getThreadAndCreator retrieves the main thread and its creator information.
 func getThreadAndCreator(m *Repository, threadID int) (mainThread models.Thread, creator models.User, err error) {
 	mainThread, err = m.DB.GetThreadByID(threadID)
 	if err != nil {
@@ -90,6 +93,7 @@ func getThreadAndCreator(m *Repository, threadID int) (mainThread models.Thread,
 	return mainThread, creator, err
 }
 
+// handlePostActions handles like/dislike actions for posts.
 func handlePostActions(w http.ResponseWriter, r *http.Request, m *Repository, visitorID int, visitor models.User, mainThread models.Thread) {
 	like := r.FormValue("like")
 	dislike := r.FormValue("dislike")
@@ -107,6 +111,7 @@ func handlePostActions(w http.ResponseWriter, r *http.Request, m *Repository, vi
 	}
 }
 
+// handleLikeAction handles the 'like' action for posts.
 func handleLikeAction(w http.ResponseWriter, r *http.Request, m *Repository, visitorID int, visitor models.User, like string) {
 	if visitor.UserName == "guest" {
 		setErrorAndRedirect(w, r, guestRestiction, "/error-page")
@@ -120,6 +125,7 @@ func handleLikeAction(w http.ResponseWriter, r *http.Request, m *Repository, vis
 	}
 }
 
+// handleDislikeAction handles the 'dislike' action for posts.
 func handleDislikeAction(w http.ResponseWriter, r *http.Request, m *Repository, visitorID int, visitor models.User, dislike string) {
 	if visitor.UserName == "guest" {
 		setErrorAndRedirect(w, r, guestRestiction, "/error-page")
@@ -133,6 +139,7 @@ func handleDislikeAction(w http.ResponseWriter, r *http.Request, m *Repository, 
 	}
 }
 
+// handlePostCreation handles the creation of a new post.
 func handlePostCreation(w http.ResponseWriter, r *http.Request, m *Repository, visitorID int, mainThread models.Thread) {
 	visitor, err := m.DB.GetUserByID(visitorID)
 	if err != nil {
@@ -166,6 +173,7 @@ func handlePostCreation(w http.ResponseWriter, r *http.Request, m *Repository, v
 
 }
 
+// createPostFromRequest creates a post from the request data.
 func createPostFromRequest(m *Repository, w http.ResponseWriter, r *http.Request, visitorID int, mainThread models.Thread) (models.Post, error) {
 	post := models.Post{
 		Subject:  ShortenerOfSubject(mainThread.Subject),
@@ -189,6 +197,7 @@ func createPostFromRequest(m *Repository, w http.ResponseWriter, r *http.Request
 	return post, nil
 }
 
+// getPostsInfo retrieves information for rendering posts.
 func getPostsInfo(m *Repository, w http.ResponseWriter, r *http.Request, threadID int) ([]models.PostDataForThemePage, error) {
 	posts, err := m.DB.GetAllPostsFromThread(threadID)
 	if err != nil {
@@ -236,6 +245,7 @@ func getPostsInfo(m *Repository, w http.ResponseWriter, r *http.Request, threadI
 	return postsInfo, nil
 }
 
+// prepareDataForThemePage prepares data for rendering the theme page template.
 func prepareDataForThemePage(m *Repository, w http.ResponseWriter, r *http.Request, visitorID int, postsInfo []models.PostDataForThemePage, mainThread models.Thread, creator models.User) (map[string]interface{}, error) {
 	data := make(map[string]interface{})
 
@@ -273,6 +283,7 @@ func prepareDataForThemePage(m *Repository, w http.ResponseWriter, r *http.Reque
 	return data, nil
 }
 
+// AttachFile attaches a file to a post or thread.
 func AttachFile(m *Repository, w http.ResponseWriter, r *http.Request, post *models.Post, thread *models.Thread) {
 	// ADD IMAGE TO STATIC_________________________
 	// Get the file from the form data
