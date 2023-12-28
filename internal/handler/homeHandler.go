@@ -42,10 +42,14 @@ func handleGetRequest(w http.ResponseWriter, r *http.Request, m *Repository, ses
 	})
 }
 
-// getThreadsBySearchOrCategory retrieves threads based on search or category.
+// getThreadsBySearchOrCategory retrieves threads based on search or category after trimming spaces.
 func getThreadsBySearchOrCategory(m *Repository, search, category string) ([]models.Thread, error) {
 	var threads []models.Thread
 	var err error
+
+	// Trim leading and trailing spaces from search and category
+	search = strings.TrimSpace(search)
+	category = strings.TrimSpace(category)
 
 	if search != "" {
 		threads, err = m.DB.GetSearchedThreads(search)
