@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/Pomog/ForumFFF/internal/forms"
+	"github.com/Pomog/ForumFFF/internal/helper"
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
 )
@@ -188,9 +190,16 @@ func createPostFromRequest(m *Repository, w http.ResponseWriter, r *http.Request
 		return post, errors.New("empty_post")
 	}
 
+	post.Content = helper.CorrectPunctuationsSpaces(post.Content)
+
 	if len(post.Content) > m.App.PostLen {
 		setErrorAndRedirect(w, r, fmt.Sprintf("Only %d symbols allowed", m.App.PostLen), "/error-page")
 		return post, errors.New("too_logn_post")
+	}
+
+	if !forms.CheckSingleWordLen(post.Content, m.App) {
+		setErrorAndRedirect(w, r, ("You are using too long words"), "/error-page")
+		return post, errors.New("post_without_spaces")
 	}
 
 	AttachFile(m, w, r, &post, nil)

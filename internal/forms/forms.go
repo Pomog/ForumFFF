@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/Pomog/ForumFFF/internal/config"
 )
 
 // Form is a custom type that embeds url.Values and includes an Errors field.
@@ -95,9 +97,16 @@ func (f *Form) PassFormat(field string, minL, maxL int, r *http.Request) bool {
 
 // Has checks if the specified field exists in the form data
 func (f *Form) Has(field string, r *http.Request) bool {
-	dataFromHtml := r.FormValue(field)
-	if len(dataFromHtml) == 0 {
-		return false
+	return len(r.FormValue(field)) != 0
+}
+
+func CheckSingleWordLen(input string, a *config.AppConfig) bool {
+	splitted := strings.Split(input, " ")
+	for _, elem := range splitted {
+		if len(elem) > len(a.LongestSingleWord) {
+			return false
+		}
 	}
 	return true
+
 }

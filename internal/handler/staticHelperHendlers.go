@@ -30,9 +30,7 @@ const (
 	fileReceivingErrorMsg = "file receiving error"
 	fileCreatingErrorMsg  = "Unable to create file"
 	fileSavingErrorMsg    = "Unable to save file"
-	guestRestiction       = "Guests can not create Themes and Posts, please log in or register!"
-
-	emptyUUID = "00000000-0000-0000-0000-000000000000"
+	guestRestiction       = "guests can not create Themes and Posts, Like or Dislike posts, please log in or register"
 )
 
 // NewRepo creates a new repository

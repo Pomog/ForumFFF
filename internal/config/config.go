@@ -20,4 +20,5 @@ type AppConfig struct {
 	CategoryLen   int //this parameter limits category size
 	FileSize      int64
 	GamesList     (map[string]string)
+	LongestSingleWord string
 }
