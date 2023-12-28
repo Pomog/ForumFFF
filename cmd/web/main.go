@@ -51,6 +51,7 @@ func main() {
 		"World of Tanks":           "WOT",
 		"EVE Online":               "EVE",
 		"The Elder Scrolls Online": "ESO",
+		"Throne and Liberty":       "TL",
 	}
 
 	srv := &http.Server{

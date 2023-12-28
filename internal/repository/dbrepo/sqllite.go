@@ -151,21 +151,21 @@ func (m *SqliteBDRepo) CreateThread(thread models.Thread) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	if strings.TrimSpace(thread.Subject) == "" {
-		return 0, errors.New("empty thread can not be created")
-	}
+	// if strings.TrimSpace(thread.Subject) == "" {
+	// 	return 0, errors.New("empty thread can not be created")
+	// }
 
-	if len(thread.Subject) > m.App.PostLen {
-		return 0, fmt.Errorf("the post is to long, %d syblos allowed", m.App.PostLen)
-	}
+	// if len(thread.Subject) > m.App.PostLen {
+	// 	return 0, fmt.Errorf("the post is to long, %d syblos allowed", m.App.PostLen)
+	// }
 
-	if strings.TrimSpace(thread.Category) == "" {
-		return 0, errors.New("empty thread can not be created")
-	}
+	// if strings.TrimSpace(thread.Category) == "" {
+	// 	return 0, errors.New("empty thread can not be created")
+	// }
 
-	if len(thread.Category) > 100 {
-		return 0, errors.New("the text is to long, 100 syblos allowed")
-	}
+	// if len(thread.Category) > 100 {
+	// 	return 0, errors.New("the text is to long, 100 syblos allowed")
+	// }
 
 	user, err := m.GetUserByID(thread.UserID)
 	if err != nil {
@@ -204,13 +204,13 @@ func (m *SqliteBDRepo) CreatePost(post models.Post) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	if strings.TrimSpace(post.Content) == "" {
-		return errors.New("empty post can not be created")
-	}
+	// if strings.TrimSpace(post.Content) == "" {
+	// 	return errors.New("empty post can not be created")
+	// }
 
-	if len(post.Content) > m.App.PostLen {
-		return fmt.Errorf("the post is to long, %d syblos allowed", m.App.PostLen)
-	}
+	// if len(post.Content) > m.App.PostLen {
+	// 	return fmt.Errorf("the post is to long, %d syblos allowed", m.App.PostLen)
+	// }
 
 	stmt := `insert into post
 	(subject, content, threadID, userID, postImage)
