@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
+	"github.com/Pomog/ForumFFF/internal/forms"
+	"github.com/Pomog/ForumFFF/internal/helper"
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
 )
@@ -35,6 +38,23 @@ func (m *Repository) EditTopicHandler(w http.ResponseWriter, r *http.Request) {
 
 		} else if user.ID != topic.UserID {
 			setErrorAndRedirect(w, r, "Only Admin or Creator of the Topic can Edit / Delete it", "/error-page")
+			return
+		}
+		topic.Subject = helper.CorrectPunctuationsSpaces(topic.Subject)
+		// checking text length
+		if len(topic.Subject) > m.App.PostLen {
+			setErrorAndRedirect(w, r, fmt.Sprintf("the post is to long, %d syblos allowed", m.App.PostLen), "/error-page")
+			return
+		}
+
+		// checking if there is a category before thread creation
+		if strings.TrimSpace(topic.Category) == "" {
+			setErrorAndRedirect(w, r, "Empty category can not be created", "/error-page")
+			return
+		}
+
+		if !forms.CheckSingleWordLen(topic.Subject, m.App) {
+			setErrorAndRedirect(w, r, ("You are using too long words"), "/error-page")
 			return
 		}
 		initialFormData.Subject = topic.Subject
@@ -91,5 +111,3 @@ func (m *Repository) EditTopicResultHandler(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "No such method", http.StatusMethodNotAllowed)
 	}
 }
-
-

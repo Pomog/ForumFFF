@@ -37,6 +37,8 @@ func main() {
 
 	app.FileSize = 2 //here we set 2mb of file size
 
+	app.LongestSingleWord = "pneumonoultramicroscopicsilicovolcanoconiosis"
+
 	//the list of games that are represented and will be covered on site.
 	app.GamesList = map[string]string{
 		"Lineage 2":                "L2",
@@ -51,6 +53,7 @@ func main() {
 		"World of Tanks":           "WOT",
 		"EVE Online":               "EVE",
 		"The Elder Scrolls Online": "ESO",
+		"Throne and Liberty":       "TL",
 	}
 
 	srv := &http.Server{

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Pomog/ForumFFF/internal/forms"
 	"github.com/Pomog/ForumFFF/internal/models"
 )
 
@@ -166,6 +167,9 @@ func (m *SqliteBDRepo) CreateThread(thread models.Thread) (int64, error) {
 	if len(thread.Category) > 100 {
 		return 0, errors.New("the text is to long, 100 syblos allowed")
 	}
+	if !forms.CheckSingleWordLen(thread.Subject, m.App) || !forms.CheckSingleWordLen(thread.Category, m.App) {
+		return 0, fmt.Errorf("the post or category without spaces is not allowed, max len of each word (without spaces) is %d", len(m.App.LongestSingleWord))
+	}
 
 	user, err := m.GetUserByID(thread.UserID)
 	if err != nil {
@@ -211,6 +215,9 @@ func (m *SqliteBDRepo) CreatePost(post models.Post) error {
 	if len(post.Content) > m.App.PostLen {
 		return fmt.Errorf("the post is to long, %d syblos allowed", m.App.PostLen)
 	}
+	if !forms.CheckSingleWordLen(post.Content, m.App) {
+		return fmt.Errorf("the post without spaces is not allowed, max len of each word (without spaces) is %d", len(m.App.LongestSingleWord))
+	}
 
 	stmt := `insert into post
 	(subject, content, threadID, userID, postImage)
@@ -242,6 +249,10 @@ func (m *SqliteBDRepo) EditPost(post models.Post) error {
 
 	if len(post.Content) > m.App.PostLen {
 		return fmt.Errorf("the post is to long, %d syblos allowed", m.App.PostLen)
+	}
+
+	if !forms.CheckSingleWordLen(post.Content, m.App) {
+		return fmt.Errorf("the post or category without spaces is not allowed, max len of each word (without spaces) is %d", len(m.App.LongestSingleWord))
 	}
 
 	stmt := `UPDATE post
@@ -290,6 +301,9 @@ func (m *SqliteBDRepo) EditTopic(topic models.Thread) error {
 
 	if len(topic.Subject) > m.App.PostLen {
 		return fmt.Errorf("the topic is to long, %d syblos allowed", m.App.PostLen)
+	}
+	if !forms.CheckSingleWordLen(topic.Subject, m.App) {
+		return fmt.Errorf("the topic without spaces is not allowed, max len of each word (without spaces) is %d", len(m.App.LongestSingleWord))
 	}
 
 	stmt := `UPDATE thread

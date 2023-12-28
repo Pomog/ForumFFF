@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,149 +10,229 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/Pomog/ForumFFF/internal/forms"
+	"github.com/Pomog/ForumFFF/internal/helper"
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
 )
 
-// ThemeHandler handles both GET and POST requests for the theme page
+// ThemeHandler handles the main functionality of the theme page.
 func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
+	visitorID, err := getVisitorID(m, w, r)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get visitor", "/error-page")
+		return
+	}
+	visitor, err := m.DB.GetUserByID(visitorID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get visitor", "/error-page")
+		// handleDBErrorAndRedirect(w, r, "Could not get visitor", "/error-page")
+		return
+	}
 
-	visitorID, _ := m.DB.GetGuestID()
+	threadID := getThreadIDFromQuery(w, r)
+	mainThread, creator, err := getThreadAndCreator(m, threadID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get thread or creator", "/error-page")
+		// handleDBErrorAndRedirect(w, r, "Could not get thread or creator", "/error-page")
+		return
+	}
+
+	handlePostActions(w, r, m, visitorID, visitor, mainThread)
+
+	if r.Method == http.MethodPost && len(r.FormValue("post-text")) != 0 {
+		handlePostCreation(w, r, m, visitorID, mainThread)
+		return
+	}
+
+	postsInfo, err := getPostsInfo(m, w, r, threadID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get posts or user information", "/error-page")
+		// handleDBErrorAndRedirect(w, r, "Could not get posts or user information", "/error-page")
+		return
+	}
+
+	data, err := prepareDataForThemePage(m, w, r, visitorID, postsInfo, mainThread, creator)
+	if err != nil {
+		return
+	}
+
+	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
+		Data: data,
+	})
+}
+
+// getVisitorID retrieves the visitor ID from cookies or generates a guest ID.
+func getVisitorID(m *Repository, w http.ResponseWriter, r *http.Request) (int, error) {
+	visitorID, err := m.DB.GetGuestID()
+	if err != nil {
+		return 0, err
+	}
 
 	for _, cookie := range r.Cookies() {
 		if cookie.Value == m.App.UserLogin.String() {
 			userID, err := strconv.Atoi(cookie.Name)
 			if err != nil {
 				setErrorAndRedirect(w, r, "Could not get visitor ID", "/error-page")
-				return
+				return 0, nil
 			}
 			if visitorID = userID; visitorID != 0 {
 				break
 			}
 		}
 	}
+	return visitorID, nil
+}
 
-	visitor, err := m.DB.GetUserByID(visitorID)
+// getThreadAndCreator retrieves the main thread and its creator information.
+func getThreadAndCreator(m *Repository, threadID int) (mainThread models.Thread, creator models.User, err error) {
+	mainThread, err = m.DB.GetThreadByID(threadID)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get visitor ID, m.DB.GetUserByID(visitorID)", "/error-page")
-		return
+		return mainThread, creator, err
 	}
 
-	threadID := getThreadIDFromQuery(w, r)
+	creator, err = m.DB.GetUserByID(mainThread.UserID)
+	return mainThread, creator, err
+}
 
-	mainThread, err := m.DB.GetThreadByID(threadID)
-	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get thread by id", "/error-page")
-		return
-	}
-
-	creator, err := m.DB.GetUserByID(mainThread.UserID)
-	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get user as creator", "/error-page")
-		return
-	}
-
+// handlePostActions handles like/dislike actions for posts.
+func handlePostActions(w http.ResponseWriter, r *http.Request, m *Repository, visitorID int, visitor models.User, mainThread models.Thread) {
 	like := r.FormValue("like")
 	dislike := r.FormValue("dislike")
+
+	// Handle like action
 	if like != "" {
-		if visitor.UserName == "guest" {
-			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
-			return
-		}
-		postID, _ := strconv.Atoi(like)
-		err := m.DB.LikePostByUserIdAndPostId(visitorID, postID)
-		if err != nil {
-			setErrorAndRedirect(w, r, "Could not LikePostByUserIdAndPostId", "/error-page")
-			return
-		}
+		handleLikeAction(w, r, m, visitorID, visitor, like)
+		return
 	}
+
+	// Handle dislike action
 	if dislike != "" {
-		if visitor.UserName == "guest" {
-			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
-			return
-		}
-		postID, _ := strconv.Atoi(dislike)
-		err := m.DB.DislikePostByUserIdAndPostId(visitorID, postID)
-		if err != nil {
-			setErrorAndRedirect(w, r, "Could not DislikePostByUserIdAndPostId", "/error-page")
-			return
-		}
+		handleDislikeAction(w, r, m, visitorID, visitor, dislike)
+		return
 	}
-	//new post
-	if r.Method == http.MethodPost && len(r.FormValue("post-text")) != 0 {
-		if visitor.UserName == "guest" || visitor.UserName == "" {
-			setErrorAndRedirect(w, r, guestRestiction, "/error-page")
-			return
-		}
+}
 
-		// Parse the form data, including files Need to Set Upper limit for DATA
-		err := r.ParseMultipartForm(m.App.FileSize << 20)
+// handleLikeAction handles the 'like' action for posts.
+func handleLikeAction(w http.ResponseWriter, r *http.Request, m *Repository, visitorID int, visitor models.User, like string) {
+	if visitor.UserName == "guest" {
+		setErrorAndRedirect(w, r, guestRestiction, "/error-page")
+		return
+	}
+	postID, _ := strconv.Atoi(like)
+	err := m.DB.LikePostByUserIdAndPostId(visitorID, postID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not LikePostByUserIdAndPostId", "/error-page")
+		return
+	}
+}
 
-		if err != nil {
-			setErrorAndRedirect(w, r, "Image is too large", "/error-page")
-			return
-		}
+// handleDislikeAction handles the 'dislike' action for posts.
+func handleDislikeAction(w http.ResponseWriter, r *http.Request, m *Repository, visitorID int, visitor models.User, dislike string) {
+	if visitor.UserName == "guest" {
+		setErrorAndRedirect(w, r, guestRestiction, "/error-page")
+		return
+	}
+	postID, _ := strconv.Atoi(dislike)
+	err := m.DB.DislikePostByUserIdAndPostId(visitorID, postID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not DislikePostByUserIdAndPostId", "/error-page")
+		return
+	}
+}
 
-		post := models.Post{
-			Subject:  ShortenerOfSubject(mainThread.Subject),
-			Content:  r.FormValue("post-text"),
-			UserID:   visitorID,
-			ThreadId: mainThread.ID,
-			Image:    r.FormValue("image"),
-		}
-
-		// checking if there is a text before thread creation
-		if post.Content == "" {
-			setErrorAndRedirect(w, r, "Empty post can not be created", "/error-page")
-			return
-		}
-
-		// checking text length
-		if len(post.Content) > m.App.PostLen {
-			setErrorAndRedirect(w, r, fmt.Sprintf("Only %d symbols allowed", m.App.PostLen), "/error-page")
-			return
-		}
-
-		//AttachFile attaches file to the post
-		AttachFile(m, w, r, &post, nil)
-		err = m.DB.CreatePost(post)
-		if err != nil {
-			setErrorAndRedirect(w, r, "Could not create a post"+err.Error(), "/error-page")
-			return
-		} else{
-			path:=fmt.Sprintf("/create_post_result?threadID=%v",post.ThreadId)
-			fmt.Println("path:",path)
-			http.Redirect(w,r,path,http.StatusSeeOther)
-			return
-		}
-
+// handlePostCreation handles the creation of a new post.
+func handlePostCreation(w http.ResponseWriter, r *http.Request, m *Repository, visitorID int, mainThread models.Thread) {
+	visitor, err := m.DB.GetUserByID(visitorID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get user", "/error-page")
+		return
 	}
 
+	if visitor.UserName == "guest" || visitor.UserName == "" {
+		setErrorAndRedirect(w, r, guestRestiction, "/error-page")
+		return
+	}
+
+	err = r.ParseMultipartForm(m.App.FileSize << 20)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Image is too large", "/error-page")
+		return
+	}
+
+	post, err := createPostFromRequest(m, w, r, visitorID, mainThread)
+	if err != nil {
+		return
+	}
+	err = m.DB.CreatePost(post)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not create a post"+err.Error(), "/error-page")
+		return
+	}
+
+	path := fmt.Sprintf("/create_post_result?threadID=%v", post.ThreadId)
+	http.Redirect(w, r, path, http.StatusSeeOther)
+
+}
+
+// createPostFromRequest creates a post from the request data.
+func createPostFromRequest(m *Repository, w http.ResponseWriter, r *http.Request, visitorID int, mainThread models.Thread) (models.Post, error) {
+	post := models.Post{
+		Subject:  ShortenerOfSubject(mainThread.Subject),
+		Content:  r.FormValue("post-text"),
+		UserID:   visitorID,
+		ThreadId: mainThread.ID,
+		Image:    r.FormValue("image"),
+	}
+
+	if post.Content == "" {
+		setErrorAndRedirect(w, r, "Empty post can not be created", "/error-page")
+		return post, errors.New("empty_post")
+	}
+
+	post.Content = helper.CorrectPunctuationsSpaces(post.Content)
+
+	if len(post.Content) > m.App.PostLen {
+		setErrorAndRedirect(w, r, fmt.Sprintf("Only %d symbols allowed", m.App.PostLen), "/error-page")
+		return post, errors.New("too_logn_post")
+	}
+
+	if !forms.CheckSingleWordLen(post.Content, m.App) {
+		setErrorAndRedirect(w, r, ("You are using too long words"), "/error-page")
+		return post, errors.New("post_without_spaces")
+	}
+
+	AttachFile(m, w, r, &post, nil)
+	return post, nil
+}
+
+// getPostsInfo retrieves information for rendering posts.
+func getPostsInfo(m *Repository, w http.ResponseWriter, r *http.Request, threadID int) ([]models.PostDataForThemePage, error) {
 	posts, err := m.DB.GetAllPostsFromThread(threadID)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get all posts from thread", "/error-page")
-		return
+		return nil, err
 	}
 
 	var postsInfo []models.PostDataForThemePage
 
 	for _, post := range posts {
+		// Populate postsInfo with post data
 		var user models.User
 		user, err = m.DB.GetUserByID(post.UserID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get user by id", "/error-page")
-			return
+			return nil, err
 		}
 		userPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(post.UserID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get amount of Posts, GetTotalPostsAmountByUserID", "/error-page")
-			return
+			return nil, err
 		}
 
 		likes, dislikes, err := m.DB.CountLikesAndDislikesForPostByPostID(post.ID)
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not get Likes for Post, CountLikesAndDislikesForPostByPostID", "/error-page")
-			return
+			return nil, err
 		}
 
 		var info models.PostDataForThemePage
@@ -170,8 +251,14 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		postsInfo = append(postsInfo, info)
 	}
 
+	return postsInfo, nil
+}
+
+// prepareDataForThemePage prepares data for rendering the theme page template.
+func prepareDataForThemePage(m *Repository, w http.ResponseWriter, r *http.Request, visitorID int, postsInfo []models.PostDataForThemePage, mainThread models.Thread, creator models.User) (map[string]interface{}, error) {
 	data := make(map[string]interface{})
 
+	// Populate data for rendering template
 	data["posts"] = postsInfo
 
 	//to get user in Nav bar ______________
@@ -179,7 +266,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	loggedUser, err := m.DB.GetUserByID(sessionUserID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(UserID)", "/error-page")
-		return
+		return data, err
 	}
 
 	data["loggedAs"] = loggedUser.UserName
@@ -188,7 +275,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	creatorPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(mainThread.UserID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get amount of Posts, GetTotalPostsAmountByUserID", "/error-page")
-		return
+		return data, err
 	}
 
 	data["creatorName"] = creator.UserName
@@ -202,11 +289,10 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	data["mainThreadCreatedTime"] = mainThread.Created.Format("2006-01-02 15:04:05")
 	data["games"] = m.App.GamesList
 
-	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
-		Data: data,
-	})
+	return data, nil
 }
 
+// AttachFile attaches a file to a post or thread.
 func AttachFile(m *Repository, w http.ResponseWriter, r *http.Request, post *models.Post, thread *models.Thread) {
 	// ADD IMAGE TO STATIC_________________________
 	// Get the file from the form data

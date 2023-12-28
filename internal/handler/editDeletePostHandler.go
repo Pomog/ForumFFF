@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Pomog/ForumFFF/internal/forms"
+	"github.com/Pomog/ForumFFF/internal/helper"
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
 )
@@ -59,8 +61,25 @@ func (m *Repository) EditPostHandler(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) EditPostResultHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
-		if strings.TrimSpace(r.FormValue("post-text")) == "" || len(r.FormValue("post-text")) > m.App.PostLen {
+		editedContent := r.FormValue("post-text")
+
+		if strings.TrimSpace(editedContent) == "" || len(editedContent) > m.App.PostLen {
 			setErrorAndRedirect(w, r, "The post is empty or too long", "/error-page")
+			return
+		}
+		if editedContent == "" {
+			setErrorAndRedirect(w, r, "Empty post can not be created", "/error-page")
+			return
+		}
+		editedContent = helper.CorrectPunctuationsSpaces(editedContent)
+
+		if len(editedContent) > m.App.PostLen {
+			setErrorAndRedirect(w, r, fmt.Sprintf("Only %d symbols allowed", m.App.PostLen), "/error-page")
+			return
+		}
+
+		if !forms.CheckSingleWordLen(editedContent, m.App) {
+			setErrorAndRedirect(w, r, ("You are using too long words"), "/error-page")
 			return
 		}
 
@@ -75,7 +94,8 @@ func (m *Repository) EditPostResultHandler(w http.ResponseWriter, r *http.Reques
 			setErrorAndRedirect(w, r, "Could not get post from GetPostByID: "+err2.Error(), "/error-page")
 			return
 		}
-		post.Content = r.FormValue("post-text")
+		post.Content = editedContent
+
 		err3 := m.DB.EditPost(post)
 
 		if err3 != nil {
