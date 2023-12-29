@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Pomog/ForumFFF/internal/forms"
 	"github.com/Pomog/ForumFFF/internal/helper"
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
@@ -20,46 +18,38 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUserID := m.GetLoggedUser(w, r)
 
 	if r.Method == http.MethodGet {
-		err := handleGetRequest(w, r, m, sessionUserID)
-		if err != nil {
-			setErrorAndRedirect(w, r, "handleGetRequest(w, r, m, sessionUserID) Faild"+err.Error(), "/error-page")
-			return
-		}
+		handleGetRequest(w, r, m, sessionUserID)
+
 	} else if r.Method == http.MethodPost {
-		err := handlePostRequest(w, r, m, sessionUserID)
-		if err != nil {
-			setErrorAndRedirect(w, r, "handlePostRequest(w, r, m, sessionUserID) Faild"+err.Error(), "/error-page")
-			return
-		}
+		handlePostRequest(w, r, m, sessionUserID)
 	}
 }
 
 // handleGetRequest handles GET requests for the home page.
-func handleGetRequest(w http.ResponseWriter, r *http.Request, m *Repository, sessionUserID int) error {
+func handleGetRequest(w http.ResponseWriter, r *http.Request, m *Repository, sessionUserID int) {
 	search := r.FormValue("search")
 	category := r.URL.Query().Get("searchCategory")
 
 	threads, err := getThreadsBySearchOrCategory(m, search, category)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get threads"+err.Error(), "/error-page")
-		return err
+		return
 	}
 
 	threadsInfo, err := processThreads(m, threads)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get threadsInfo from: processThreads(m, threads)"+err.Error(), "/error-page")
-		return err
+		return
 	}
 
 	data, err := prepareDataForTemplate(w, r, m, sessionUserID, threadsInfo)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get data from: prepareDataForTemplate(w, r, m, sessionUserID, threadsInfo)"+err.Error(), "/error-page")
-		return err
+		return
 	}
 	renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
 		Data: data,
 	})
-	return nil
 }
 
 // getThreadsBySearchOrCategory retrieves threads based on search or category after trimming spaces.
@@ -153,61 +143,50 @@ func prepareDataForTemplate(w http.ResponseWriter, r *http.Request, m *Repositor
 }
 
 // handlePostRequest handles POST requests for creating new threads.
-func handlePostRequest(w http.ResponseWriter, r *http.Request, m *Repository, sessionUserID int) error {
+func handlePostRequest(w http.ResponseWriter, r *http.Request, m *Repository, sessionUserID int) {
 	loggedUser, err := m.DB.GetUserByID(sessionUserID)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get user by ID: m.DB.GetUserByID(sessionUserID)", "/error-page")
-		return err
+		return
 	}
 
 	userName := loggedUser.UserName
 	if userName == "guest" || strings.TrimSpace(userName) == "" {
 		setErrorAndRedirect(w, r, guestRestiction, "/error-page")
-		return errors.New(guestRestiction)
+		return
 	}
 
 	thread := createThreadFromRequest(m, w, r, sessionUserID)
+	thread.Category = strings.TrimSpace(helper.CorrectPunctuationsSpaces(thread.Category))
+	thread.Subject = strings.TrimSpace(helper.CorrectPunctuationsSpaces(thread.Subject))
 
-	// checking if there is a text before thread creation
-	if strings.TrimSpace(thread.Subject) == "" {
-		setErrorAndRedirect(w, r, "Empty thread can not be created", "/error-page")
-		return errors.New("empty_thread")
-	}
-	thread.Subject = helper.CorrectPunctuationsSpaces(thread.Subject)
-	// checking text length
-	if len(thread.Subject) > m.App.PostLen {
-		setErrorAndRedirect(w, r, fmt.Sprintf("the post is to long, %d syblos allowed", m.App.PostLen), "/error-page")
-		return errors.New("too_long_post")
-	}
-
-	// checking if there is a category before thread creation
-	if strings.TrimSpace(thread.Category) == "" {
-		setErrorAndRedirect(w, r, "Empty category can not be created", "/error-page")
-		return errors.New("empty_category")
+	// Validation of the thread info
+	validationParameters := models.ValidationConfig{
+		MinCategoryLen:   m.App.MinCategoryLen,
+		MaxCategoryLen:   m.App.MaxCategoryLen,
+		MinSubjectLen:    m.App.MinSubjectLen,
+		MaxSubjectLen:    m.App.MaxSubjectLen,
+		SingleWordMaxLen: len(m.App.LongestSingleWord),
 	}
 
-	// checking category length
-	if len(thread.Category) > m.App.CategoryLen {
-		setErrorAndRedirect(w, r, fmt.Sprintf("the category is to long, %d syblos allowed", m.App.CategoryLen), "/error-page")
-		return errors.New("category_too_long")
-	}
-
-	if !forms.CheckSingleWordLen(thread.Subject, m.App) {
-		setErrorAndRedirect(w, r, ("You are using too long words"), "/error-page")
-		return errors.New("post_without_spaces")
+	validationsErrors := thread.Validate(validationParameters)
+	if len(validationsErrors) > 0 {
+		// prepare error msg
+		var errorMsg string
+		for _, err := range validationsErrors {
+			errorMsg += err.Error() + "\n"
+		}
+		setErrorAndRedirect(w, r, errorMsg, "/error-page")
+		return
 	}
 
 	id, err := m.DB.CreateThread(thread)
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not create thread: m.DB.CreateThread(thread)"+err.Error(), "/error-page")
-		return err
+		return
 	}
 
-	// r.Form.Del("message-text")
-	// r.Form.Del("category-text")
-
 	http.Redirect(w, r, fmt.Sprintf("/theme?threadID=%d", id), http.StatusPermanentRedirect)
-	return nil
 }
 
 // createThreadFromRequest creates a thread from the HTTP request.
@@ -238,6 +217,7 @@ func getThreadIDFromQuery(w http.ResponseWriter, r *http.Request) int {
 	threadID, err := strconv.Atoi(r.URL.Query().Get("threadID"))
 	if err != nil {
 		setErrorAndRedirect(w, r, "Could not get all posts from thread", "/error-page")
+		return 0
 	}
 	return threadID
 }

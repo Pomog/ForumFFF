@@ -126,10 +126,6 @@ func (m *SqliteBDRepo) CreateUser(r models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	if r.UserName == "" || r.Email == "" || r.FirstName == "" {
-		return errors.New("wrong User Data")
-	}
-
 	stmt := `insert into users
 	(username, password, first_name, last_name, email, picture)
 	values ($1, $2, $3, $4, $5, $6)
@@ -151,25 +147,6 @@ func (m *SqliteBDRepo) CreateUser(r models.User) error {
 func (m *SqliteBDRepo) CreateThread(thread models.Thread) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-
-	if strings.TrimSpace(thread.Subject) == "" {
-		return 0, errors.New("empty thread can not be created")
-	}
-
-	if len(thread.Subject) > m.App.PostLen {
-		return 0, fmt.Errorf("the post is to long, %d syblos allowed", m.App.PostLen)
-	}
-
-	if strings.TrimSpace(thread.Category) == "" {
-		return 0, errors.New("empty thread can not be created")
-	}
-
-	if len(thread.Category) > 100 {
-		return 0, errors.New("the text is to long, 100 syblos allowed")
-	}
-	if !forms.CheckSingleWordLen(thread.Subject, m.App) || !forms.CheckSingleWordLen(thread.Category, m.App) {
-		return 0, fmt.Errorf("the post or category without spaces is not allowed, max len of each word (without spaces) is %d", len(m.App.LongestSingleWord))
-	}
 
 	user, err := m.GetUserByID(thread.UserID)
 	if err != nil {
@@ -215,7 +192,7 @@ func (m *SqliteBDRepo) CreatePost(post models.Post) error {
 	if len(post.Content) > m.App.PostLen {
 		return fmt.Errorf("the post is to long, %d syblos allowed", m.App.PostLen)
 	}
-	if !forms.CheckSingleWordLen(post.Content, m.App) {
+	if !forms.CheckSingleWordLen(post.Content, 45) {
 		return fmt.Errorf("the post without spaces is not allowed, max len of each word (without spaces) is %d", len(m.App.LongestSingleWord))
 	}
 
@@ -251,7 +228,7 @@ func (m *SqliteBDRepo) EditPost(post models.Post) error {
 		return fmt.Errorf("the post is to long, %d syblos allowed", m.App.PostLen)
 	}
 
-	if !forms.CheckSingleWordLen(post.Content, m.App) {
+	if !forms.CheckSingleWordLen(post.Content, 45) {
 		return fmt.Errorf("the post or category without spaces is not allowed, max len of each word (without spaces) is %d", len(m.App.LongestSingleWord))
 	}
 
@@ -302,7 +279,7 @@ func (m *SqliteBDRepo) EditTopic(topic models.Thread) error {
 	if len(topic.Subject) > m.App.PostLen {
 		return fmt.Errorf("the topic is to long, %d syblos allowed", m.App.PostLen)
 	}
-	if !forms.CheckSingleWordLen(topic.Subject, m.App) {
+	if !forms.CheckSingleWordLen(topic.Subject, 45) {
 		return fmt.Errorf("the topic without spaces is not allowed, max len of each word (without spaces) is %d", len(m.App.LongestSingleWord))
 	}
 

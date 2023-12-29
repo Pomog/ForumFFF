@@ -78,7 +78,7 @@ func (m *Repository) EditPostResultHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
-		if !forms.CheckSingleWordLen(editedContent, m.App) {
+		if !forms.CheckSingleWordLen(editedContent, 45) {
 			setErrorAndRedirect(w, r, ("You are using too long words"), "/error-page")
 			return
 		}
