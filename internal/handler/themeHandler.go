@@ -9,8 +9,8 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
+	"strings"
 
-	"github.com/Pomog/ForumFFF/internal/forms"
 	"github.com/Pomog/ForumFFF/internal/helper"
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
@@ -20,45 +20,42 @@ import (
 func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	visitorID, err := getVisitorID(m, w, r)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get visitor", "/error-page")
+		setErrorAndRedirect(w, r, "Could not get visitor\n"+err.Error(), "/error-page")
 		return
 	}
 	visitor, err := m.DB.GetUserByID(visitorID)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get visitor", "/error-page")
-		// handleDBErrorAndRedirect(w, r, "Could not get visitor", "/error-page")
+		setErrorAndRedirect(w, r, "Could not get visitor\n"+err.Error(), "/error-page")
 		return
 	}
 
 	threadID := getThreadIDFromQuery(w, r)
-	if threadID == 0{
-		setErrorAndRedirect(w, r, "Could not get thread or creator", "/error-page")
-		// handleDBErrorAndRedirect(w, r, "Could not get thread or creator", "/error-page")
+	if threadID == 0 {
+		setErrorAndRedirect(w, r, "Could not get thread or creator\n"+err.Error(), "/error-page")
 		return
 	}
 	mainThread, creator, err := getThreadAndCreator(m, threadID)
-	if err != nil ||  threadID == 0{
-		setErrorAndRedirect(w, r, "Could not get thread or creator", "/error-page")
-		// handleDBErrorAndRedirect(w, r, "Could not get thread or creator", "/error-page")
+	if err != nil || threadID == 0 {
+		setErrorAndRedirect(w, r, "Could not get thread or creator\n"+err.Error(), "/error-page")
 		return
 	}
 
 	handlePostActions(w, r, m, visitorID, visitor, mainThread)
 
-	if r.Method == http.MethodPost && len(r.FormValue("post-text")) != 0 {
+	if r.Method == http.MethodPost {
 		handlePostCreation(w, r, m, visitorID, mainThread)
 		return
 	}
 
 	postsInfo, err := getPostsInfo(m, w, r, threadID)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get posts or user information", "/error-page")
-		// handleDBErrorAndRedirect(w, r, "Could not get posts or user information", "/error-page")
+		setErrorAndRedirect(w, r, "Could not get posts or user information \n"+err.Error(), "/error-page")
 		return
 	}
 
 	data, err := prepareDataForThemePage(m, w, r, visitorID, postsInfo, mainThread, creator)
 	if err != nil {
+		setErrorAndRedirect(w, r, "Could not data from prepareDataForThemePage \n"+err.Error(), "/error-page")
 		return
 	}
 
@@ -78,7 +75,6 @@ func getVisitorID(m *Repository, w http.ResponseWriter, r *http.Request) (int, e
 		if cookie.Value == m.App.UserLogin.String() {
 			userID, err := strconv.Atoi(cookie.Name)
 			if err != nil {
-				setErrorAndRedirect(w, r, "Could not get visitor ID", "/error-page")
 				return 0, nil
 			}
 			if visitorID = userID; visitorID != 0 {
@@ -161,23 +157,23 @@ func handlePostCreation(w http.ResponseWriter, r *http.Request, m *Repository, v
 
 	err = r.ParseMultipartForm(m.App.FileSize << 20)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Image is too large", "/error-page")
+		setErrorAndRedirect(w, r, "Image is too large \n"+err.Error(), "/error-page")
 		return
 	}
 
 	post, err := createPostFromRequest(m, w, r, visitorID, mainThread)
 	if err != nil {
+		setErrorAndRedirect(w, r, "Could not create a post \n"+err.Error(), "/error-page")
 		return
 	}
 	err = m.DB.CreatePost(post)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not create a post"+err.Error(), "/error-page")
+		setErrorAndRedirect(w, r, "Could not create a post \n"+err.Error(), "/error-page")
 		return
 	}
 
 	path := fmt.Sprintf("/create_post_result?threadID=%v", post.ThreadId)
 	http.Redirect(w, r, path, http.StatusSeeOther)
-
 }
 
 // createPostFromRequest creates a post from the request data.
@@ -190,21 +186,24 @@ func createPostFromRequest(m *Repository, w http.ResponseWriter, r *http.Request
 		Image:    r.FormValue("image"),
 	}
 
-	if post.Content == "" {
-		setErrorAndRedirect(w, r, "Empty post can not be created", "/error-page")
-		return post, errors.New("empty_post")
-	}
-
+	post.Content = strings.TrimSpace(post.Content)
 	post.Content = helper.CorrectPunctuationsSpaces(post.Content)
 
-	if len(post.Content) > m.App.PostLen {
-		setErrorAndRedirect(w, r, fmt.Sprintf("Only %d symbols allowed", m.App.PostLen), "/error-page")
-		return post, errors.New("too_logn_post")
+	// Validation of the User info
+	validationParameters := models.ValidationConfig{
+		MinSubjectLen:    m.App.MinSubjectLen,
+		MaxSubjectLen:    m.App.MaxSubjectLen,
+		SingleWordMaxLen: len(m.App.LongestSingleWord),
 	}
 
-	if !forms.CheckSingleWordLen(post.Content, 45) {
-		setErrorAndRedirect(w, r, ("You are using too long words"), "/error-page")
-		return post, errors.New("post_without_spaces")
+	validationsErrors := post.Validate(validationParameters)
+	if len(validationsErrors) > 0 {
+		// prepare error msg
+		var errorMsg string
+		for _, err := range validationsErrors {
+			errorMsg += err.Error() + "\n"
+		}
+		return post, errors.New(errorMsg)
 	}
 
 	AttachFile(m, w, r, &post, nil)
@@ -214,30 +213,28 @@ func createPostFromRequest(m *Repository, w http.ResponseWriter, r *http.Request
 // getPostsInfo retrieves information for rendering posts.
 func getPostsInfo(m *Repository, w http.ResponseWriter, r *http.Request, threadID int) ([]models.PostDataForThemePage, error) {
 	posts, err := m.DB.GetAllPostsFromThread(threadID)
-	if err != nil {
-		return nil, err
-	}
-
 	var postsInfo []models.PostDataForThemePage
+
+	if err != nil {
+		return postsInfo, err
+	}
 
 	for _, post := range posts {
 		// Populate postsInfo with post data
 		var user models.User
 		user, err = m.DB.GetUserByID(post.UserID)
 		if err != nil {
-			setErrorAndRedirect(w, r, "Could not get user by id", "/error-page")
-			return nil, err
+			return postsInfo, err
 		}
+
 		userPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(post.UserID)
 		if err != nil {
-			setErrorAndRedirect(w, r, "Could not get amount of Posts, GetTotalPostsAmountByUserID", "/error-page")
-			return nil, err
+			return postsInfo, err
 		}
 
 		likes, dislikes, err := m.DB.CountLikesAndDislikesForPostByPostID(post.ID)
 		if err != nil {
-			setErrorAndRedirect(w, r, "Could not get Likes for Post, CountLikesAndDislikesForPostByPostID", "/error-page")
-			return nil, err
+			return postsInfo, err
 		}
 
 		var info models.PostDataForThemePage
@@ -270,7 +267,6 @@ func prepareDataForThemePage(m *Repository, w http.ResponseWriter, r *http.Reque
 	sessionUserID := m.GetLoggedUser(w, r)
 	loggedUser, err := m.DB.GetUserByID(sessionUserID)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get user as creator, m.DB.GetUserByID(UserID)", "/error-page")
 		return data, err
 	}
 
@@ -279,7 +275,6 @@ func prepareDataForThemePage(m *Repository, w http.ResponseWriter, r *http.Reque
 	//__________________________________
 	creatorPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(mainThread.UserID)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get amount of Posts, GetTotalPostsAmountByUserID", "/error-page")
 		return data, err
 	}
 

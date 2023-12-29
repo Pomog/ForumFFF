@@ -63,15 +63,17 @@ func (m *Repository) EditPostResultHandler(w http.ResponseWriter, r *http.Reques
 	if r.Method == http.MethodPost {
 		editedContent := r.FormValue("post-text")
 
-		if strings.TrimSpace(editedContent) == "" || len(editedContent) > m.App.PostLen {
-			setErrorAndRedirect(w, r, "The post is empty or too long", "/error-page")
+		editedContent = strings.TrimSpace(editedContent)
+		editedContent = helper.CorrectPunctuationsSpaces(editedContent)
+
+		if len(editedContent) > m.App.PostLen {
+			setErrorAndRedirect(w, r, "The post is too long", "/error-page")
 			return
 		}
 		if editedContent == "" {
 			setErrorAndRedirect(w, r, "Empty post can not be created", "/error-page")
 			return
 		}
-		editedContent = helper.CorrectPunctuationsSpaces(editedContent)
 
 		if len(editedContent) > m.App.PostLen {
 			setErrorAndRedirect(w, r, fmt.Sprintf("Only %d symbols allowed", m.App.PostLen), "/error-page")
@@ -132,6 +134,14 @@ func (m *Repository) DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 			setErrorAndRedirect(w, r, "Could not get post from GetPostByID: "+err2.Error(), "/error-page")
 			return
 		}
+
+		if user.UserName == "guest" || user.UserName == "" {
+			setErrorAndRedirect(w, r, "Guests can not edit/delete posts", "/error-page")
+			return
+		} else if user.ID != post.UserID {
+			setErrorAndRedirect(w, r, "Only Admin or Creator of the Post can Edit / Delete it", "/error-page")
+			return
+		}
 		post.Content = r.FormValue("post-text")
 		err3 := m.DB.DeletePost(post)
 
@@ -140,8 +150,7 @@ func (m *Repository) DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		message := fmt.Sprintf("Post ID - %v deleted by User %s with email %s", post.ID, user.UserName, user.Email)
-		fmt.Println(message)
+		// message := fmt.Sprintf("Post ID - %v deleted by User %s with email %s", post.ID, user.UserName, user.Email)
 		// helper.SendEmail(m.App.ServerEmail, message)
 
 		data := make(map[string]interface{})

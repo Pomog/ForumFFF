@@ -130,7 +130,6 @@ func prepareDataForTemplate(w http.ResponseWriter, r *http.Request, m *Repositor
 	data := make(map[string]interface{})
 	loggedUser, err := m.DB.GetUserByID(sessionUserID)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get user by ID: m.DB.GetUserByID(sessionUserID)", "/error-page")
 		return data, err
 	}
 
