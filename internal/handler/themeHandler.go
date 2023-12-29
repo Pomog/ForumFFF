@@ -265,6 +265,9 @@ func prepareDataForThemePage(m *Repository, w http.ResponseWriter, r *http.Reque
 
 	//to get user in Nav bar ______________
 	sessionUserID := m.GetLoggedUser(w, r)
+	if sessionUserID == 0 {
+		return data, errors.New("unautorized")
+	}
 	loggedUser, err := m.DB.GetUserByID(sessionUserID)
 	if err != nil {
 		return data, err

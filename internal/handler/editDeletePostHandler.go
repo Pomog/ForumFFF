@@ -15,6 +15,10 @@ import (
 // RegisterHandler handles both GET and POST requests for the registration page.
 func (m *Repository) EditPostHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUserID := m.GetLoggedUser(w, r)
+	if sessionUserID == 0 {
+		setErrorAndRedirect(w, r, "unautorized", "/error-page")
+		return
+	}
 	user, _ := m.DB.GetUserByID(sessionUserID)
 
 	if r.Method == http.MethodPost {
@@ -121,6 +125,10 @@ func (m *Repository) EditPostResultHandler(w http.ResponseWriter, r *http.Reques
 
 func (m *Repository) DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUserID := m.GetLoggedUser(w, r)
+	if sessionUserID == 0 {
+		setErrorAndRedirect(w, r, "unautorized", "/error-page")
+		return
+	}
 	user, _ := m.DB.GetUserByID(sessionUserID)
 
 	if r.Method == http.MethodPost {

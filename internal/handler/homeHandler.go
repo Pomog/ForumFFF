@@ -16,6 +16,10 @@ import (
 // HomeHandler handles both GET and POST requests for the home page.
 func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUserID := m.GetLoggedUser(w, r)
+	if sessionUserID == 0 {
+		setErrorAndRedirect(w, r, "unautorized", "/error-page")
+		return
+	}
 
 	if r.Method == http.MethodGet {
 		handleGetRequest(w, r, m, sessionUserID)
@@ -215,7 +219,6 @@ func getUserThatCreatedLastPost(posts []models.Post) int {
 func getThreadIDFromQuery(w http.ResponseWriter, r *http.Request) int {
 	threadID, err := strconv.Atoi(r.URL.Query().Get("threadID"))
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get all posts from thread", "/error-page")
 		return 0
 	}
 	return threadID
