@@ -185,17 +185,6 @@ func (m *SqliteBDRepo) CreatePost(post models.Post) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	if strings.TrimSpace(post.Content) == "" {
-		return errors.New("empty post can not be created")
-	}
-
-	if len(post.Content) > m.App.PostLen {
-		return fmt.Errorf("the post is to long, %d syblos allowed", m.App.PostLen)
-	}
-	if !forms.CheckSingleWordLen(post.Content, 45) {
-		return fmt.Errorf("the post without spaces is not allowed, max len of each word (without spaces) is %d", len(m.App.LongestSingleWord))
-	}
-
 	stmt := `insert into post
 	(subject, content, threadID, userID, postImage)
 	values ($1, $2, $3, $4, $5

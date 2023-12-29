@@ -80,6 +80,11 @@ func (u *User) Validate(config ValidationConfig) []error {
 	return validationErrors
 }
 
+/*
+Validate performs validation on the thread struct.
+It checks for the presence of required fields and validates the length format.
+Returns a slice of errors, where each error represents a validation issue.
+*/
 func (thread *Thread) Validate(config ValidationConfig) []error {
 	var validationErrors []error
 
@@ -101,6 +106,33 @@ func (thread *Thread) Validate(config ValidationConfig) []error {
 		} else {
 			if !forms.CheckSingleWordLen(thread.Subject, config.SingleWordMaxLen) {
 				err := fmt.Errorf("the Subject without spaces is not allowed, max len of each word (without spaces) is %d", config.SingleWordMaxLen)
+				validationErrors = append(validationErrors, err)
+			}
+		}
+	}
+
+	// Add more validation logic for other fields
+
+	return validationErrors
+}
+
+/*
+Validate performs validation on the thread struct.
+It checks for the presence of required fields and validates the length format.
+Returns a slice of errors, where each error represents a validation issue.
+*/
+func (post *Post) Validate(config ValidationConfig) []error {
+	var validationErrors []error
+
+	// Validate Content
+	if err := ValidateRequired("Content", post.Content); err != nil {
+		validationErrors = append(validationErrors, err)
+	} else {
+		if err := ValidateLength("Content", post.Content, config.MinSubjectLen, config.MaxSubjectLen); err != nil {
+			validationErrors = append(validationErrors, err)
+		} else {
+			if !forms.CheckSingleWordLen(post.Content, config.SingleWordMaxLen) {
+				err := fmt.Errorf("the Content without spaces is not allowed, max len of each word (without spaces) is %d", config.SingleWordMaxLen)
 				validationErrors = append(validationErrors, err)
 			}
 		}

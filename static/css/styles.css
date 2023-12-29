@@ -151,6 +151,10 @@ section {
     color: aliceblue;
   }
 
+  form:focus-within {
+    background-color: rgb(19, 17, 26);
+  }
+
   #form-search{
     margin-right: 5em;
   }

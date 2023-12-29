@@ -335,7 +335,7 @@ func (m *Repository) GetLoggedUser(w http.ResponseWriter, r *http.Request) int {
 
 	if loginUUID == uuid.Nil {
 		m.App.InfoLog.Println("Could not get loginUUID in HomeHandler")
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return 0
 	}
 
 	for _, cookie := range r.Cookies() {
@@ -348,7 +348,6 @@ func (m *Repository) GetLoggedUser(w http.ResponseWriter, r *http.Request) int {
 	}
 
 	if UserID == 0 {
-		setErrorAndRedirect(w, r, "Could not verify User, Please LogIN", "/error-page")
 		return 0
 	}
 	return UserID
