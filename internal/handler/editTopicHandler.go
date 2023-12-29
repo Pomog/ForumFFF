@@ -53,7 +53,7 @@ func (m *Repository) EditTopicHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if !forms.CheckSingleWordLen(topic.Subject, m.App) {
+		if !forms.CheckSingleWordLen(topic.Subject, 45) {
 			setErrorAndRedirect(w, r, ("You are using too long words"), "/error-page")
 			return
 		}

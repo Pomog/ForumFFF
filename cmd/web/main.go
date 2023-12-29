@@ -36,7 +36,14 @@ func main() {
 	app.CategoryLen = 100 //category size
 
 	app.FileSize = 2 //here we set 2mb of file size
-
+	app.NameMinLen = 3
+	app.NameMaxLen = 12
+	app.PasswordMinLen = 6
+	app.PasswordMaxLen = 20
+	app.MinCategoryLen = 3
+	app.MaxCategoryLen = 2500
+	app.MinSubjectLen = 3
+	app.MaxSubjectLen = 2500
 	app.LongestSingleWord = "pneumonoultramicroscopicsilicovolcanoconiosis"
 
 	//the list of games that are represented and will be covered on site.

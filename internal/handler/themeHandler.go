@@ -31,8 +31,13 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	threadID := getThreadIDFromQuery(w, r)
+	if threadID == 0{
+		setErrorAndRedirect(w, r, "Could not get thread or creator", "/error-page")
+		// handleDBErrorAndRedirect(w, r, "Could not get thread or creator", "/error-page")
+		return
+	}
 	mainThread, creator, err := getThreadAndCreator(m, threadID)
-	if err != nil {
+	if err != nil ||  threadID == 0{
 		setErrorAndRedirect(w, r, "Could not get thread or creator", "/error-page")
 		// handleDBErrorAndRedirect(w, r, "Could not get thread or creator", "/error-page")
 		return
@@ -197,7 +202,7 @@ func createPostFromRequest(m *Repository, w http.ResponseWriter, r *http.Request
 		return post, errors.New("too_logn_post")
 	}
 
-	if !forms.CheckSingleWordLen(post.Content, m.App) {
+	if !forms.CheckSingleWordLen(post.Content, 45) {
 		setErrorAndRedirect(w, r, ("You are using too long words"), "/error-page")
 		return post, errors.New("post_without_spaces")
 	}
