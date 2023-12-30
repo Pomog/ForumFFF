@@ -189,7 +189,7 @@ func handlePostRequest(w http.ResponseWriter, r *http.Request, m *Repository, se
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/theme?threadID=%d", id), http.StatusPermanentRedirect)
+	http.Redirect(w, r, fmt.Sprintf("/theme?threadID=%d", id), http.StatusSeeOther)
 }
 
 // createThreadFromRequest creates a thread from the HTTP request.
