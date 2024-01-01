@@ -40,6 +40,9 @@ func routes(a *config.AppConfig) http.Handler {
 
 	mux.HandleFunc("/create_post_result", handler.Repo.CreatePostResultHandler)
 
+	mux.HandleFunc("/login-github", handler.Repo.LoginWithGitHubHandler)
+	mux.HandleFunc("/github-callback", handler.Repo.CallbackGitHubHandler)
+
 	return mux
 }
 

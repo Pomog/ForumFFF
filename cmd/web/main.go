@@ -45,6 +45,9 @@ func main() {
 	app.MinSubjectLen = 3
 	app.MaxSubjectLen = 2500
 	app.LongestSingleWord = "pneumonoultramicroscopicsilicovolcanoconiosis"
+	app.GitHubClientID = "b383a969da8082007c4c"
+	app.GitHubClientSecret = "2327f7f8677894e2726f70696d9321399efb6b61"
+	app.GitHubRedirectURL = "http://localhost:8080/github-callback"
 
 	//the list of games that are represented and will be covered on site.
 	app.GamesList = map[string]string{
