@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum</title>
+    <link rel="stylesheet" href="/assets/style.css">
+</head>
+
+<body>
+    <header>
+        <nav class="topnav">
+          <img src="/assets/images/logo.png" alt="Logo" />
+          <ul>
+            <ul>
+              <li><a href="/">Home</a></li>
+              {{if .SessionValid}}
+                  <li><a href="/logout">Logout</a></li>
+                  <li><a href="/me">Profile</a></li>
+              {{else}}
+                  <li><a href="/login">Login</a></li>
+              {{end}}
+          </ul>
+        </nav>
+      </header>
+    <main class="signup-main">
+        <form action="/signup" method="POST" enctype="application/json" class="signup-container">
+            {{ if .Message }}
+            <div class="signup-error"> {{ .Message }} </div>
+            {{ end }}
+            <h2>Sign up</h2>
+            <div class="input-area">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required><br><br>
+            </div>
+            <div class="input-area">
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" required><br><br>
+            </div>
+            <div class="input-area">
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other
+                </select><br><br>
+            </div>
+            <div class="input-area">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" name="first_name" required><br><br>
+            </div>
+            <div class="input-area">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" name="last_name" required><br><br>
+            </div>
+            <div class="input-area">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required><br><br>
+            </div>
+            <div class="input-area">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required><br><br>
+            </div>
+
+            <input type="submit" value="Sign Up" class="signup-button">
+        </form>
+    </main>
+</body>
+
+</html>
