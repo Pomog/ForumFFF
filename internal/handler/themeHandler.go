@@ -42,7 +42,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 
 	handlePostActions(w, r, m, visitorID, visitor, mainThread)
 
-	if r.Method == http.MethodPost && !(r.FormValue("like") == "" || r.FormValue("dislike") == "") {
+	if r.Method == http.MethodPost && (r.FormValue("like") == "" && r.FormValue("dislike") == "") {
 		handlePostCreation(w, r, m, visitorID, mainThread)
 		return
 	}
