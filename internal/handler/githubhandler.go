@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,7 +19,6 @@ import (
 
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func (m *Repository) LoginWithGitHubHandler(w http.ResponseWriter, r *http.Request) {
@@ -72,7 +73,8 @@ func (m *Repository) CallbackGitHubHandler(w http.ResponseWriter, r *http.Reques
 		fmt.Println("Failed to check User: ", err)
 		return
 	}
-	if userExist {
+	fmt.Println("userExist ", userExist)
+	if !userExist {
 		err := m.DB.CreateUser(user)
 		if err != nil {
 			fmt.Println("Failed to create User based on GitHub Data: ", err)
@@ -257,14 +259,13 @@ func processAvatarURL(url string, username string) (string, error) {
 }
 
 func generatePassword(email string) (string, error) {
-	// Use the email as a seed or input
+	// Use the email as input
 	password := []byte(email)
 
-	// Hash the password using bcrypt
-	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
+	// Hash the password using sha256
+	hasher := sha256.New()
+	hasher.Write(password)
+	hashedPassword := hex.EncodeToString(hasher.Sum(nil))
 
-	return string(hashedPassword), nil
+	return hashedPassword, nil
 }
