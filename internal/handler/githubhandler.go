@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime"
 	"net/http"
 	"net/url"
@@ -31,53 +30,50 @@ func (m *Repository) LoginWithGitHubHandler(w http.ResponseWriter, r *http.Reque
 func (m *Repository) CallbackGitHubHandler(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
 	if code == "" {
-		fmt.Println("Code not provided")
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		setErrorAndRedirect(w, r, "Code not provided", "/error-page")
 		return
 	}
 
 	token, err := exchangeCodeForToken(code, m)
 	if err != nil {
-		fmt.Println("Failed to exchange code for token:", err)
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		setErrorAndRedirect(w, r, "Failed to exchange code for token: "+err.Error(), "/error-page")
 		return
 	}
 
 	user_email, err := githubRequestEmail("https://api.github.com/user/emails", token)
 	if err != nil {
-		fmt.Println("Failed to get Email: ", err)
+		setErrorAndRedirect(w, r, "Failed to get email:  "+err.Error(), "/error-page")
 		return
 	}
 
 	user_data, err := githubRequestUserData("https://api.github.com/user", token)
 	if err != nil {
-		fmt.Println("Failed to get User Data: ", err)
+		setErrorAndRedirect(w, r, "Failed to get User Data: "+err.Error(), "/error-page")
 		return
 	}
 
 	user, err := parseUserData(user_data, user_email)
 	if err != nil {
-		fmt.Println("Failed to parse User: ", err)
+		setErrorAndRedirect(w, r, "Failed to parse User: "+err.Error(), "/error-page")
 		return
 	}
 
 	// generate password based on email
 	user.Password, err = generatePassword(user.Email)
 	if err != nil {
-		fmt.Println("Failed to generate password based on GitHub Data: ", err)
+		setErrorAndRedirect(w, r, "Failed to generate password based on GitHub data: "+err.Error(), "/error-page")
 		return
 	}
 
 	userExist, err := m.DB.UserPresent(user.UserName, user.Email)
 	if err != nil {
-		fmt.Println("Failed to check User: ", err)
+		setErrorAndRedirect(w, r, "Failed to check User: "+err.Error(), "/error-page")
 		return
 	}
-	fmt.Println("userExist ", userExist)
 	if !userExist {
 		err := m.DB.CreateUser(user)
 		if err != nil {
-			fmt.Println("Failed to create User based on GitHub Data: ", err)
+			setErrorAndRedirect(w, r, "Failed to create user based on GitHub data: "+err.Error(), "/error-page")
 			return
 		}
 	}
@@ -100,7 +96,7 @@ func (m *Repository) CallbackGitHubHandler(w http.ResponseWriter, r *http.Reques
 
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 	} else {
-		setErrorAndRedirect(w, r, "Wrong email or password", "/error-page")
+		setErrorAndRedirect(w, r, "Unfortunately you cannot log in with your GitHub account.", "/error-page")
 		return
 	}
 
@@ -121,7 +117,7 @@ func githubRequest(url, access_token string, target interface{}) error {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
@@ -173,14 +169,17 @@ func exchangeCodeForToken(code string, m *Repository) (access_token string, err 
 func githubRequestEmail(url, access_token string) (string, error) {
 	var data []map[string]interface{}
 	if err := githubRequest(url, access_token, &data); err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 
 	user_email := ""
+	var user_email_exist  bool
 	for _, v := range data {
 		if v["primary"].(bool) {
-			user_email = v["email"].(string)
+			user_email,user_email_exist = v["email"].(string)
+			if !user_email_exist{
+				return user_email, errors.New("missing or invalid data keys of email")
+			}
 			break
 		}
 	}
@@ -191,7 +190,6 @@ func githubRequestEmail(url, access_token string) (string, error) {
 func githubRequestUserData(url, access_token string) (map[string]interface{}, error) {
 	var data map[string]interface{}
 	if err := githubRequest(url, access_token, &data); err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
@@ -207,8 +205,18 @@ func parseUserData(data map[string]interface{}, email string) (models.User, erro
 	}
 
 	// Map the fields from the data to the User struct
-	user.UserName = data["login"].(string)
-	user.FirstName, user.LastName = splitName(data["name"].(string))
+
+	name, nameExists := data["login"].(string)
+	FirtLastName, FirtLastNameExists := data["name"].(string)
+
+
+	// Verify if the required keys exist and have the expected types
+	if !nameExists || !FirtLastNameExists {
+		return user, errors.New("missing or invalid data keys")
+	}
+
+	user.UserName = name
+	user.FirstName, user.LastName = splitName(FirtLastName)
 	user.Email = email
 	user.Picture = avatar
 

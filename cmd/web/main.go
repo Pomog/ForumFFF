@@ -49,6 +49,10 @@ func main() {
 	app.GitHubClientSecret = "2327f7f8677894e2726f70696d9321399efb6b61"
 	app.GitHubRedirectURL = "http://localhost:8080/github-callback"
 
+	app.GoogleClientID = "1045980296590-9c2dpdmdbp17kiih3oev5nsk55a33q29.apps.googleusercontent.com"
+	app.GoogleClientSecret = "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"
+	app.GoogleRedirectURL = "http://localhost:8080/google-callback"
+
 	//the list of games that are represented and will be covered on site.
 	app.GamesList = map[string]string{
 		"Lineage 2":                "L2",
