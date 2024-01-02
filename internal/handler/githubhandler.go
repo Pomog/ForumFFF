@@ -96,7 +96,7 @@ func (m *Repository) CallbackGitHubHandler(w http.ResponseWriter, r *http.Reques
 
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 	} else {
-		setErrorAndRedirect(w, r, "Wrong email or password", "/error-page")
+		setErrorAndRedirect(w, r, "Unfortunately you cannot log in with your GitHub account.", "/error-page")
 		return
 	}
 
@@ -173,9 +173,13 @@ func githubRequestEmail(url, access_token string) (string, error) {
 	}
 
 	user_email := ""
+	var user_email_exist  bool
 	for _, v := range data {
 		if v["primary"].(bool) {
-			user_email = v["email"].(string)
+			user_email,user_email_exist = v["email"].(string)
+			if !user_email_exist{
+				return user_email, errors.New("missing or invalid data keys of email")
+			}
 			break
 		}
 	}
@@ -201,8 +205,18 @@ func parseUserData(data map[string]interface{}, email string) (models.User, erro
 	}
 
 	// Map the fields from the data to the User struct
-	user.UserName = data["login"].(string)
-	user.FirstName, user.LastName = splitName(data["name"].(string))
+
+	name, nameExists := data["login"].(string)
+	FirtLastName, FirtLastNameExists := data["name"].(string)
+
+
+	// Verify if the required keys exist and have the expected types
+	if !nameExists || !FirtLastNameExists {
+		return user, errors.New("missing or invalid data keys")
+	}
+
+	user.UserName = name
+	user.FirstName, user.LastName = splitName(FirtLastName)
 	user.Email = email
 	user.Picture = avatar
 
