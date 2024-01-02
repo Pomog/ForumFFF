@@ -6,9 +6,18 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime"
 	"net/http"
 	"net/url"
+	"os"
+	"path"
+	"path/filepath"
+	"strconv"
 	"strings"
+
+	"github.com/Pomog/ForumFFF/internal/models"
+	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (m *Repository) LoginWithGitHubHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,16 +42,65 @@ func (m *Repository) CallbackGitHubHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	fmt.Fprintf(w, "Token: %s", token)
-
-	email, err := githubRequestEmail("https://api.github.com/user/emails", token)
+	user_email, err := githubRequestEmail("https://api.github.com/user/emails", token)
 	if err != nil {
 		fmt.Println("Failed to get Email: ", err)
 		return
 	}
 
-	fmt.Println("**************************************************")
-	fmt.Println(email)
+	user_data, err := githubRequestUserData("https://api.github.com/user", token)
+	if err != nil {
+		fmt.Println("Failed to get User Data: ", err)
+		return
+	}
+
+	user, err := parseUserData(user_data, user_email)
+	if err != nil {
+		fmt.Println("Failed to parse User: ", err)
+		return
+	}
+
+	// generate password based on email
+	user.Password, err = generatePassword(user.Email)
+	if err != nil {
+		fmt.Println("Failed to generate password based on GitHub Data: ", err)
+		return
+	}
+
+	userExist, err := m.DB.UserPresent(user.UserName, user.Email)
+	if err != nil {
+		fmt.Println("Failed to check User: ", err)
+		return
+	}
+	if userExist {
+		err := m.DB.CreateUser(user)
+		if err != nil {
+			fmt.Println("Failed to create User based on GitHub Data: ", err)
+			return
+		}
+	}
+
+	// Check if User is Present in the DB, ERR should be handled
+	userID, _ := m.DB.UserPresentLogin(user.Email, user.Password)
+	if userID != 0 {
+		m.App.UserLogin = uuid.New()
+		err := m.DB.InsertSessionintoDB(m.App.UserLogin.String(), userID)
+		if err != nil {
+			setErrorAndRedirect(w, r, err.Error(), "/error-page")
+			return
+		}
+
+		cookie := &http.Cookie{
+			Name:  strconv.Itoa(userID),
+			Value: m.App.UserLogin.String(),
+		}
+		http.SetCookie(w, cookie)
+
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+	} else {
+		setErrorAndRedirect(w, r, "Wrong email or password", "/error-page")
+		return
+	}
 
 }
 
@@ -126,4 +184,87 @@ func githubRequestEmail(url, access_token string) (string, error) {
 	}
 
 	return user_email, nil
+}
+
+func githubRequestUserData(url, access_token string) (map[string]interface{}, error) {
+	var data map[string]interface{}
+	if err := githubRequest(url, access_token, &data); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func parseUserData(data map[string]interface{}, email string) (models.User, error) {
+	var user models.User
+
+	avatar, err := processAvatarURL(data["avatar_url"].(string), data["login"].(string))
+	if err != nil {
+		return user, err
+	}
+
+	// Map the fields from the data to the User struct
+	user.UserName = data["login"].(string)
+	user.FirstName, user.LastName = splitName(data["name"].(string))
+	user.Email = email
+	user.Picture = avatar
+
+	return user, nil
+}
+
+func splitName(name string) (string, string) {
+	names := strings.Fields(name)
+	if len(names) >= 2 {
+		return names[0], strings.Join(names[1:], " ")
+	}
+	return names[0], ""
+}
+
+func processAvatarURL(url string, username string) (string, error) {
+	// Fetch the image from the URL
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// Extract content type from the response headers
+	contentType := resp.Header.Get("Content-Type")
+
+	// Get extension from the content type
+	extension, err := mime.ExtensionsByType(contentType)
+	if err != nil || len(extension) == 0 {
+		// Use a default extension or handle the error as needed
+		extension = []string{".jpg"}
+	}
+
+	newFileName := fmt.Sprintf("%s%s", username, extension[0])
+	newFilePath := filepath.Join("static/ava", newFileName)
+	newFile, err := os.Create(newFilePath)
+	if err != nil {
+		return "", err
+	}
+	defer newFile.Close()
+
+	// Copy the fetched image to the new file
+	_, err = io.Copy(newFile, resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join("/", newFilePath), nil
+}
+
+func generatePassword(email string) (string, error) {
+	// Use the email as a seed or input
+	password := []byte(email)
+
+	// Hash the password using bcrypt
+	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+
+	return string(hashedPassword), nil
 }
