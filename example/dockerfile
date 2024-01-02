@@ -1,0 +1,12 @@
+FROM golang:1.21
+
+ADD . /go/src/app
+WORKDIR /go/src/app
+
+RUN go get forum-authentication
+RUN go build -o app
+RUN go install
+
+EXPOSE 8080
+
+CMD ["./app"]

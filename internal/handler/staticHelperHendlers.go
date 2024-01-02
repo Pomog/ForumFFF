@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -90,6 +91,7 @@ func (m *Repository) PrivatPolicyHandler(w http.ResponseWriter, r *http.Request)
 func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		userID, _ := strconv.Atoi(r.URL.Query().Get("userID"))
+		fmt.Println("userID ", userID)
 		var personalInfo models.User
 		user, errUser := m.DB.GetUserByID(userID)
 		if errUser != nil {

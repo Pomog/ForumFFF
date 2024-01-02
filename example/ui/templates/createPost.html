@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/assets/style.css" type="text/css" />
+    <title>Forum Post Form</title>
+</head>
+
+<body>
+    <header>
+        <nav class="topnav">
+            <img src="/assets/images/logo.png" alt="Logo" />
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/logout">Logout</a></li>
+                <li><a href="/me">Profile</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="create-post-main">
+        <div class="create-post">
+            <h1>Create a New Forum Post</h1>
+            <form action="/create" method="POST" enctype="application/json">
+                <div class="title">
+                    <label for="title">Title:</label><br>
+                    <input type="text" id="title" name="title" required><br><br>
+                </div>
+                <div class="content">
+                    <label for="content">Content:</label><br>
+                    <textarea id="content" name="content" rows="4" required></textarea><br><br>
+                </div>
+                <div class="create-post-category">
+                    {{range .Categories}}
+                    <label for="category{{.Id}}">
+                        <input type="checkbox" id="category{{.Id}}" name="categories" value="{{.Id}}">
+                        {{.Name}}
+                    </label>
+                    {{end}}
+                </div>
+                <input type="submit" value="+ Create Post" class="submit-post" id="submit-button">
+            </form>
+        </div>
+    </main>
+    <script>
+        document.getElementById("submit-button").addEventListener("click", function (event) {
+            var checkboxes = document.querySelectorAll('input[type="checkbox"][name="categories"]');
+            var checked = Array.prototype.slice.call(checkboxes).some(function (checkbox) {
+                return checkbox.checked;
+            });
+
+            if (!checked) {
+                event.preventDefault();
+                alert("Please check at least one category.");
+            }
+        });
+    </script>
+</body>
+</html>

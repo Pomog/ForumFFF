@@ -2,40 +2,44 @@
 
 {{define "centralPart"}}
 
-        <div class="container">
-            {{$res := index .Data "loginData"}}
-            <div class="row">
-                <div class="col-md-6">
-                    <h1>Login</h1>
-                    <form action="" method="post">
-                        <div class="mb-3">
-                          <label for="emailLogIn" class="col-form-label">Email</label>
-                            {{with .Form.Errors.Get "emailLogIn"}}
-                                <label class="text-danger">{{.}}</label>
-                            {{end}}
-                            <input class="form-control"  type="email" name="emailLogIn" id="emailLogIn">
-                        </div>
-                        <div class="mb-3">
-                          <label for="passwordLogIn" class="col-form-label">Password</label>
-                            {{with .Form.Errors.Get "passwordLogIn"}}
-                                <label class="text-danger">{{.}}</label>
-                            {{end}}
-                            <input class="form-control" type="password" name="passwordLogIn" id="passwordLogIn" placeholder="Password">
-                        </div>
-                        <button type="submit" class="btn btn-light">Login</button>
-                    </form>
-                    <form action="" method="post">
-                        <!-- Hidden input field with pre-filled data -->
-                        <input type="hidden" name="emailLogIn" value="guest@gmail.com">
-                        <input type="hidden" name="passwordLogIn" value="123456">
-                        
-                        <!-- Button for submitting the form -->
-                        <br>
-                        <button type="submit" class="btn btn-warning">Enter As Guest</button>
-                    </form>
-                    
+<div class="container">
+    {{$res := index .Data "loginData"}}
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Login</h1>
+            <form action="" method="post">
+                <div class="mb-3">
+                    <label for="emailLogIn" class="col-form-label">Email</label>
+                    {{with .Form.Errors.Get "emailLogIn"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
+                    <input class="form-control" type="email" name="emailLogIn" id="emailLogIn">
                 </div>
-            </div>
+                <div class="mb-3">
+                    <label for="passwordLogIn" class="col-form-label">Password</label>
+                    {{with .Form.Errors.Get "passwordLogIn"}}
+                    <label class="text-danger">{{.}}</label>
+                    {{end}}
+                    <input class="form-control" type="password" name="passwordLogIn" id="passwordLogIn"
+                        placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-light">Login</button>
+            </form>
+            <form action="" method="post">
+                <!-- Hidden input field with pre-filled data -->
+                <input type="hidden" name="emailLogIn" value="guest@gmail.com">
+                <input type="hidden" name="passwordLogIn" value="123456">
+
+                <!-- Button for submitting the form -->
+                <br>
+                <button type="submit" class="btn btn-warning">Enter As Guest</button>
+            </form>
+            
+            <br>
+            <a class="btn btn-primary" href="/login-github" role="button">Login with GitHub</a>
+
         </div>
     </div>
+</div>
+</div>
 {{end}}

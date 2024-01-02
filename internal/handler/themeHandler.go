@@ -42,7 +42,7 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 
 	handlePostActions(w, r, m, visitorID, visitor, mainThread)
 
-	if r.Method == http.MethodPost {
+	if r.Method == http.MethodPost && !(r.FormValue("like") == "" || r.FormValue("dislike") == "") {
 		handlePostCreation(w, r, m, visitorID, mainThread)
 		return
 	}
@@ -157,7 +157,7 @@ func handlePostCreation(w http.ResponseWriter, r *http.Request, m *Repository, v
 
 	err = r.ParseMultipartForm(m.App.FileSize << 20)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Image is too large \n"+err.Error(), "/error-page")
+		setErrorAndRedirect(w, r, "Image is too large row 160 \n"+err.Error(), "/error-page")
 		return
 	}
 

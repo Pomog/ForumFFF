@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forum</title>
+    <link rel="stylesheet" href="/assets/style.css" type="text/css"/>
+  </head>
+  <body>
+    <header>
+      <nav class="topnav">
+        <img src="/assets/images/logo.png" alt="Logo" />
+        <ul>
+          <ul>
+            <li><a href="/">Home</a></li>
+            {{if .SessionValid}}
+                <li><a href="/logout">Logout</a></li>
+                <li><a href="/me">Profile</a></li>
+            {{else}}
+                <li><a href="/login">Login</a></li>
+            {{end}}
+        </ul>
+      </nav>
+    </header>
+    <main class="home">
+      <div class="info"></div>
+      <div class="category-container">
+        <div class="filters-create">
+        <div class="filters">
+          <div class="select">
+            <select name="Filter" id="filters" onchange="optionFilter()">
+              <option value="" disabled selected>Filter</option>
+              <option value="liked-posts">Liked posts</option>
+              <option value="created-posts">Created posts</option>
+            </select>
+          </div>
+        </div>
+        {{if .SessionValid}}
+          <form action="/create" class="create">
+            <input type="submit" value="Create Post">
+        {{else}}
+        {{end}}
+      </form>
+      </div>
+        <div class="headers">
+          <div class="left"><h3>{{.CurrentCategory.Name}}</h3></div>
+        </div>
+        <div class="posts">
+          {{range .Posts}}
+          <a class="post" href="?post={{.Id}}">
+            <div class="left">
+              <div class="topic">{{.Title}}</div>
+            </div>
+          </a>
+          {{end}}
+        </div>
+      </div>
+      <div class="sidebar">
+        <p>Categories:</p>
+        <ul class="categories">
+          {{range .Categories}}
+          <li class="category">
+            <span><a href="?category={{.Name_slug}}"> {{.Name}} </a> </span>
+          </li>
+          {{end}}
+        </ul>
+      </div>
+    </main>
+    <footer></footer>
+    <script>
+      // On page load, set the filter to the one in the url
+      const url = new URL(window.location.href);
+      const filter = url.searchParams.get("filter");
+
+      if (filter != null) {
+        document.getElementById("filters").value = filter;
+      }
+
+    function optionFilter() {
+      // When the filter is changed, change the url
+      value = document.getElementById("filters").value
+      const url = new URL(window.location.href);
+      url.searchParams.set('filter', value);
+      window.location.href = url.toString()
+    }
+    </script>
+  </body>
+</html>
