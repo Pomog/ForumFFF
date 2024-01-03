@@ -1,0 +1,16 @@
+{{template "body" .}}
+
+{{define "centralPart"}}
+<div class="container custom-container">
+  {{$userID := index .Data "userID"}}
+  <div class="mt-3">
+    <p>Congratulations! Your upgrade has been approved. You're now wielding the mighty powers 
+      of a Moderator! Time to sprinkle some stardust and wield that virtual hammer with grace. 
+      🌟 And hey, remember, with great power comes great... jokes! How about this one: Why don't 
+      programmers like nature? It has too many bugs! 😄 Welcome to the Moderator club, where puns 
+      and power collide!</p>
+    <br><a href="/personal_cabinet?userID={{$userID}}"><h2>Return to your cabinet...</h2></a>
+  </div>
+</div>
+
+{{end}}

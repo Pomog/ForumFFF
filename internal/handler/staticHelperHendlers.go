@@ -103,6 +103,7 @@ func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Reques
 		personalInfo.LastName = user.LastName
 		personalInfo.Picture = user.Picture
 		personalInfo.UserName = user.UserName
+		personalInfo.Type = user.Type //will show type of user in personal cabinet
 		totalPosts, _ := m.DB.GetTotalPostsAmmountByUserID(personalInfo.ID)
 		data := make(map[string]interface{})
 		data["personal"] = personalInfo

@@ -688,3 +688,23 @@ func (m *SqliteBDRepo) GetSearchedThreadsByCategory(search string) ([]models.Thr
 
 	return threads, nil
 }
+
+//EditUserType changes type of user from "user" to "moder"
+func (m *SqliteBDRepo) EditUserType(user models.User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `UPDATE users
+	SET type = $1 
+	WHERE id = $2;
+	`
+	_, err := m.DB.ExecContext(ctx, stmt,
+		user.Type,
+		user.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}

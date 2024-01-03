@@ -61,7 +61,7 @@ var addClassificationToThread = `ALTER TABLE thread
 ADD COLUMN classification VARCHAR(50) DEFAULT '';`
 
 var addUserType = `ALTER TABLE users
-ADD COLUMN type VARCHAR(50) DEFAULT 'user';`
+ADD COLUMN type VARCHAR(50) DEFAULT '';`
 
 func getQuerys() []string {
 	var sqlQuerys []string

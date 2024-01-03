@@ -53,6 +53,8 @@ func main() {
 	app.GoogleClientSecret = "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"
 	app.GoogleRedirectURL = "http://localhost:8080/google-callback"
 
+	app.ModeratorPass = "123" //our secret pass for moders
+
 	//the list of games that are represented and will be covered on site.
 	app.GamesList = map[string]string{
 		"Lineage 2":                "L2",

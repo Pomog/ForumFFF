@@ -18,6 +18,11 @@
                     </tr>
                     {{if ne  $person.UserName "guest"}}
                     <tr>
+                        <!-- to show type of user in personal cabinet -->
+                        <th>Type of Account:</th>
+                        <td>{{$person.Type}}</td>
+                    </tr>
+                    <tr>
                         <th>Email</th>
                         <td>{{$person.Email}}</td>
                     </tr>
@@ -49,7 +54,7 @@
                         <th></th>
                        
                         <td> 
-                            <form action="" method="post">
+                            <form action="/personal_cabinet_user_type?userID={{$person.ID}}" method="post">
                                 <div class="mb-3">
                                     <input class="form-control" type="password" name="changeUserType" id="changeUserType" placeholder="secret code" style="width: 10rem;">
                                     <p><button type="submit" class="btn btn-light">Submit Code</button></p>
