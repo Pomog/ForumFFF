@@ -68,7 +68,7 @@ func (m *SqliteBDRepo) GetUserByID(ID int) (models.User, error) {
 
 	row := m.DB.QueryRowContext(ctx, query, ID)
 
-	err := row.Scan(&user.ID, &user.UserName, &user.Password, &user.FirstName, &user.LastName, &user.Email, &user.Created, &user.Picture, &user.LastActivity)
+	err := row.Scan(&user.ID, &user.UserName, &user.Password, &user.FirstName, &user.LastName, &user.Email, &user.Created, &user.Picture, &user.LastActivity, &user.Type)
 	if err != nil {
 		return user, err
 	}
@@ -96,7 +96,7 @@ func (m *SqliteBDRepo) GetThreadByID(ID int) (models.Thread, error) {
 
 	row := m.DB.QueryRowContext(ctx, query, ID)
 
-	err := row.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, &thread.Category)
+	err := row.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, &thread.Category, &thread.Classification)
 	if err != nil {
 		return thread, err
 	}
@@ -115,7 +115,7 @@ func (m *SqliteBDRepo) GetPostByID(ID int) (models.Post, error) {
 
 	row := m.DB.QueryRowContext(ctx, query, ID)
 
-	err := row.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID, &post.Image)
+	err := row.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID, &post.Image, &post.Classification)
 	if err != nil {
 		return post, err
 	}
@@ -334,7 +334,7 @@ func (m *SqliteBDRepo) GetAllPostsFromThread(threadID int) ([]models.Post, error
 
 	for rows.Next() {
 		var post models.Post
-		err := rows.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID, &post.Image)
+		err := rows.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID, &post.Image, &post.Classification)
 		if err != nil {
 			return nil, err
 		}
@@ -363,7 +363,7 @@ func (m *SqliteBDRepo) GetAllPostsByUserID(userID int) ([]models.Post, error) {
 
 	for rows.Next() {
 		var post models.Post
-		err := rows.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID, &post.Image)
+		err := rows.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID, &post.Image, &post.Classification)
 		if err != nil {
 			return nil, err
 		}
@@ -421,7 +421,7 @@ func (m *SqliteBDRepo) GetAllThreadsByUserID(userID int) ([]models.Thread, error
 
 	for rows.Next() {
 		var thread models.Thread
-		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, &thread.Category)
+		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, &thread.Category, &thread.Classification)
 		if err != nil {
 			return nil, err
 		}
@@ -449,7 +449,7 @@ func (m *SqliteBDRepo) GetAllThreads() ([]models.Thread, error) {
 
 	for rows.Next() {
 		var thread models.Thread
-		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, &thread.Category)
+		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, &thread.Category, &thread.Classification)
 		if err != nil {
 			return nil, err
 		}
@@ -651,7 +651,7 @@ func (m *SqliteBDRepo) GetSearchedThreads(search string) ([]models.Thread, error
 
 	for rows.Next() {
 		var thread models.Thread
-		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, &thread.Category)
+		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, &thread.Category, &thread.Classification)
 		if err != nil {
 			return nil, err
 		}
@@ -679,7 +679,7 @@ func (m *SqliteBDRepo) GetSearchedThreadsByCategory(search string) ([]models.Thr
 
 	for rows.Next() {
 		var thread models.Thread
-		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, &thread.Category)
+		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, &thread.Category, &thread.Classification)
 		if err != nil {
 			return nil, err
 		}

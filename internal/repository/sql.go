@@ -8,7 +8,7 @@ var userTable = `CREATE TABLE IF NOT EXISTS users (
     last_name varchar(100) DEFAULT "",
     email varchar(254) DEFAULT "",
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    picture TEXT DEFAULT "static/ava/pomog_ava.png",
+    picture TEXT DEFAULT "static/ava/ava1.png",
     last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );`
 
@@ -51,9 +51,17 @@ var sessionIdTable = `CREATE TABLE IF NOT EXISTS sessionId (
     FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );`
 
-var guestUser = `INSERT INTO users (username, password, first_name, last_name, email)
-VALUES ('guest', '123456', 'Guest', 'User', 'guest@gmail.com');`
+var guestUser = `INSERT INTO users (username, password, first_name, last_name, email, type)
+VALUES ('guest', '123456', 'Guest', 'User', 'guest@gmail.com', 'guest');`
 
+var addClassificationToPost = `ALTER TABLE post
+ADD COLUMN classification VARCHAR(50) DEFAULT '';`
+
+var addClassificationToThread = `ALTER TABLE thread
+ADD COLUMN classification VARCHAR(50) DEFAULT '';`
+
+var addUserType = `ALTER TABLE users
+ADD COLUMN type VARCHAR(50) DEFAULT 'user';`
 
 func getQuerys() []string {
 	var sqlQuerys []string
@@ -62,5 +70,10 @@ func getQuerys() []string {
 	sqlQuerys = append(sqlQuerys, postTable)
 	sqlQuerys = append(sqlQuerys, votesTable)
 	sqlQuerys = append(sqlQuerys, sessionIdTable)
+
+	sqlQuerys = append(sqlQuerys, addClassificationToPost)
+	sqlQuerys = append(sqlQuerys, addClassificationToThread)
+	sqlQuerys = append(sqlQuerys, addUserType)
+
 	return sqlQuerys
 }

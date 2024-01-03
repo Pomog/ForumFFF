@@ -16,6 +16,7 @@
                         <th>Username</th>
                         <td>{{$person.UserName}}</td>
                     </tr>
+                    {{if ne  $person.UserName "guest"}}
                     <tr>
                         <th>Email</th>
                         <td>{{$person.Email}}</td>
@@ -44,6 +45,19 @@
                             <a href="/personal_cabinet_posts?userID={{$person.ID}}" class="btn btn-light">Get posts</a>
                             <a href="/personal_cabinet_likes?userID={{$person.ID}}" class="btn btn-light">Get liked posts</a></td>
                     </tr>
+                    <tr>
+                        <th></th>
+                       
+                        <td> 
+                            <form action="" method="post">
+                                <div class="mb-3">
+                                    <input class="form-control" type="password" name="changeUserType" id="changeUserType" placeholder="secret code" style="width: 10rem;">
+                                    <p><button type="submit" class="btn btn-light">Submit Code</button></p>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    {{end}}
                 </tbody>
             </table>
         </div>

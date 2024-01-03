@@ -37,6 +37,7 @@ func routes(a *config.AppConfig) http.Handler {
 	mux.HandleFunc("/personal_cabinet_threads", handler.Repo.GetAllThreadsForUserHandler)
 	mux.HandleFunc("/personal_cabinet_posts", handler.Repo.GetAllPostsForUserHandler)
 	mux.HandleFunc("/personal_cabinet_likes", handler.Repo.GetAllLikedPostsByUserIDHandler)
+	// mux.HandleFunc("/personal_cabinet_user_type", handler.Repo.ChangeUserTypeResultHandler)
 
 	mux.HandleFunc("/create_post_result", handler.Repo.CreatePostResultHandler)
 
