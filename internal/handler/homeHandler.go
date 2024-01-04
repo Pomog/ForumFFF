@@ -141,6 +141,7 @@ func prepareDataForTemplate(w http.ResponseWriter, r *http.Request, m *Repositor
 	data["threads"] = threadsInfo
 	data["loggedAs"] = loggedUser.UserName
 	data["loggedAsID"] = loggedUser.ID
+	data["loggedUserType"] = loggedUser.Type
 
 	return data, nil
 }

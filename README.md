@@ -1,6 +1,6 @@
 # FFForum
 Online forum for MMORPG fans and friends!
-![Forum Home Page](static/readme_images/image.png)
+![Forum Home Page](static/readme_images/homePageScreen.png)
 
 ## Access the Web Application
 
@@ -64,7 +64,7 @@ The session feature in this project is implemented using the `github.com/google/
 - Initializes the database and performs checks to ensure connectivity.
 
 ### SQL schema
-<img src="static/readme_images/shema.png.jpg?raw=true" alt="example" style="width:30%;">
+<img src="static/readme_images/schema.jpg?raw=true" alt="example" style="width:30%;">
 
 ### Template Rendering
 - We are using in-memory cache to parse HTML templates

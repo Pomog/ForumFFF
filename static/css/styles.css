@@ -185,3 +185,6 @@ section {
     --bs-border-opacity: 1;
     border-color: rgba(var(--bs-success-rgb), var(--bs-border-opacity)) !important;
   }
+  .moder_img{
+    width: 2rem;
+  }

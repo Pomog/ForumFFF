@@ -275,6 +275,7 @@ func prepareDataForThemePage(m *Repository, w http.ResponseWriter, r *http.Reque
 
 	data["loggedAs"] = loggedUser.UserName
 	data["loggedAsID"] = loggedUser.ID
+	data["loggedUserType"] = loggedUser.Type
 	//__________________________________
 	creatorPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(mainThread.UserID)
 	if err != nil {
