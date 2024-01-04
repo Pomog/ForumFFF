@@ -13,6 +13,20 @@ import (
 
 // LoginHandler handles both GET and POST requests for the login page.
 func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
+	userIDstring := r.URL.Query().Get("id")
+	if userIDstring != "" {
+		userID, err := strconv.Atoi(userIDstring)
+		if err != nil {
+			setErrorAndRedirect(w, r, "wrong URL", "/error-page")
+			return
+		}
+		err = m.DB.DelSessionByUserID(userID)
+		if err != nil {
+			setErrorAndRedirect(w, r, err.Error(), "/error-page")
+			return
+		}
+	}
+
 	if r.Method == http.MethodGet {
 		var emptyLogin models.User
 		data := make(map[string]interface{})
@@ -62,8 +76,9 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			cookie := &http.Cookie{
-				Name:  strconv.Itoa(userID),
-				Value: m.App.UserLogin.String(),
+				Name:     strconv.Itoa(userID),
+				Value:    m.App.UserLogin.String(),
+				HttpOnly: true,
 			}
 			http.SetCookie(w, cookie)
 

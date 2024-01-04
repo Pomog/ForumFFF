@@ -88,6 +88,12 @@ func (m *Repository) PrivatPolicyHandler(w http.ResponseWriter, r *http.Request)
 
 // PersonaCabinetHandler hanles the personal cabinet of selected user.
 func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Request) {
+	sessionUserID := m.GetLoggedUser(w, r)
+	if sessionUserID == 0 {
+		setErrorAndRedirect(w, r, "unautorized", "/error-page")
+		return
+	}
+
 	if r.Method == http.MethodGet {
 		userID, _ := strconv.Atoi(r.URL.Query().Get("userID"))
 		var personalInfo models.User
@@ -108,6 +114,7 @@ func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Reques
 		data := make(map[string]interface{})
 		data["personal"] = personalInfo
 		data["totalPosts"] = totalPosts
+		data["loggedAsID"] = sessionUserID
 
 		renderer.RendererTemplate(w, "personal.page.html", &models.TemplateData{
 			Data: data,

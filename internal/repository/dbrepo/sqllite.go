@@ -708,3 +708,20 @@ func (m *SqliteBDRepo) EditUserType(user models.User) error {
 	}
 	return nil
 }
+
+func (m *SqliteBDRepo) DelSessionByUserID(userID int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `delete from sessionId
+	where userID = $1
+	`
+	_, err := m.DB.ExecContext(ctx, stmt,
+		userID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
