@@ -14,15 +14,17 @@ type User struct {
 	Created      time.Time
 	Picture      string
 	LastActivity time.Time
+	Type         string
 }
 
 type Thread struct {
-	ID       int
-	Subject  string
-	Created  time.Time
-	UserID   int
-	Image    string
-	Category string
+	ID             int
+	Subject        string
+	Created        time.Time
+	UserID         int
+	Image          string
+	Category       string
+	Classification string
 }
 
 type ThreadDataForMainPage struct {
@@ -36,6 +38,7 @@ type ThreadDataForMainPage struct {
 	ThreadID                      int
 	Image                         string
 	Category                      string
+	Classification                string
 }
 
 type PostDataForThemePage struct {
@@ -51,16 +54,18 @@ type PostDataForThemePage struct {
 	UserPostsAmmount          int
 	Likes                     int
 	Dislikes                  int
+	Classification            string
 }
 
 type Post struct {
-	ID       int
-	Subject  string
-	Content  string
-	Created  time.Time
-	ThreadId int
-	UserID   int
-	Image    string
+	ID             int
+	Subject        string
+	Content        string
+	Created        time.Time
+	ThreadId       int
+	UserID         int
+	Image          string
+	Classification string
 }
 
 type Votes struct {

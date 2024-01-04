@@ -36,4 +36,6 @@ type AppConfig struct {
 	GoogleClientID     string
 	GoogleClientSecret string
 	GoogleRedirectURL  string
+
+	ModeratorPass string //added Moder pass to app config
 }

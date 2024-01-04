@@ -30,4 +30,6 @@ type DatabaseInt interface {
 	GetAllThreadsByUserID(userID int) ([]models.Thread, error)
 	GetAllPostsByUserID(userID int) ([]models.Post, error)
 	GetAllLikedPostsByUserID(userID int) ([]models.Post, error)
+	EditUserType(user models.User) error
+	DelSessionByUserID(userID int) error
 }
