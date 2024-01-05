@@ -74,3 +74,14 @@ type Votes struct {
 	DownCount int
 	PostId    int
 }
+
+// CommentType represents the type of a comment
+type TextClassification string
+
+var Classifications = []TextClassification{"irrelevant",
+	"obscene",
+	"illegal",
+	"insulting",
+	"unsorted",
+	"approved",
+}

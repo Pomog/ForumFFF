@@ -30,8 +30,25 @@ func (m *Repository) ModerPanelHandler(w http.ResponseWriter, r *http.Request) {
 
 // handleGetRequest handles GET requests for the home page.
 func handleGetRequestModerPage(w http.ResponseWriter, r *http.Request, m *Repository, sessionUserID int) {
-	// topics := r.URL.Query().Get("topics")
-	// posts := r.URL.Query().Get("posts")
+	topicCat := r.URL.Query().Get("topic")
+	postCat := r.URL.Query().Get("post")
+	var topics []models.Thread
+	var posts []models.Post
+	var err error
+	if topicCat != "" && postCat == "" {
+		topics, err = m.DB.GetAllThreadsByClassification(models.TextClassification(topicCat))
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get topics by category "+err.Error(), "/error-page")
+			return
+		}
+	} else if topicCat == "" && postCat != "" {
+		posts, err = m.DB.GetAllPostsByClassification(models.TextClassification(postCat))
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get posts by category "+err.Error(), "/error-page")
+			return
+		}
+	}
+
 	data := make(map[string]interface{})
 	loggedUser, err := m.DB.GetUserByID(sessionUserID)
 	if err != nil {
@@ -42,6 +59,9 @@ func handleGetRequestModerPage(w http.ResponseWriter, r *http.Request, m *Reposi
 	data["loggedAs"] = loggedUser.UserName
 	data["loggedAsID"] = loggedUser.ID
 	data["loggedUserType"] = loggedUser.Type
+	data["categories"] = models.Classifications
+	data["posts"] = posts
+	data["topics"] = topics
 
 	renderer.RendererTemplate(w, "moderMain.page.html", &models.TemplateData{
 		Data: data,

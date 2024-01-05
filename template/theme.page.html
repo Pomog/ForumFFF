@@ -11,9 +11,11 @@
     <thead class="containerHead">
       <tr>
         <!-- Colling Modal -->
+        {{ if $threadID}}
         <div class="d-flex justify-content-start align-items-center">
           <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#createNewPostModal">Create New Post</button>
         </div>
+        {{ end }}
         <div class="d-flex justify-content-center">
         </div>
         <!-- End -->

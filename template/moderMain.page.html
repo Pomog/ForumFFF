@@ -1,9 +1,50 @@
 {{template "body" .}}
 
 {{define "centralPart"}}
-    <div class="content">
-        Moderator Main page
+<div class="content">
+    Moderator Main page
+    <div class="navbar" id="navbarSupportedContent">
+        <!-- Drop down manu -->
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <h2>Select Thread Category:</h2>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    {{$categories := index .Data "categories"}}
+                    {{range $categories}}
+                    {{$route := printf "/moder_panel?topic=%s" . }}
+                    <li><a class="dropdown-item" href={{$route}}>{{ . }}</a></li>
+                    {{end}}
+                </ul>
+            </li>
+        </ul>
+        <!-- ends -->
+        {{$posts := index .Data "posts"}}
+        {{$topics := index .Data "topics"}}
+        {{if $topics}}
+        <div>
+            <tbody class="containerBody">
+                {{ range $topics }}
+                <tr>
+                    <td>
+
+                        <br>Created by user with ID: {{ .UserID}}
+                        <br>Topic created: {{convertTimeTopic . }}
+                        <br>Category: {{ .Category}}
+                        <br>Classification: {{ .Classification}}
+                        <br><strong>{{ .Subject }} </strong>
+                        <hr>
+
+                    </td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </div>
+        {{ end }}
     </div>
 </div>
 {{end}}
-
