@@ -794,9 +794,8 @@ func (m *SqliteBDRepo) EditTopicClassification(topic models.Thread, classificati
 	SET classification = $1
 	WHERE id = $2;
 	`
-
 	_, err := m.DB.ExecContext(ctx, stmt,
-		topic.Classification,
+		classification,
 		topic.ID,
 	)
 
@@ -817,7 +816,7 @@ func (m *SqliteBDRepo) EditPostClassification(post models.Post, classification m
 	`
 
 	_, err := m.DB.ExecContext(ctx, stmt,
-		post.Classification,
+		classification,
 		post.ID,
 	)
 

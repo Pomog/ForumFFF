@@ -39,6 +39,7 @@ type ThreadDataForMainPage struct {
 	Image                         string
 	Category                      string
 	Classification                string
+	UserID                        int
 }
 
 type PostDataForThemePage struct {

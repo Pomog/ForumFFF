@@ -29,19 +29,41 @@
         <div>
             <tbody class="containerBody">
                 {{ range $topics }}
+                {{$topicCategory := .Classification}}
+                {{$topicID := .ID}}
                 <tr>
                     <td>
 
                         <br>Created by user with ID: {{ .UserID}}
                         <br>Topic created: {{convertTimeTopic . }}
                         <br>Category: {{ .Category}}
-                        <br>Classification: {{ .Classification}}
                         <br><strong>{{ .Subject }} </strong>
-                        <hr>
+
+
+                    </td>
+            <tbody class="containerBody">
+                <tr>
+                    <td>
+                        <form method="post" action="">
+                            {{range $index, $category := $categories}}
+                            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio{{$index}}"
+                                    autocomplete="off" value="{{$category}}" {{ if eq $category $topicCategory }}
+                                    checked {{end}}>
+                                <label class="btn btn-outline-primary" for="btnradio{{$index}}"> {{$category}} </label>
+                                <input type="hidden" name="topicID" value="{{ $topicID }}">
+                            </div>
+                            {{end}}
+                            <input type="submit" value="Submit">
+                        </form>
 
                     </td>
                 </tr>
-                {{ end }}
+
+            </tbody>
+            <hr>
+            </tr>
+            {{ end }}
             </tbody>
         </div>
         {{ end }}

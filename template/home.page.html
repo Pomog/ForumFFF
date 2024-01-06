@@ -53,8 +53,9 @@
         </thead>
         <tbody class="containerBody">
             {{$threadinfo := index .Data "threads"}}
+            {{$loggedID := index .Data "loggedAsID"}}
             {{ range $threadinfo }}
-
+            {{ if or (eq .UserID $loggedID) (eq .Classification "approved") }}
               <tr>
                   <td>
                       <!-- 1column --> 
@@ -63,6 +64,9 @@
                           <br>Created by: {{ .UserNameWhoCreatedThread}}
                           <br>Topic created: {{ .Created}}
                           <br>Category: {{ .Category}}
+                          {{ if eq .UserID $loggedID}}
+                          <br>Classification: {{ .Classification}}
+                          {{ end }}
                           <br><strong>{{ .Subject }} </strong><hr>
                       </a>
                   </td>
@@ -86,7 +90,7 @@
                   <td><!-- 3column -->{{ $numOfPosts}} messages</td>
                   
               </tr>
-
+              {{end}}
             {{ end }}
         </tbody>
     </table>

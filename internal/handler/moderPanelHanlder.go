@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
@@ -25,7 +26,39 @@ func (m *Repository) ModerPanelHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
 		handleGetRequestModerPage(w, r, m, sessionUserID)
+	} else if r.Method == http.MethodPost {
+		handlePostRequestModerPage(w, r, m, sessionUserID)
 	}
+}
+
+func handlePostRequestModerPage(w http.ResponseWriter, r *http.Request, m *Repository, sessionUserID int) {
+	err := r.ParseForm()
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not parse form "+err.Error(), "/error-page")
+		return
+	}
+
+	selectedCategory := r.FormValue("btnradio")
+	topicID, err := strconv.Atoi(r.FormValue("topicID"))
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not convert string into int "+err.Error(), "/error-page")
+		return
+	}
+	topic, err := m.DB.GetThreadByID(topicID)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not get topic by id "+err.Error(), "/error-page")
+		return
+	}
+	cat := models.TextClassification(selectedCategory)
+
+	err = m.DB.EditTopicClassification(topic, cat)
+	if err != nil {
+		setErrorAndRedirect(w, r, "Could not edit topic classification "+err.Error(), "/error-page")
+		return
+	}
+
+	// Redirect back to the previous page (referer)
+	http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
 }
 
 // handleGetRequest handles GET requests for the home page.
