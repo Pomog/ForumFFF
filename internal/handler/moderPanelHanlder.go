@@ -39,22 +39,45 @@ func handlePostRequestModerPage(w http.ResponseWriter, r *http.Request, m *Repos
 	}
 
 	selectedCategory := r.FormValue("btnradio")
-	topicID, err := strconv.Atoi(r.FormValue("topicID"))
-	if err != nil {
-		setErrorAndRedirect(w, r, "Could not convert string into int "+err.Error(), "/error-page")
-		return
-	}
-	topic, err := m.DB.GetThreadByID(topicID)
-	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get topic by id "+err.Error(), "/error-page")
-		return
-	}
-	cat := models.TextClassification(selectedCategory)
 
-	err = m.DB.EditTopicClassification(topic, cat)
-	if err != nil {
-		setErrorAndRedirect(w, r, "Could not edit topic classification "+err.Error(), "/error-page")
-		return
+	if r.FormValue("postID") != "" {
+		postID, err := strconv.Atoi(r.FormValue("postID"))
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not convert string into int "+err.Error(), "/error-page")
+			return
+		}
+		post, err := m.DB.GetPostByID(postID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get post by id "+err.Error(), "/error-page")
+			return
+		}
+		cat := models.TextClassification(selectedCategory)
+
+		err = m.DB.EditPostClassification(post, cat)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not edit post classification "+err.Error(), "/error-page")
+			return
+		}
+	}
+
+	if r.FormValue("topicID") != "" {
+		topicID, err := strconv.Atoi(r.FormValue("topicID"))
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not convert string into int "+err.Error(), "/error-page")
+			return
+		}
+		topic, err := m.DB.GetThreadByID(topicID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get topic by id "+err.Error(), "/error-page")
+			return
+		}
+		cat := models.TextClassification(selectedCategory)
+
+		err = m.DB.EditTopicClassification(topic, cat)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not edit topic classification "+err.Error(), "/error-page")
+			return
+		}
 	}
 
 	// Redirect back to the previous page (referer)

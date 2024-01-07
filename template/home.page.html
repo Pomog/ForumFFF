@@ -1,6 +1,7 @@
 {{template "body" .}}
 
 {{define "centralPart"}}
+{{$loggedID := index .Data "loggedAsID"}}
 <div class="container custom-container">
     <table class="table-borderless forumTable whiteLink mt-3">
         <thead class="containerHead">
@@ -8,7 +9,9 @@
                 <!-- modal starts -->
                 <th class="forumFirstCol" scope="col">
                   <div class="d-flex justify-content-start align-items-center">
+                    {{ if ne 1 $loggedID}}
                     <button type="button" class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#createNewTopicModal">Create New Topic</button>
+                    {{end}}
                   </div>
                   <div class="d-flex justify-content-center">
                     <h3>Created Topics</h3>
@@ -53,7 +56,7 @@
         </thead>
         <tbody class="containerBody">
             {{$threadinfo := index .Data "threads"}}
-            {{$loggedID := index .Data "loggedAsID"}}
+            
             {{ range $threadinfo }}
             {{ if or (eq .UserID $loggedID) (eq .Classification "approved") }}
               <tr>
@@ -83,7 +86,7 @@
                     {{ $lastPostShorten := shortenPost .Posts}}
                     <br><em>{{ $lastPostShorten}}</em></td>
                   {{ else }}
-                  <h8><em>Be the first one to add post here...</em></h8>
+                  <h6><em>Be the first one to add post here...</em></h6>
                   {{end}}
                   {{ $numOfPosts := numberOfPosts .Posts }}
                   

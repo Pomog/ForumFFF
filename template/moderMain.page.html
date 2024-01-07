@@ -1,6 +1,8 @@
 {{template "body" .}}
 
 {{define "centralPart"}}
+        {{$posts := index .Data "posts"}}
+        {{$topics := index .Data "topics"}}
 <div class="content">
     Moderator Main page
     <div class="navbar" id="navbarSupportedContent">
@@ -21,10 +23,66 @@
                     {{end}}
                 </ul>
             </li>
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <h2>Select Posts Category:</h2>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    {{$categories := index .Data "categories"}}
+                    {{range $categories}}
+                    {{$route := printf "/moder_panel?post=%s" . }}
+                    <li><a class="dropdown-item" href={{$route}}>{{ . }}</a></li>
+                    {{end}}
+                </ul>
+            </li>
         </ul>
         <!-- ends -->
-        {{$posts := index .Data "posts"}}
-        {{$topics := index .Data "topics"}}
+
+
+        {{if $posts}}
+        <div>
+            <tbody class="containerBody">
+            {{ range $posts }}
+                {{$postsCategory := .Classification}}
+                {{$postID := .ID}}
+                <tr>
+                    <td>
+                        <br>Created by user with ID: {{ .UserID}}
+                        <br>Topic created: {{convertTime . }}
+                        <br>Category: {{ .Classification}}
+                        <br><em>{{ .Subject }} </em>
+                        <br><strong>{{ .Content }} </strong>
+                    </td>
+                <tbody class="containerBody">
+                    <tr>
+                        <td>
+                            <form method="post" action="">
+                                {{range $index, $category := $categories}}
+                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                    <input type="radio" class="btn-check" name="btnradio" id="btnradio{{$index}}"
+                                        autocomplete="off" value="{{$category}}" {{ if eq $category $postsCategory }}
+                                        checked {{end}}>
+                                    <label class="btn btn-outline-primary" for="btnradio{{$index}}"> {{$category}} </label>
+                                    <input type="hidden" name="postID" value="{{ $postID }}">
+                                </div>
+                                {{end}}
+                                <input type="submit" value="Submit">
+                            </form>
+
+                        </td>
+                    </tr>
+
+                </tbody>
+                <hr>
+                </tr>
+                {{ end }}
+            </tbody>
+
+       {{ end }}
+
+
         {{if $topics}}
         <div>
             <tbody class="containerBody">
@@ -38,7 +96,6 @@
                         <br>Topic created: {{convertTimeTopic . }}
                         <br>Category: {{ .Category}}
                         <br><strong>{{ .Subject }} </strong>
-
 
                     </td>
             <tbody class="containerBody">

@@ -18,15 +18,23 @@ This is a Web Application written in Golang, utilizing only standard [Go librari
 - [How to use Docker](docs/howToUsewDocker.md)
 
 ### User Management:
-- User Registration: Users can create new accounts.
-- Guest Registration: Allow guest users to access limited features or explore the platform without registration.
-- Login System: Users can log in using their email and password credentials.
+- **User Registration:** Users can create new accounts.
+- **Guest Registration:** Allows guest users to access limited features or explore the platform without registration.
+- **Login System:** Users can log in using their email and password credentials.
+- The registered user can have types: user, moderator.
+- To change the user type, registered users should use a Special Code in their personal cabinet.
+#### User Types
+- **Moderator:** Has special rights, including the ability to see all messages and change the classification for messages.
 
 ### Content Creation:
-- Topic Creation: Users can create new discussion topics.
-  - Topic Creation with Image: Option to include images when creating topics.
-- Post Creation: Users can contribute to discussions by creating posts.
-  - Post Creation with Image: Ability to attach images to posts.
+- **Topic Creation:** Users can create new discussion topics.
+  - **Topic Creation with Image:** Option to include images when creating topics.
+- **Post Creation:** Users can contribute to discussions by creating posts.
+  - **Post Creation with Image:** Ability to attach images to posts.
+- Forum messages have classifications: unsorted, obscene, illegal, insulting, approved.
+- Users without moderator rights can create unsorted messages.
+- Users without moderator rights can see all their own messages and approved messages from other users.
+
 
 ### Interaction Features:
 - Like/Dislike System: Users can like or dislike posts.
