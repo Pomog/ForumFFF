@@ -257,6 +257,7 @@ func (m *SqliteBDRepo) DeletePost(post models.Post) error {
 	return nil
 }
 
+// EditTopic updates topic
 func (m *SqliteBDRepo) EditTopic(topic models.Thread) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -689,7 +690,7 @@ func (m *SqliteBDRepo) GetSearchedThreadsByCategory(search string) ([]models.Thr
 	return threads, nil
 }
 
-//EditUserType changes type of user from "user" to "moder"
+// EditUserType changes type of user from "user" to "moder"
 func (m *SqliteBDRepo) EditUserType(user models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -718,6 +719,105 @@ func (m *SqliteBDRepo) DelSessionByUserID(userID int) error {
 	`
 	_, err := m.DB.ExecContext(ctx, stmt,
 		userID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// GetAllThreadsByClassification returns all Threads of given classification type, nil if there are no threads in DB
+func (m *SqliteBDRepo) GetAllThreadsByClassification(classification models.TextClassification) ([]models.Thread, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select * 
+	from thread
+	where classification=$1
+	`
+	rows, err := m.DB.QueryContext(ctx, query, classification)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var threads []models.Thread
+
+	for rows.Next() {
+		var thread models.Thread
+		err := rows.Scan(&thread.ID, &thread.Subject, &thread.Created, &thread.UserID, &thread.Image, &thread.Category, &thread.Classification)
+		if err != nil {
+			return nil, err
+		}
+		threads = append(threads, thread)
+	}
+
+	return threads, nil
+}
+
+// GetAllPostsByClassification returns all slice of all Posts with given classification type, nil if there are no Posts
+func (m *SqliteBDRepo) GetAllPostsByClassification(classification models.TextClassification) ([]models.Post, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select * 
+	from post
+	where classification = $1
+	`
+	rows, err := m.DB.QueryContext(ctx, query, classification)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []models.Post
+
+	for rows.Next() {
+		var post models.Post
+		err := rows.Scan(&post.ID, &post.Subject, &post.Content, &post.Created, &post.ThreadId, &post.UserID, &post.Image, &post.Classification)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}
+
+// EditTopicClassification updates classification of the topic by moderator
+func (m *SqliteBDRepo) EditTopicClassification(topic models.Thread, classification models.TextClassification) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `UPDATE thread
+	SET classification = $1
+	WHERE id = $2;
+	`
+	_, err := m.DB.ExecContext(ctx, stmt,
+		classification,
+		topic.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// EditTopicClassification updates classification of the topic by moderator
+func (m *SqliteBDRepo) EditPostClassification(post models.Post, classification models.TextClassification) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `UPDATE post
+	SET classification = $1
+	WHERE id = $2;
+	`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		classification,
+		post.ID,
 	)
 
 	if err != nil {

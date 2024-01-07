@@ -59,6 +59,8 @@ func (m *Repository) ThemeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	data["loggedAsID"] = visitorID
+
 	renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
 		Data: data,
 	})
@@ -250,6 +252,7 @@ func getPostsInfo(m *Repository, w http.ResponseWriter, r *http.Request, threadI
 		info.UserPostsAmmount = userPostsAmount
 		info.Likes = likes
 		info.Dislikes = dislikes
+		info.Classification = post.Classification
 		postsInfo = append(postsInfo, info)
 	}
 
@@ -275,6 +278,7 @@ func prepareDataForThemePage(m *Repository, w http.ResponseWriter, r *http.Reque
 
 	data["loggedAs"] = loggedUser.UserName
 	data["loggedAsID"] = loggedUser.ID
+	data["loggedUserType"] = loggedUser.Type
 	//__________________________________
 	creatorPostsAmount, err := m.DB.GetTotalPostsAmmountByUserID(mainThread.UserID)
 	if err != nil {

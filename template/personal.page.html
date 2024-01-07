@@ -46,9 +46,11 @@
                     <tr>
                         <th></th>
                        
-                        <td> <a href="/personal_cabinet_threads?userID={{$person.ID}}" class="btn btn-light">Get threads</a> 
+                        <td> 
+                            <a href="/personal_cabinet_threads?userID={{$person.ID}}" class="btn btn-light">Get threads</a> 
                             <a href="/personal_cabinet_posts?userID={{$person.ID}}" class="btn btn-light">Get posts</a>
-                            <a href="/personal_cabinet_likes?userID={{$person.ID}}" class="btn btn-light">Get liked posts</a></td>
+                            <a href="/personal_cabinet_likes?userID={{$person.ID}}" class="btn btn-light">Get liked posts</a>
+                        </td>
                     </tr>
                     <tr>
                         <th></th>
@@ -62,10 +64,18 @@
                             </form>
                         </td>
                     </tr>
+                    <tr>
+                        {{if eq $person.Type "moder"}}
+                            <div class="mb-3">
+                                <a class="btn btn-warning" href="/moder_panel" role="button">Open Moderator Panel</a>
+                            </div>
+                        {{end}}
+                    </tr>
                     {{end}}
                 </tbody>
             </table>
         </div>
     </div>
+</div>
 {{end}}
 

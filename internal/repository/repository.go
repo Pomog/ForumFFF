@@ -32,4 +32,8 @@ type DatabaseInt interface {
 	GetAllLikedPostsByUserID(userID int) ([]models.Post, error)
 	EditUserType(user models.User) error
 	DelSessionByUserID(userID int) error
+	EditPostClassification(post models.Post, classification models.TextClassification) error
+	EditTopicClassification(topic models.Thread, classification models.TextClassification) error
+	GetAllPostsByClassification(classification models.TextClassification) ([]models.Post, error)
+	GetAllThreadsByClassification(classification models.TextClassification) ([]models.Thread, error)
 }

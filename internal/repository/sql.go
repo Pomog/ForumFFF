@@ -55,10 +55,10 @@ var guestUser = `INSERT INTO users (username, password, first_name, last_name, e
 VALUES ('guest', '123456', 'Guest', 'User', 'guest@gmail.com', 'guest');`
 
 var addClassificationToPost = `ALTER TABLE post
-ADD COLUMN classification VARCHAR(50) DEFAULT '';`
+ADD COLUMN classification VARCHAR(50) DEFAULT 'unsorted';`
 
 var addClassificationToThread = `ALTER TABLE thread
-ADD COLUMN classification VARCHAR(50) DEFAULT '';`
+ADD COLUMN classification VARCHAR(50) DEFAULT 'unsorted';`
 
 var addUserType = `ALTER TABLE users
 ADD COLUMN type VARCHAR(50) DEFAULT 'user';`

@@ -39,6 +39,7 @@ type ThreadDataForMainPage struct {
 	Image                         string
 	Category                      string
 	Classification                string
+	UserID                        int
 }
 
 type PostDataForThemePage struct {
@@ -73,4 +74,15 @@ type Votes struct {
 	UpCount   int
 	DownCount int
 	PostId    int
+}
+
+// CommentType represents the type of a comment
+type TextClassification string
+
+var Classifications = []TextClassification{"irrelevant",
+	"obscene",
+	"illegal",
+	"insulting",
+	"unsorted",
+	"approved",
 }

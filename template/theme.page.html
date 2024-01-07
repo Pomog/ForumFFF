@@ -5,15 +5,20 @@
 {{end}}
 {{define "centralPart"}}
 {{$threadID :=index .Data "mainThreadID"}}
+{{$loggedID := index .Data "loggedAsID"}}
 <div class="container custom-container">
  
   <table class="table-borderless forumTable whiteLink mt-3">
     <thead class="containerHead">
       <tr>
         <!-- Colling Modal -->
+        {{ if $threadID}}
         <div class="d-flex justify-content-start align-items-center">
+        {{ if ne 1 $loggedID}}
           <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#createNewPostModal">Create New Post</button>
+        {{end}}  
         </div>
+        {{ end }}
         <div class="d-flex justify-content-center">
         </div>
         <!-- End -->
@@ -71,12 +76,13 @@
             {{ end }} <br><br>
             {{index .Data "mainThreadName"}} <br>
 
-            
+            {{ if and (ne $loggedID 1) (eq $creatorID $loggedID) }}
             <form method="POST" action="/edit_topic?topicID={{$threadID}}">
               <input type="hidden" name="topic_id" value="{{$threadID }}">
               <button type="submit" style="background: none; border: none; padding: 0; font: inherit; cursor: pointer; 
               text-decoration: underline; color:inherit;">✍🏻 Edit</button>
             </form>
+            {{end}}
             <hr>
             Created: {{index .Data "mainThreadCreatedTime"}}
           </div>
@@ -92,44 +98,52 @@
     <tbody class="containerBody">
       {{$postinfo := index .Data "posts"}}
       {{ range $postinfo }}
-      <tr>
-        <td>
-          <img src="{{ .PictureUserWhoCreatedPost }}" class="ava_img" alt="ava">
-          <br><a href="/personal_cabinet?userID={{ .UserIDWhoCreatedPost}}"><strong>&nbsp;{{ .UserNameWhoCreatedPost }}</strong></a><br>
-          Date of Registration:<br>{{ .UserRegistrationDate}} <br>
-          Total Messages: {{ .UserPostsAmmount}}
-        </td>
-        <td>
-        </td>
-        <td>
-          <em>{{ .Subject}}</em> <br><br>
+      {{$postCreatorID := .UserIDWhoCreatedPost}}
+      {{ if or (eq $postCreatorID $loggedID) (eq .Classification "approved") }}
 
-          {{ if .Image }}
-              <img src="{{ .Image }}" class="post_img" alt="post_img">
-          {{ end }} <br><br>
+          <tr>
+            <td>
+              <img src="{{ .PictureUserWhoCreatedPost }}" class="ava_img" alt="ava">
+              <br><a href="/personal_cabinet?userID={{ .UserIDWhoCreatedPost}}"><strong>&nbsp;{{ .UserNameWhoCreatedPost }}</strong></a><br>
+              Date of Registration:<br>{{ .UserRegistrationDate}} <br>
+              Total Messages: {{ .UserPostsAmmount}}
+            </td>
+            <td>
+            </td>
+            <td>
+              <em>{{ .Subject}}</em> <br><br>
 
-          {{ .Content }}&nbsp;
-            <form method="POST" action="/edit_post?postID={{ .ID}}">
-              <input type="hidden" name="topic_id" value="{{ .ID }}">
-              <button type="submit" style="background: none; border: none; padding: 0; font: inherit; cursor: pointer; 
-              text-decoration: underline; color:inherit;">✍🏻 Edit / Delete</button>
-            </form>
-          <br>
-          Posted: {{ .Created }}<br>
-          <div class="d-flex justify-content-start align-items-center">
-            <form method="POST" action="">
-              <input type="hidden" name="like" value="{{ .ID }}">
-              <button type="submit" class="btn btn-success btn-sm mr-2">Like👍&nbsp;{{ .Likes }}</button>
-            </form>
-            &nbsp;&nbsp;
-            <form method="POST" action="">
-              <input type="hidden" name="dislike" value="{{ .ID }}">
-              <button type="submit" class="btn btn-danger btn-sm">Dislike👎&nbsp;{{ .Dislikes }}</button>
-            </form>
-          </div>
-          <hr>
-        </td>
-      </tr>
+              {{ if .Image }}
+                  <img src="{{ .Image }}" class="post_img" alt="post_img">
+              {{ end }} <br><br>
+
+              {{ .Content }}&nbsp;
+              {{ if and (ne $loggedID 1) (eq $postCreatorID $loggedID) }}
+                <form method="POST" action="/edit_post?postID={{ .ID}}">
+                  <input type="hidden" name="topic_id" value="{{ .ID }}">
+                  <button type="submit" style="background: none; border: none; padding: 0; font: inherit; cursor: pointer; 
+                  text-decoration: underline; color:inherit;">✍🏻 Edit / Delete</button>
+                </form>
+                {{end}}
+              <br>
+              Posted: {{ .Created }}<br>
+              <div class="d-flex justify-content-start align-items-center">
+              {{ if ne 1 $loggedID}}
+                <form method="POST" action="">
+                  <input type="hidden" name="like" value="{{ .ID }}">
+                  <button type="submit" class="btn btn-success btn-sm mr-2">Like👍&nbsp;{{ .Likes }}</button>
+                </form>
+                &nbsp;&nbsp;
+                <form method="POST" action="">
+                  <input type="hidden" name="dislike" value="{{ .ID }}">
+                  <button type="submit" class="btn btn-danger btn-sm">Dislike👎&nbsp;{{ .Dislikes }}</button>
+                </form>
+                {{ end }}
+              </div>
+              <hr>
+            </td>
+          </tr>
+          {{ end }}
       {{ end }}
       <!-- posts end here -->
     </tbody>

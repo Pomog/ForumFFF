@@ -47,6 +47,10 @@ func routes(a *config.AppConfig) http.Handler {
 	mux.HandleFunc("/login-google", handler.Repo.LoginWithGoogleHandler)
 	mux.HandleFunc("/google-callback", handler.Repo.CallbackGoogleHandler)
 
+	mux.HandleFunc("/moder_panel", handler.Repo.ModerPanelHandler)
+
+
+
 	return mux
 }
 

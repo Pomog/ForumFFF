@@ -104,6 +104,9 @@ func processThreadInfo(m *Repository, thread models.Thread) (models.ThreadDataFo
 	info.Subject = thread.Subject
 	info.Created = thread.Created.Format("2006-01-02 15:04:05")
 	info.Category = thread.Category
+	info.Classification = thread.Classification
+	info.UserID = user.ID
+
 
 	info.PictureUserWhoCreatedThread = user.Picture
 	info.UserNameWhoCreatedThread = user.UserName
@@ -141,6 +144,7 @@ func prepareDataForTemplate(w http.ResponseWriter, r *http.Request, m *Repositor
 	data["threads"] = threadsInfo
 	data["loggedAs"] = loggedUser.UserName
 	data["loggedAsID"] = loggedUser.ID
+	data["loggedUserType"] = loggedUser.Type
 
 	return data, nil
 }
