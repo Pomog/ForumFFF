@@ -825,3 +825,43 @@ func (m *SqliteBDRepo) EditPostClassification(post models.Post, classification m
 	}
 	return nil
 }
+
+// CreatePM  insert post into SQLite DB
+func (m *SqliteBDRepo) CreatePM(pm models.PM) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `insert into pm
+	(content, senderUserID, receiverUserID)
+	values ($1, $2, $3)
+	`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		pm.Content,
+		pm.SenderUserID,
+		pm.ReceiverUserID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// DeletePM deletes pm
+func (m *SqliteBDRepo) DeletePM(pm models.PM) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `DELETE FROM pm
+	WHERE id = $1;
+	`
+	_, err := m.DB.ExecContext(ctx, stmt,
+		pm.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}

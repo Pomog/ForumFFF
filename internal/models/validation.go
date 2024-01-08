@@ -143,6 +143,29 @@ func (post *Post) Validate(config ValidationConfig) []error {
 	return validationErrors
 }
 
+func (pm *PM) ValidatePM(config ValidationConfig) []error {
+	var validationErrors []error
+
+	// Validate Content
+	if err := ValidateRequired("Content", pm.Content); err != nil {
+		validationErrors = append(validationErrors, err)
+	} else {
+		if err := ValidateLength("Content", pm.Content, config.MinSubjectLen, config.MaxSubjectLen); err != nil {
+			validationErrors = append(validationErrors, err)
+		} else {
+			if !forms.CheckSingleWordLen(pm.Content, config.SingleWordMaxLen) {
+				err := fmt.Errorf("the Content without spaces is not allowed, max len of each word (without spaces) is %d", config.SingleWordMaxLen)
+				validationErrors = append(validationErrors, err)
+			}
+		}
+	}
+
+	// Add more validation logic for other fields
+
+	return validationErrors
+}
+
+
 // ValidateRequired checks if the field is required and not empty.
 func ValidateRequired(fieldName string, fieldValue string) error {
 	if fieldValue == "" {
