@@ -49,6 +49,8 @@ func routes(a *config.AppConfig) http.Handler {
 
 	mux.HandleFunc("/moder_panel", handler.Repo.ModerPanelHandler)
 
+	mux.HandleFunc("/send-pm", handler.Repo.SendPMHandler)
+
 
 
 	return mux

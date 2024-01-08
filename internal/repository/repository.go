@@ -36,4 +36,6 @@ type DatabaseInt interface {
 	EditTopicClassification(topic models.Thread, classification models.TextClassification) error
 	GetAllPostsByClassification(classification models.TextClassification) ([]models.Post, error)
 	GetAllThreadsByClassification(classification models.TextClassification) ([]models.Thread, error)
+	CreatePM(pm models.PM) error
+	DeletePM(pm models.PM) error
 }

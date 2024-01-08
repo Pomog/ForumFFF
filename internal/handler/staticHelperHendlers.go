@@ -1,11 +1,14 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/Pomog/ForumFFF/internal/config"
+	"github.com/Pomog/ForumFFF/internal/helper"
 	"github.com/Pomog/ForumFFF/internal/models"
 	"github.com/Pomog/ForumFFF/internal/renderer"
 	"github.com/Pomog/ForumFFF/internal/repository"
@@ -326,6 +329,60 @@ func (m *Repository) GetAllLikedPostsByUserIDHandler(w http.ResponseWriter, r *h
 		renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
 			Data: data,
 		})
+	}
+}
+
+// SendPMHandler hanles sending of personal message.
+func (m *Repository) SendPMHandler(w http.ResponseWriter, r *http.Request) {
+	senderID := m.GetLoggedUser(w, r)
+	if senderID == 0 {
+		setErrorAndRedirect(w, r, "unautorized", "/error-page")
+		return
+	}
+
+	if r.Method == http.MethodPost {
+		receiverID, _ := strconv.Atoi(r.FormValue("receiverID"))
+		content := r.FormValue("pm-text")
+
+		content = strings.TrimSpace(content)
+		content = helper.CorrectPunctuationsSpaces(content)
+
+		// Validation of privat message
+		validationParameters := models.ValidationConfig{
+			MinSubjectLen:    m.App.MinSubjectLen,
+			MaxSubjectLen:    m.App.MaxSubjectLen,
+			SingleWordMaxLen: len(m.App.LongestSingleWord),
+		}
+
+		if senderID == 1 || receiverID == 1 || senderID == receiverID {
+			setErrorAndRedirect(w, r, "Wrong receiver!", "/error-page")
+			return
+		}
+		p_message := models.PM{
+			Content:        content,
+			SenderUserID:   senderID,
+			ReceiverUserID: receiverID,
+		}
+
+		validationsErrors := p_message.ValidatePM(validationParameters)
+		if len(validationsErrors) > 0 {
+			// prepare error msg
+			var errorMsg string
+			for _, err := range validationsErrors {
+				errorMsg += err.Error() + "\n"
+			}
+			setErrorAndRedirect(w, r, errorMsg, "/error-page")
+			return
+		}
+
+		err := m.DB.CreatePM(p_message)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not created a PM "+err.Error(), "/error-page")
+			return
+		}
+		http.Redirect(w, r, fmt.Sprintf("/personal_cabinet?userID=%v", receiverID), http.StatusSeeOther)
+	} else {
+		http.Error(w, "No such method", http.StatusMethodNotAllowed)
 	}
 }
 
