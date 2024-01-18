@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -38,9 +39,13 @@ func handlePostRequestModerPage(w http.ResponseWriter, r *http.Request, m *Repos
 		return
 	}
 
-	selectedCategory := r.FormValue("btnradio")
+	topicID := r.FormValue("topicID")
+	selectedCategory := r.FormValue("btnradio" + topicID)
 
 	if r.FormValue("postID") != "" {
+		postIDF := r.FormValue("postID")
+		selectedCategory := r.FormValue("btnradio" + postIDF)
+
 		postID, err := strconv.Atoi(r.FormValue("postID"))
 		if err != nil {
 			setErrorAndRedirect(w, r, "Could not convert string into int "+err.Error(), "/error-page")
@@ -72,6 +77,7 @@ func handlePostRequestModerPage(w http.ResponseWriter, r *http.Request, m *Repos
 			return
 		}
 		cat := models.TextClassification(selectedCategory)
+		fmt.Println("selectedCategory", cat)
 
 		err = m.DB.EditTopicClassification(topic, cat)
 		if err != nil {
