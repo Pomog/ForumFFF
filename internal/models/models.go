@@ -86,3 +86,11 @@ var Classifications = []TextClassification{"irrelevant",
 	"unsorted",
 	"approved",
 }
+
+type PM struct {
+	ID             int
+	Content        string
+	Created        time.Time
+	SenderUserID   int
+	ReceiverUserID int
+}

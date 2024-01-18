@@ -51,6 +51,16 @@ var sessionIdTable = `CREATE TABLE IF NOT EXISTS sessionId (
     FOREIGN KEY (userID) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );`
 
+var privateMessageTable = `CREATE TABLE IF NOT EXISTS pm (
+    id INTEGER PRIMARY KEY,
+    content TEXT,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    senderUserID INTEGER,
+    receiverUserID INTEGER,
+    FOREIGN KEY (senderUserID) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (receiverUserID) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+);`
+
 var guestUser = `INSERT INTO users (username, password, first_name, last_name, email, type)
 VALUES ('guest', '123456', 'Guest', 'User', 'guest@gmail.com', 'guest');`
 
@@ -70,6 +80,7 @@ func getQuerys() []string {
 	sqlQuerys = append(sqlQuerys, postTable)
 	sqlQuerys = append(sqlQuerys, votesTable)
 	sqlQuerys = append(sqlQuerys, sessionIdTable)
+	sqlQuerys = append(sqlQuerys, privateMessageTable)
 
 	sqlQuerys = append(sqlQuerys, addClassificationToPost)
 	sqlQuerys = append(sqlQuerys, addClassificationToThread)
