@@ -101,6 +101,7 @@
       {{$postinfo := index .Data "posts"}}
       {{ range $postinfo }}
       {{$postCreatorID := .UserIDWhoCreatedPost}}
+
       {{ if or (eq $postCreatorID $loggedID) (eq .Classification "approved") }}
 
           <tr>

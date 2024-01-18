@@ -51,8 +51,6 @@ func routes(a *config.AppConfig) http.Handler {
 
 	mux.HandleFunc("/send-pm", handler.Repo.SendPMHandler)
 
-
-
 	return mux
 }
 
