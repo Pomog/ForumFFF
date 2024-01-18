@@ -208,8 +208,8 @@ func createPostFromRequest(m *Repository, w http.ResponseWriter, r *http.Request
 		return post, errors.New(errorMsg)
 	}
 
-	AttachFile(m, w, r, &post, nil)
-	return post, nil
+	err:= AttachFile(m, w, r, &post, nil)
+	return post, err
 }
 
 // getPostsInfo retrieves information for rendering posts.
