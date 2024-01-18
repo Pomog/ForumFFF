@@ -208,8 +208,8 @@ func createPostFromRequest(m *Repository, w http.ResponseWriter, r *http.Request
 		return post, errors.New(errorMsg)
 	}
 
-	AttachFile(m, w, r, &post, nil)
-	return post, nil
+	err:= AttachFile(m, w, r, &post, nil)
+	return post, err
 }
 
 // getPostsInfo retrieves information for rendering posts.
@@ -301,7 +301,7 @@ func prepareDataForThemePage(m *Repository, w http.ResponseWriter, r *http.Reque
 }
 
 // AttachFile attaches a file to a post or thread.
-func AttachFile(m *Repository, w http.ResponseWriter, r *http.Request, post *models.Post, thread *models.Thread) {
+func AttachFile(m *Repository, w http.ResponseWriter, r *http.Request, post *models.Post, thread *models.Thread) error {
 	// ADD IMAGE TO STATIC_________________________
 	// Get the file from the form data
 	file, handler, errFileGet := r.FormFile("image")
@@ -310,31 +310,27 @@ func AttachFile(m *Repository, w http.ResponseWriter, r *http.Request, post *mod
 
 		// Validate file size (2 MB limit)
 		if handler.Size > m.App.FileSize<<20 {
-			setErrorAndRedirect(w, r, "File size should be below 2 MB", "/error-page")
-			return
+			return errors.New("file size should be below 2 MB")  
 		}
 
 		// Validate file type (must be an image)
 		contentType := handler.Header.Get("Content-Type")
 		if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
-			setErrorAndRedirect(w, r, "Wrong File Formate, allowed jpeg, png, gif ", "/error-page")
-			return
+			return errors.New("wrong File Formate, allowed jpeg, png, gif")  
 		}
 
 		// Create a new file in the "static/post_images" directory
 		newFilePath := filepath.Join("static/post_images", handler.Filename)
 		newFile, errFileCreate := os.Create(newFilePath)
 		if errFileCreate != nil {
-			setErrorAndRedirect(w, r, fileCreatingErrorMsg, "/error-page")
-			return
+			return errors.New(fileCreatingErrorMsg)  
 		}
 		defer newFile.Close()
 
 		// Copy the uploaded file to the new file
 		_, err := io.Copy(newFile, file)
 		if err != nil {
-			setErrorAndRedirect(w, r, fileSavingErrorMsg, "/error-page")
-			return
+			return errors.New(fileSavingErrorMsg)  
 		}
 		if post != nil {
 			post.Image = path.Join("/", newFilePath)
@@ -343,5 +339,5 @@ func AttachFile(m *Repository, w http.ResponseWriter, r *http.Request, post *mod
 		}
 
 	}
-	//_______________________________________
+	return nil
 }

@@ -43,42 +43,41 @@
 
         {{if $posts}}
         <div>
-            <tbody class="containerBody">
-            {{ range $posts }}
-                {{$postsCategory := .Classification}}
-                {{$postID := .ID}}
-                <tr>
-                    <td>
-                        <br>Created by user with ID: {{ .UserID}}
-                        <br>Topic created: {{convertTime . }}
-                        <br>Category: {{ .Classification}}
-                        <br><em>{{ .Subject }} </em>
-                        <br><strong>{{ .Content }} </strong>
-                    </td>
-                <tbody class="containerBody">
-                    <tr>
-                        <td>
-                            <form method="post" action="">
-                                {{range $index, $category := $categories}}
-                                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                                    <input type="radio" class="btn-check" name="btnradio" id="btnradio{{$index}}"
-                                        autocomplete="off" value="{{$category}}" {{ if eq $category $postsCategory }}
-                                        checked {{end}}>
-                                    <label class="btn btn-outline-primary" for="btnradio{{$index}}"> {{$category}} </label>
-                                    <input type="hidden" name="postID" value="{{ $postID }}">
-                                </div>
-                                {{end}}
-                                <input type="submit" value="Submit">
-                            </form>
+<tbody class="containerBody">
+    {{ range $posts }}
+        {{$postsCategory := .Classification}}
+        {{$postID := .ID}}
+        <tr>
+            <td>
+                <br>Created by user with ID: {{ .UserID}}
+                <br>Topic created: {{convertTime . }}
+                <br>Category: {{ .Classification}}
+                <br><em>{{ .Subject }} </em>
+                <br><strong>{{ .Content }} </strong>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <form method="post" action="">
+                    {{range $index, $category := $categories}}
+                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                        <input type="radio" class="btn-check" name="btnradio{{$postID}}" id="btnradio{{$postID}}{{$index}}"
+                            autocomplete="off" value="{{$category}}" {{ if eq $category $postsCategory }}
+                            checked {{end}}>
+                        <label class="btn btn-outline-primary" for="btnradio{{$postID}}{{$index}}"> {{$category}} </label>
+                    </div>
+                    {{end}}
+                    <input type="hidden" name="postID" value="{{ $postID }}">
+                    <input type="submit" value="Submit">
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td><hr></td>
+        </tr>
+    {{ end }}
+</tbody>
 
-                        </td>
-                    </tr>
-
-                </tbody>
-                <hr>
-                </tr>
-                {{ end }}
-            </tbody>
 
        {{ end }}
 
@@ -104,10 +103,10 @@
                         <form method="post" action="">
                             {{range $index, $category := $categories}}
                             <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                                <input type="radio" class="btn-check" name="btnradio" id="btnradio{{$index}}"
+                                <input type="radio" class="btn-check" name="btnradio{{$topicID}}" id="btnradio{{$topicID}}{{$index}}"
                                     autocomplete="off" value="{{$category}}" {{ if eq $category $topicCategory }}
                                     checked {{end}}>
-                                <label class="btn btn-outline-primary" for="btnradio{{$index}}"> {{$category}} </label>
+                                <label class="btn btn-outline-primary" for="btnradio{{$topicID}}{{$index}}"> {{$category}} </label>
                                 <input type="hidden" name="topicID" value="{{ $topicID }}">
                             </div>
                             {{end}}

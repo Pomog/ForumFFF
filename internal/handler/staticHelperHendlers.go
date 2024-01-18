@@ -26,12 +26,12 @@ type Repository struct {
 }
 
 const (
-	dbErrorUserPresent    = "DB Error func UserPresent"
-	userAlreadyExistsMsg  = "User Already Exists"
-	dbErrorCreateUser     = "DB Error func CreateUser"
+	dbErrorUserPresent    = "db Error func UserPresent"
+	userAlreadyExistsMsg  = "user Already Exists"
+	dbErrorCreateUser     = "bd Error func CreateUser"
 	fileReceivingErrorMsg = "file receiving error"
-	fileCreatingErrorMsg  = "Unable to create file"
-	fileSavingErrorMsg    = "Unable to save file"
+	fileCreatingErrorMsg  = "unable to create file"
+	fileSavingErrorMsg    = "unable to save file"
 	guestRestiction       = "guests can not create Themes and Posts, Like or Dislike posts, please log in or register"
 )
 

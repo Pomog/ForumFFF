@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -25,7 +26,11 @@ func (m *Repository) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		handleGetRequest(w, r, m, sessionUserID)
 
 	} else if r.Method == http.MethodPost {
-		handlePostRequest(w, r, m, sessionUserID)
+		err := handlePostRequest(w, r, m, sessionUserID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not create Post"+err.Error(), "/error-page")
+			return
+		}
 	}
 }
 
@@ -107,7 +112,6 @@ func processThreadInfo(m *Repository, thread models.Thread) (models.ThreadDataFo
 	info.Classification = thread.Classification
 	info.UserID = user.ID
 
-
 	info.PictureUserWhoCreatedThread = user.Picture
 	info.UserNameWhoCreatedThread = user.UserName
 	posts, err := m.DB.GetAllPostsFromThread(thread.ID)
@@ -150,20 +154,21 @@ func prepareDataForTemplate(w http.ResponseWriter, r *http.Request, m *Repositor
 }
 
 // handlePostRequest handles POST requests for creating new threads.
-func handlePostRequest(w http.ResponseWriter, r *http.Request, m *Repository, sessionUserID int) {
+func handlePostRequest(w http.ResponseWriter, r *http.Request, m *Repository, sessionUserID int) error {
 	loggedUser, err := m.DB.GetUserByID(sessionUserID)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not get user by ID: m.DB.GetUserByID(sessionUserID)", "/error-page")
-		return
+		return err
 	}
 
 	userName := loggedUser.UserName
 	if userName == "guest" || strings.TrimSpace(userName) == "" {
-		setErrorAndRedirect(w, r, guestRestiction, "/error-page")
-		return
+		return errors.New("guestRestiction")
 	}
 
-	thread := createThreadFromRequest(m, w, r, sessionUserID)
+	thread, err := createThreadFromRequest(m, w, r, sessionUserID)
+	if err != nil {
+		return err
+	}
 	thread.Category = strings.TrimSpace(helper.CorrectPunctuationsSpaces(thread.Category))
 	thread.Subject = strings.TrimSpace(helper.CorrectPunctuationsSpaces(thread.Subject))
 
@@ -183,28 +188,27 @@ func handlePostRequest(w http.ResponseWriter, r *http.Request, m *Repository, se
 		for _, err := range validationsErrors {
 			errorMsg += err.Error() + "\n"
 		}
-		setErrorAndRedirect(w, r, errorMsg, "/error-page")
-		return
+		return err
 	}
 
 	id, err := m.DB.CreateThread(thread)
 	if err != nil {
-		setErrorAndRedirect(w, r, "Could not create thread: m.DB.CreateThread(thread)"+err.Error(), "/error-page")
-		return
+		return err
 	}
 
 	http.Redirect(w, r, fmt.Sprintf("/theme?threadID=%d", id), http.StatusSeeOther)
+	return nil
 }
 
 // createThreadFromRequest creates a thread from the HTTP request.
-func createThreadFromRequest(m *Repository, w http.ResponseWriter, r *http.Request, sessionUserID int) models.Thread {
+func createThreadFromRequest(m *Repository, w http.ResponseWriter, r *http.Request, sessionUserID int) (models.Thread, error) {
 	thread := models.Thread{
 		Subject:  r.FormValue("message-text"),
 		Category: r.FormValue("category-text"),
 		UserID:   sessionUserID,
 	}
-	AttachFile(m, w, r, nil, &thread)
-	return thread
+	err := AttachFile(m, w, r, nil, &thread)
+	return thread, err
 }
 
 func getUserThatCreatedLastPost(posts []models.Post) int {
