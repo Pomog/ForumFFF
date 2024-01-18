@@ -114,10 +114,18 @@ func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Reques
 		personalInfo.UserName = user.UserName
 		personalInfo.Type = user.Type //will show type of user in personal cabinet
 		totalPosts, _ := m.DB.GetTotalPostsAmmountByUserID(personalInfo.ID)
+
+		receivedPMS, err := m.DB.GetPMbyReceiverUserID(sessionUserID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get received PMS"+err.Error(), "/error-page")
+			return
+		}
+
 		data := make(map[string]interface{})
 		data["personal"] = personalInfo
 		data["totalPosts"] = totalPosts
 		data["loggedAsID"] = sessionUserID
+		data["receivedPMS"] = receivedPMS
 
 		renderer.RendererTemplate(w, "personal.page.html", &models.TemplateData{
 			Data: data,
@@ -219,7 +227,7 @@ func (m *Repository) GetAllPostsForUserHandler(w http.ResponseWriter, r *http.Re
 		setErrorAndRedirect(w, r, "unautorized", "/error-page")
 		return
 	}
-	
+
 	if r.Method == http.MethodGet {
 		userID, _ := strconv.Atoi(r.URL.Query().Get("userID"))
 		user, errUser := m.DB.GetUserByID(userID)

@@ -38,4 +38,6 @@ type DatabaseInt interface {
 	GetAllThreadsByClassification(classification models.TextClassification) ([]models.Thread, error)
 	CreatePM(pm models.PM) error
 	DeletePM(pm models.PM) error
+	GetPMbyReceiverUserID(userID int) ([]models.PM, error)
+	GetPMbysenderUserID(userID int) ([]models.PM, error)
 }
