@@ -71,6 +71,9 @@
         <th>
           <div id="mainTheme">
             <h3>Topic:</h3>
+            <p>
+            {{index .Data "mainThreadCategory"}}
+            </p>
             <hr>
             {{$threadImage := index .Data "threadImg"}}
             {{ if $threadImage  }}
@@ -101,6 +104,7 @@
       {{$postinfo := index .Data "posts"}}
       {{ range $postinfo }}
       {{$postCreatorID := .UserIDWhoCreatedPost}}
+
       {{ if or (eq $postCreatorID $loggedID) (eq .Classification "approved") }}
 
           <tr>

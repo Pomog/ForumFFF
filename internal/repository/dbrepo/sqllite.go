@@ -865,3 +865,63 @@ func (m *SqliteBDRepo) DeletePM(pm models.PM) error {
 	}
 	return nil
 }
+
+// GetPMbyReceiverUserID insert post into SQLite DB
+func (m *SqliteBDRepo) GetPMbyReceiverUserID(userID int) ([]models.PM, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select * from pm
+	where receiverUserID = $1
+	`
+
+	rows, err := m.DB.QueryContext(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var pms []models.PM
+
+	for rows.Next() {
+		var pm models.PM
+		err := rows.Scan(&pm.ID, &pm.Content, &pm.Created, &pm.SenderUserID, &pm.ReceiverUserID)
+		if err != nil {
+			return nil, err
+		}
+		pms = append(pms, pm)
+	}
+
+	return pms, nil
+}
+
+// GetPMbysenderUserID insert post into SQLite DB
+func (m *SqliteBDRepo) GetPMbysenderUserID(userID int) ([]models.PM, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select * from pm
+	where senderUserID = $1
+	`
+
+	rows, err := m.DB.QueryContext(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var pms []models.PM
+
+	for rows.Next() {
+		var pm models.PM
+		err := rows.Scan(&pm.ID, &pm.Content, &pm.Created, &pm.SenderUserID, &pm.ReceiverUserID)
+		if err != nil {
+			return nil, err
+		}
+		pms = append(pms, pm)
+	}
+
+	return pms, nil
+}
+
+

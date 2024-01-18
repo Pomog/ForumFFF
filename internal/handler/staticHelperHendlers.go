@@ -114,10 +114,18 @@ func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Reques
 		personalInfo.UserName = user.UserName
 		personalInfo.Type = user.Type //will show type of user in personal cabinet
 		totalPosts, _ := m.DB.GetTotalPostsAmmountByUserID(personalInfo.ID)
+
+		receivedPMS, err := m.DB.GetPMbyReceiverUserID(sessionUserID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get received PMS"+err.Error(), "/error-page")
+			return
+		}
+
 		data := make(map[string]interface{})
 		data["personal"] = personalInfo
 		data["totalPosts"] = totalPosts
 		data["loggedAsID"] = sessionUserID
+		data["receivedPMS"] = receivedPMS
 
 		renderer.RendererTemplate(w, "personal.page.html", &models.TemplateData{
 			Data: data,
@@ -130,6 +138,11 @@ func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Reques
 
 // GetAllThreadsForUserHandler gets all threads from user (user id)
 func (m *Repository) GetAllThreadsForUserHandler(w http.ResponseWriter, r *http.Request) {
+	sessionUserID := m.GetLoggedUser(w, r)
+	if sessionUserID == 0 {
+		setErrorAndRedirect(w, r, "unautorized", "/error-page")
+		return
+	}
 	if r.Method == http.MethodGet {
 		userID, _ := strconv.Atoi(r.URL.Query().Get("userID"))
 		user, errUser := m.DB.GetUserByID(userID)
@@ -163,6 +176,7 @@ func (m *Repository) GetAllThreadsForUserHandler(w http.ResponseWriter, r *http.
 			info.Subject = thread.Subject
 			info.Created = thread.Created.Format("2006-01-02 15:04:05")
 			info.Category = thread.Category
+			info.UserID = thread.UserID
 
 			info.PictureUserWhoCreatedThread = user.Picture
 			info.UserNameWhoCreatedThread = user.UserName
@@ -195,6 +209,7 @@ func (m *Repository) GetAllThreadsForUserHandler(w http.ResponseWriter, r *http.
 
 		data["games"] = m.App.GamesList
 		data["threads"] = threadsInfo
+		data["loggedAsID"] = sessionUserID
 
 		renderer.RendererTemplate(w, "home.page.html", &models.TemplateData{
 			Data: data,
@@ -207,6 +222,12 @@ func (m *Repository) GetAllThreadsForUserHandler(w http.ResponseWriter, r *http.
 
 // GetAllPostsForUserHandler gets all posts from user (user id)
 func (m *Repository) GetAllPostsForUserHandler(w http.ResponseWriter, r *http.Request) {
+	sessionUserID := m.GetLoggedUser(w, r)
+	if sessionUserID == 0 {
+		setErrorAndRedirect(w, r, "unautorized", "/error-page")
+		return
+	}
+
 	if r.Method == http.MethodGet {
 		userID, _ := strconv.Atoi(r.URL.Query().Get("userID"))
 		user, errUser := m.DB.GetUserByID(userID)
@@ -262,6 +283,7 @@ func (m *Repository) GetAllPostsForUserHandler(w http.ResponseWriter, r *http.Re
 
 		data["posts"] = postsInfo
 		data["games"] = m.App.GamesList
+		data["loggedAsID"] = sessionUserID
 
 		renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
 			Data: data,
@@ -270,6 +292,12 @@ func (m *Repository) GetAllPostsForUserHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (m *Repository) GetAllLikedPostsByUserIDHandler(w http.ResponseWriter, r *http.Request) {
+	sessionUserID := m.GetLoggedUser(w, r)
+	if sessionUserID == 0 {
+		setErrorAndRedirect(w, r, "unautorized", "/error-page")
+		return
+	}
+
 	if r.Method == http.MethodGet {
 		userID, _ := strconv.Atoi(r.URL.Query().Get("userID"))
 		user, errUser := m.DB.GetUserByID(userID)
@@ -325,6 +353,7 @@ func (m *Repository) GetAllLikedPostsByUserIDHandler(w http.ResponseWriter, r *h
 
 		data["posts"] = postsInfo
 		data["games"] = m.App.GamesList
+		data["loggedAsID"] = sessionUserID
 
 		renderer.RendererTemplate(w, "theme.page.html", &models.TemplateData{
 			Data: data,

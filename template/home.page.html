@@ -58,6 +58,7 @@
             {{$threadinfo := index .Data "threads"}}
             
             {{ range $threadinfo }}
+              
             {{ if or (eq .UserID $loggedID) (eq .Classification "approved") }}
               <tr>
                   <td>

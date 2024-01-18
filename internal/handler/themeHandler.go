@@ -292,6 +292,7 @@ func prepareDataForThemePage(m *Repository, w http.ResponseWriter, r *http.Reque
 	data["creatorPostsAmount"] = creatorPostsAmount
 	data["creatorImg"] = creator.Picture
 	data["mainThreadName"] = mainThread.Subject
+	data["mainThreadCategory"] = mainThread.Category
 	data["mainThreadID"] = mainThread.ID
 	data["mainThreadCreatedTime"] = mainThread.Created.Format("2006-01-02 15:04:05")
 	data["games"] = m.App.GamesList
