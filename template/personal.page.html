@@ -118,6 +118,33 @@
                 {{end}}
             </tbody>
         </table>
+        <div>
+            {{if and (eq $loggedID $person.ID) (ne $loggedID 1)}}
+            <table class="table-borderless forumTable whiteLink mt-3">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Message</th>
+                        <th scope="col">Remitent</th>
+                        <th scope="col">Receiver</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{$sortedPM := index .Data "sortedPMs"}}
+                    {{range $sortedPM}}
+                    <tr>
+                        {{$convertedTime := convertTimePM . }}
+                        <th scope="row"><hr>{{$convertedTime}}</th>
+                        <td><hr>{{.Content}}</td>
+                        <td><hr>{{.SenderName}}</td>
+                        <td><hr>{{.ReceiverName}}</td>
+                    </tr>
+
+                    {{end}}
+                </tbody>
+            </table>
+            {{end}}
+        </div>
     </div>
 </div>
 </div>

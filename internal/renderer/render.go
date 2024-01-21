@@ -40,6 +40,9 @@ var functions = template.FuncMap{
 	"convertTimeTopic": func(topic models.Thread) string {
 		return topic.Created.Format("2006-01-02 15:04:05")
 	},
+	"convertTimePM": func(pm models.PM) string {
+		return pm.Created.Format("2006-01-02 15:04:05")
+	},
 	"shortenPost": func(allPosts []models.Post) string {
 		var latestPost2 models.Post
 		latestPost2.Created, _ = time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
