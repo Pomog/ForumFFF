@@ -135,11 +135,19 @@ func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
+		loggedUser, err := m.DB.GetUserByID(sessionUserID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get User"+err.Error(), "/error-page")
+			return
+		}
+
 		data := make(map[string]interface{})
 		data["personal"] = personalInfo
 		data["totalPosts"] = totalPosts
 		data["loggedAsID"] = sessionUserID
 		data["sortedPMs"] = sortedPMsWithNames
+		data["loggedAs"] = loggedUser.UserName
+		data["loggedUserType"] = loggedUser.Type
 
 		renderer.RendererTemplate(w, "personal.page.html", &models.TemplateData{
 			Data: data,
