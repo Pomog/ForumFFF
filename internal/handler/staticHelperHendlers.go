@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -121,11 +122,24 @@ func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
+		sendedPMS, err := m.DB.GetPMbysenderUserID(userID)
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get sended PMS"+err.Error(), "/error-page")
+			return
+		}
+		var sortedPMs = sortingPMsByDate(append(receivedPMS, sendedPMS...))
+		sortedPMsWithNames, err := AddNamesToPMs(sortedPMs, m)
+
+		if err != nil {
+			setErrorAndRedirect(w, r, "Could not get names for PMS"+err.Error(), "/error-page")
+			return
+		}
+
 		data := make(map[string]interface{})
 		data["personal"] = personalInfo
 		data["totalPosts"] = totalPosts
 		data["loggedAsID"] = sessionUserID
-		data["receivedPMS"] = receivedPMS
+		data["sortedPMs"] = sortedPMsWithNames
 
 		renderer.RendererTemplate(w, "personal.page.html", &models.TemplateData{
 			Data: data,
@@ -134,6 +148,32 @@ func (m *Repository) PersonaCabinetHandler(w http.ResponseWriter, r *http.Reques
 	} else {
 		http.Error(w, "No such method", http.StatusMethodNotAllowed)
 	}
+}
+
+func AddNamesToPMs(pms []models.PM, m *Repository) ([]models.PM, error) {
+
+	for i, pm := range pms {
+		sender, err := m.DB.GetUserByID(pm.SenderUserID)
+		if err != nil {
+			return pms, err
+		}
+		receiver, err := m.DB.GetUserByID(pm.ReceiverUserID)
+		if err != nil {
+			return pms, err
+		}
+		pms[i].SenderName = sender.UserName
+		pms[i].ReceiverName = receiver.UserName
+	}
+	return pms, nil
+}
+
+func sortingPMsByDate(pms []models.PM) []models.PM {
+
+	// Define the custom sorting function
+	sort.Slice(pms, func(i, j int) bool {
+		return pms[i].Created.Before(pms[j].Created)
+	})
+	return pms
 }
 
 // GetAllThreadsForUserHandler gets all threads from user (user id)

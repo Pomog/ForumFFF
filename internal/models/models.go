@@ -93,4 +93,6 @@ type PM struct {
 	Created        time.Time
 	SenderUserID   int
 	ReceiverUserID int
+	SenderName     string
+	ReceiverName   string
 }
