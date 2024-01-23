@@ -120,6 +120,13 @@
         </table>
         <div>
             {{if and (eq $loggedID $person.ID) (ne $loggedID 1)}}
+            <div>
+                <button type="button" class="btn btn-primary" id="allMessages">All</button>
+                <button type="button" class="btn btn-secondary" id="sentMessages">Sent</button>
+                <button type="button" class="btn btn-light" id="receivedMessages">Received</button>
+                <button type="button" class="btn btn-info" id="systemMessages">System</button>
+            </div>
+            
             <table class="table-borderless forumTable whiteLink mt-3">
                 <thead>
                     <tr>
@@ -132,12 +139,14 @@
                 <tbody>
                     {{$sortedPM := index .Data "sortedPMs"}}
                     {{range $sortedPM}}
-                    <tr>
+                    <tr name="messageRow" id="{{.SenderUserID}} {{$loggedID}}" {{if eq .SenderUserID $loggedID}}
+                        style="background-color: #242132 ;" {{else}} style="background-color: #37324d ;" {{end}}>
+
                         {{$convertedTime := convertTimePM . }}
-                        <th scope="row"><hr>{{$convertedTime}}</th>
-                        <td><hr>{{.Content}}</td>
-                        <td><hr>{{.SenderName}}</td>
-                        <td><hr>{{.ReceiverName}}</td>
+                        <th scope="row">{{$convertedTime}}</th>
+                        <td>{{.Content}}</td>
+                        <td>{{.SenderName}}</td>
+                        <td>{{.ReceiverName}}</td>
                     </tr>
 
                     {{end}}
@@ -148,4 +157,79 @@
     </div>
 </div>
 </div>
+<script>
+
+    var removedRows = [];
+    
+    let sentMessagesNode = document.getElementById("sentMessages")
+    let receivedMessagesNode = document.getElementById("receivedMessages")
+    let systemMessagesNode = document.getElementById("systemMessages")
+    let allMessagesNode = document.getElementById("allMessages")
+
+    receivedMessagesNode.addEventListener("click", showReceivedMessages)
+    sentMessagesNode.addEventListener("click", showSentMessages)
+    allMessagesNode.addEventListener("click", showAllMessages)
+    
+    function showReceivedMessages(){
+        let messageRowNode = document.getElementsByName("messageRow");
+
+        for (let message of messageRowNode){
+
+            for (let delRow of removedRows){
+                message.parentNode.appendChild(delRow)
+            }
+
+            // Get the value of the name attribute
+            var nameAttributeValue = message.getAttribute("id");
+
+            // Split the value into individual parts
+            var values = nameAttributeValue.split(" ");
+
+            // Compare the values
+            var senderUserID = values[0];
+            var loggedID = values[1];
+
+            if (senderUserID != loggedID) {
+                removedRows.push(message)
+                message.parentNode.removeChild(message);
+            }
+        }
+    }
+
+    function showSentMessages() {
+            let messageRowNode = document.getElementsByName("messageRow");
+
+            for (let message of messageRowNode) {
+                
+                for (let delRow of removedRows) {
+                    message.parentNode.appendChild(delRow)
+                }
+
+                // Get the value of the name attribute
+                var nameAttributeValue = message.getAttribute("id");
+
+                // Split the value into individual parts
+                var values = nameAttributeValue.split(" ");
+
+                // Compare the values
+                var senderUserID = values[0];
+                var loggedID = values[1];
+
+                if (senderUserID == loggedID) {
+                    removedRows.push(message)
+                    message.parentNode.removeChild(message);
+                }
+            }
+        }
+
+            function showAllMessages() {
+                    let messageRowNode = document.getElementsByName("messageRow");
+                    for (let message of messageRowNode) {
+                        for (let delRow of removedRows) {
+                            message.parentNode.appendChild(delRow)
+                        }
+                    }
+            }
+
+</script>
 {{end}}
