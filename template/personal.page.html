@@ -159,12 +159,14 @@
 </div>
 <script>
 
-    var removedRows = [];
+    var RowsSent = [];
+    var RowsReceived = [];
     
     let sentMessagesNode = document.getElementById("sentMessages")
     let receivedMessagesNode = document.getElementById("receivedMessages")
     let systemMessagesNode = document.getElementById("systemMessages")
     let allMessagesNode = document.getElementById("allMessages")
+    
 
     receivedMessagesNode.addEventListener("click", showReceivedMessages)
     sentMessagesNode.addEventListener("click", showSentMessages)
@@ -175,7 +177,7 @@
 
         for (let message of messageRowNode){
 
-            for (let delRow of removedRows){
+            for (let delRow of RowsSent) {
                 message.parentNode.appendChild(delRow)
             }
 
@@ -189,43 +191,54 @@
             var senderUserID = values[0];
             var loggedID = values[1];
 
-            if (senderUserID != loggedID) {
-                removedRows.push(message)
-                message.parentNode.removeChild(message);
+            if (senderUserID == loggedID) {
+                RowsReceived.push(message)
             }
+        }
+
+        // Here, you might want to remove the messages that meet the condition
+        for (let removedMessage of RowsReceived) {
+            removedMessage.parentNode.removeChild(removedMessage);
         }
     }
 
     function showSentMessages() {
-            let messageRowNode = document.getElementsByName("messageRow");
+        let messageRowNodes = document.getElementsByName("messageRow");
 
-            for (let message of messageRowNode) {
-                
-                for (let delRow of removedRows) {
-                    message.parentNode.appendChild(delRow)
-                }
+        for (let message of messageRowNodes) {
 
-                // Get the value of the name attribute
-                var nameAttributeValue = message.getAttribute("id");
+            for (let delRow of RowsReceived) {
+                message.parentNode.appendChild(delRow)
+            }
+            
+            // Get the value of the id attribute
+            var idAttributeValue = message.getAttribute("id");
 
-                // Split the value into individual parts
-                var values = nameAttributeValue.split(" ");
+            // Split the value into individual parts
+            var values = idAttributeValue.split(" ");
 
-                // Compare the values
-                var senderUserID = values[0];
-                var loggedID = values[1];
+            // Compare the values
+            var senderUserID = values[0];
+            var loggedID = values[1];
 
-                if (senderUserID == loggedID) {
-                    removedRows.push(message)
-                    message.parentNode.removeChild(message);
-                }
+            if (senderUserID != loggedID) {
+                RowsSent.push(message);
             }
         }
+
+        // Here, you might want to remove the messages that meet the condition
+        for (let removedMessage of RowsSent) {
+            removedMessage.parentNode.removeChild(removedMessage);
+        }
+    }
 
             function showAllMessages() {
                     let messageRowNode = document.getElementsByName("messageRow");
                     for (let message of messageRowNode) {
-                        for (let delRow of removedRows) {
+                        for (let delRow of RowsReceived) {
+                            message.parentNode.appendChild(delRow)
+                        }
+                        for (let delRow of RowsSent) {
                             message.parentNode.appendChild(delRow)
                         }
                     }
