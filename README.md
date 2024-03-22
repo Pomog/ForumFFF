@@ -1,4 +1,4 @@
-# FFForum
+6 8# FFForum
 Online forum for MMORPG fans and friends!
 ![Forum Home Page](static/readme_images/homePageScreen.png)
 
@@ -128,6 +128,8 @@ The session feature in this project is implemented using the `github.com/google/
 2. No Middleware.
 3. User's passwords are stored as strings in the Database.
 4. No pagination
+
+## ISSUES: HPPTS not implemented
 
 ## Authors
 - [Denys Verves](https://github.com/TartuDen)
