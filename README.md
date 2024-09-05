@@ -124,6 +124,10 @@ The session feature in this project is implemented using the `github.com/google/
 - Defined structs like `User`, `Thread`, `Post`, etc., represent data models used throughout the application.
 
 ## Unsolved Issues
+
+## CHECK
+
+
 1. Not optimized requests to the Database. Sometimes there are several requests per function or method.
 2. No Middleware.
 3. User's passwords are stored as strings in the Database.
